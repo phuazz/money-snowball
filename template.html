@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Money Snowball ❄️ — the magic of growing money</title>
+<meta name="description" content="A playful dashboard that teaches kids the power of compounding. Inspired by Adam Khoo. Made to teach my kids, and yours.">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* --- house tokens (design.md) --- */
+  --bg:#fafaf8; --bg2:#ffffff; --bg3:#f5f5f0; --bg4:#eeeee8; --bg-hover:#f0f0ea;
+  --bd:#e2e0d8; --bd2:#d5d3ca; --bd-strong:#c0beb5;
+  --t1:#1a1a18; --t2:#5c5c56; --t3:#8a8a82; --t4:#b0b0a8;
+  --g:#1a8754; --g2:#22a366; --g-bg:rgba(26,135,84,0.07); --g-bg2:rgba(26,135,84,0.14);
+  --r:#c0392b; --r2:#e74c3c; --r-bg:rgba(192,57,43,0.07); --r-bg2:rgba(192,57,43,0.14);
+  --b:#2563eb; --b2:#3b82f6; --b-bg:rgba(37,99,235,0.06); --b-bg2:rgba(37,99,235,0.12);
+  --a:#b45309; --a-bg:rgba(180,83,9,0.07);
+  --p:#7c3aed; --p-bg:rgba(124,58,237,0.06);
+  --c:#0891b2; --c-bg:rgba(8,145,178,0.06);
+  --pk:#be185d; --pk-bg:rgba(190,24,93,0.06);
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'DM Sans',-apple-system,sans-serif;
+  --mono:'JetBrains Mono','SF Mono','Menlo',monospace;
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.04);
+  --shadow:0 1px 3px rgba(0,0,0,0.06),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 6px rgba(0,0,0,0.05),0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:0 10px 15px rgba(0,0,0,0.06),0 4px 6px rgba(0,0,0,0.04);
+  --radius:8px; --radius-lg:12px;
+  /* --- kid layer: warmer, rounder, bigger --- */
+  --radius-kid:20px;
+  --sky:#eaf4ff; --sky2:#d6ebff;
+  --sun:#fbbf24; --sun-bg:rgba(251,191,36,0.14);
+  --joy:#7c3aed;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:
+    radial-gradient(1200px 500px at 50% -10%, var(--sky) 0%, rgba(234,244,255,0) 70%),
+    var(--bg);
+  color:var(--t1); font-family:var(--sans); font-size:17px; line-height:1.6;
+  -webkit-text-size-adjust:100%; -webkit-font-smoothing:antialiased;
+}
+.mono{font-family:var(--mono)}
+.shell{max-width:820px; margin:0 auto; padding:18px 18px 80px}
+
+/* ---------- masthead ---------- */
+.masthead{text-align:center; padding:14px 0 6px}
+.masthead h1{font-family:var(--serif); font-weight:400; font-size:clamp(38px,10vw,60px); line-height:1.02; letter-spacing:-1px; margin:0}
+.masthead h1 .flake{ -webkit-background-clip:text; background-clip:text; }
+.masthead .sub{font-family:var(--serif); font-style:italic; color:var(--t3); font-size:clamp(17px,4.5vw,22px); margin-top:4px}
+
+/* ---------- age toggle ---------- */
+.agebar{display:flex; justify-content:center; gap:10px; margin:16px 0 6px}
+.agebar .seg{display:inline-flex; background:var(--bg3); border:1px solid var(--bd); border-radius:999px; padding:4px; gap:4px}
+.agebar button{border:0; background:transparent; font-family:var(--sans); font-weight:700; font-size:15px; color:var(--t2); padding:9px 18px; border-radius:999px; cursor:pointer; min-height:44px}
+.agebar button.on{background:var(--bg2); color:var(--t1); box-shadow:var(--shadow-sm)}
+.agebar .hint{font-size:12px; color:var(--t3); text-align:center; margin-top:2px}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex; gap:6px; overflow-x:auto; padding:14px 2px 6px; scrollbar-width:none; -ms-overflow-style:none; scroll-snap-type:x proximity}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto; border:1px solid var(--bd); background:var(--bg2); color:var(--t2); border-radius:999px; padding:10px 15px; font-weight:600; font-size:14px; cursor:pointer; min-height:44px; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; scroll-snap-align:start; transition:transform .08s ease}
+.tab .n{display:inline-flex; width:22px; height:22px; border-radius:999px; background:var(--bg4); color:var(--t3); font-family:var(--mono); font-size:12px; align-items:center; justify-content:center; font-weight:700}
+.tab.active{background:var(--t1); color:#fff; border-color:var(--t1)}
+.tab.active .n{background:rgba(255,255,255,.22); color:#fff}
+.tab.done .n{background:var(--g-bg2); color:var(--g)}
+.tab:active{transform:scale(.97)}
+
+/* ---------- step card ---------- */
+.step{display:none; animation:pop .3s ease}
+.step.active{display:block}
+@keyframes pop{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+.card{background:var(--bg2); border:1px solid var(--bd); border-radius:var(--radius-kid); box-shadow:var(--shadow-md); padding:22px; margin:14px 0}
+.eyebrow{font-size:12px; text-transform:uppercase; letter-spacing:1px; font-weight:700; color:var(--t3)}
+.step h2{font-family:var(--serif); font-weight:400; font-size:clamp(28px,7vw,38px); line-height:1.05; margin:6px 0 4px; letter-spacing:-.5px}
+.lead{font-size:18px; color:var(--t2)}
+.big{font-family:var(--mono); font-weight:700; letter-spacing:-1px; line-height:1}
+.center{text-align:center}
+.muted{color:var(--t3)}
+.tiny{font-size:13px}
+.pill{display:inline-block; padding:4px 12px; border-radius:999px; font-size:13px; font-weight:700}
+.pill.blue{background:var(--b-bg2); color:var(--b)}
+.pill.green{background:var(--g-bg2); color:var(--g)}
+.pill.amber{background:var(--sun-bg); color:var(--a)}
+.older-only{display:none}
+body.older .older-only{display:block}
+body.older .older-only.inline{display:inline}
+
+/* ---------- buttons ---------- */
+.btn{border:0; border-radius:14px; font-family:var(--sans); font-weight:700; font-size:17px; padding:15px 22px; cursor:pointer; min-height:52px; box-shadow:var(--shadow); transition:transform .08s ease, filter .15s ease}
+.btn:active{transform:translateY(1px) scale(.99)}
+.btn-primary{background:var(--joy); color:#fff}
+.btn-sun{background:var(--sun); color:#3a2c00}
+.btn-ghost{background:var(--bg3); color:var(--t1); border:1px solid var(--bd)}
+.btn:disabled{opacity:.5; cursor:default}
+.btnrow{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+.grow-wrap{display:flex; flex-direction:column; align-items:center; gap:6px}
+
+/* ---------- would-you-rather choice cards ---------- */
+.choices{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px}
+@media(max-width:520px){.choices{grid-template-columns:1fr}}
+.choice{border:2px solid var(--bd); border-radius:var(--radius-kid); background:var(--bg2); padding:20px 16px; text-align:center; cursor:pointer; transition:transform .1s ease, border-color .15s ease, box-shadow .15s ease; min-height:160px; display:flex; flex-direction:column; justify-content:center; gap:8px}
+.choice:hover{transform:translateY(-3px); box-shadow:var(--shadow-lg)}
+.choice .emoji{font-size:52px; line-height:1}
+.choice .lbl{font-weight:700; font-size:17px}
+.choice .cap{font-size:13px; color:var(--t3)}
+.choice.picked{border-color:var(--joy); box-shadow:0 0 0 4px rgba(124,58,237,.12)}
+.choice.win{border-color:var(--g); box-shadow:0 0 0 4px var(--g-bg2)}
+.choice.lose{opacity:.6}
+
+/* ---------- snowball ---------- */
+.snow-stage{position:relative; height:220px; margin:6px 0 2px; border-radius:var(--radius-kid); overflow:hidden;
+  background:linear-gradient(180deg, var(--sky) 0%, #ffffff 100%)}
+.snow-stage svg{position:absolute; inset:0; width:100%; height:100%}
+.snow-readout{display:flex; justify-content:center; align-items:baseline; gap:10px; margin-top:6px}
+.yeartag{font-family:var(--mono); font-size:13px; color:var(--t3)}
+.gain-line{display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:8px; font-size:14px}
+.gain-line b{font-family:var(--mono)}
+
+/* ---------- rule of 72 bars ---------- */
+.rate-readout{text-align:center; margin:8px 0 4px}
+/* Chunky sliders: little hands need a big grab target (min 44px per the touch rule). */
+.slider{width:100%; margin:10px 0 4px; height:44px; -webkit-appearance:none; appearance:none; background:transparent; cursor:pointer}
+.slider:focus{outline:0}
+.slider::-webkit-slider-runnable-track{height:12px; border-radius:999px; background:var(--bg4); border:1px solid var(--bd)}
+.slider::-moz-range-track{height:12px; border-radius:999px; background:var(--bg4); border:1px solid var(--bd)}
+.slider::-webkit-slider-thumb{-webkit-appearance:none; appearance:none; width:34px; height:34px; margin-top:-12px; border-radius:999px; background:var(--joy); border:3px solid #fff; box-shadow:var(--shadow-md); cursor:grab}
+.slider::-moz-range-thumb{width:34px; height:34px; border-radius:999px; background:var(--joy); border:3px solid #fff; box-shadow:var(--shadow-md); cursor:grab}
+.slider:active::-webkit-slider-thumb{transform:scale(1.1)}
+.bars{display:flex; flex-direction:column; gap:10px; margin-top:14px}
+.barrow{display:grid; grid-template-columns:64px 1fr auto; align-items:center; gap:10px}
+.barrow .rate{font-family:var(--mono); font-weight:700; text-align:right; font-size:15px}
+.bartrack{background:var(--bg4); border-radius:999px; height:26px; overflow:hidden}
+.barfill{height:100%; border-radius:999px; transition:width .5s cubic-bezier(.2,.8,.2,1); min-width:6px}
+.barrow .yrs{font-family:var(--mono); font-size:14px; color:var(--t2); white-space:nowrap}
+.barrow.hot .rate{color:var(--joy)}
+.barrow.hot .yrs{color:var(--joy); font-weight:700}
+
+/* ---------- generic bits ---------- */
+.note{background:var(--sun-bg); border:1px solid rgba(180,83,9,.25); border-radius:14px; padding:12px 14px; font-size:14px; color:#7a5200; margin-top:14px}
+.factbox{background:var(--b-bg); border:1px solid var(--b-bg2); border-radius:14px; padding:12px 14px; font-size:14px; margin-top:12px}
+.stub{border:2px dashed var(--bd2); background:repeating-linear-gradient(45deg,var(--bg3),var(--bg3) 10px,var(--bg2) 10px,var(--bg2) 20px); text-align:center; color:var(--t2)}
+.stub .emoji{font-size:44px}
+.nav{display:flex; justify-content:space-between; gap:10px; margin-top:18px}
+.foot{text-align:center; color:var(--t3); font-size:13px; margin-top:34px; line-height:1.7}
+.foot a{color:var(--b); text-decoration:none}
+.confetti{position:fixed; inset:0; pointer-events:none; z-index:50}
+.reveal{animation:reveal .5s ease}
+@keyframes reveal{from{opacity:0; transform:scale(.9)}to{opacity:1; transform:none}}
+
+/* ---------- controls (steps 3 & 6) ---------- */
+.ctrl{margin:16px 0}
+.ctrl>label{display:block; font-weight:600; font-size:16px; margin-bottom:2px}
+.opts{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+.opt{border:2px solid var(--bd); background:var(--bg2); border-radius:14px; padding:10px 14px; font-family:var(--sans); font-weight:600; font-size:15px; cursor:pointer; min-height:46px; display:inline-flex; align-items:center; gap:7px; color:var(--t2)}
+.opt small{font-family:var(--mono); color:var(--t3); font-weight:700}
+.opt.on{border-color:var(--joy); background:rgba(124,58,237,.06); color:var(--t1)}
+.opt.on small{color:var(--joy)}
+.guessrow{display:flex; gap:8px; align-items:center; margin-top:12px; flex-wrap:wrap}
+.guessin{flex:1; min-width:130px; font-family:var(--mono); font-size:20px; font-weight:700; padding:12px 14px; border:2px solid var(--bd); border-radius:14px; background:var(--bg2); color:var(--t1); min-height:52px}
+.guessin:focus{outline:0; border-color:var(--joy)}
+.splitrow{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:16px 0}
+.splitcell{background:var(--bg3); border:1px solid var(--bd); border-radius:14px; padding:12px; text-align:center}
+.splitcell .big{font-size:clamp(20px,5.5vw,28px); margin-top:2px}
+.splitcell.grow{background:var(--g-bg); border-color:var(--g-bg2)}
+.splitcell.grow .big{color:var(--g)}
+.chart{width:100%; margin:6px 0}
+.chart svg{width:100%; height:auto; display:block; overflow:visible}
+.chart .gl{stroke:var(--bg4); stroke-width:1}
+.chart .ax{fill:var(--t3); font-family:var(--mono); font-size:9px}
+.chart .lb{font-family:var(--mono); font-size:10px; font-weight:700}
+.legend{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; font-size:13px; margin-top:4px}
+.legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:5px; vertical-align:-1px}
+
+/* ---------- bird race (step 4) ---------- */
+.birds{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px}
+@media(max-width:520px){.birds{grid-template-columns:1fr} .splitrow{grid-template-columns:1fr}}
+.bird{border:2px solid var(--bd); border-radius:var(--radius-kid); padding:16px; text-align:center; background:var(--bg2)}
+.bird .emoji{font-size:40px}
+.bird h4{margin:4px 0 2px; font-size:18px}
+.bird .who{font-size:13px; color:var(--t3); min-height:38px}
+.bird .tot{font-family:var(--mono); font-weight:700; font-size:clamp(20px,5.5vw,26px); margin-top:8px}
+.bird.win{border-color:var(--g); background:var(--g-bg)}
+.bird.win .tot{color:var(--g)}
+.bird.lose{opacity:.75}
+
+/* ---------- ladder (step 5) ---------- */
+.rung{display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; border:1px solid var(--bd); border-radius:14px; padding:12px 14px; margin-top:10px; background:var(--bg2)}
+.rung .emoji{font-size:30px}
+.rung b{display:block; font-size:16px}
+.rung .r{font-family:var(--mono); font-weight:700; font-size:18px; white-space:nowrap}
+.rung.hi{border-color:var(--g); background:var(--g-bg)}
+.rung.hi .r{color:var(--g)}
+.warn{background:var(--r-bg); border:1px solid var(--r-bg2); border-radius:14px; padding:12px 14px; font-size:14px; margin-top:12px}
+
+/* ---------- grown-up ---------- */
+.gu-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media(max-width:560px){.gu-grid{grid-template-columns:1fr}}
+.gu-in{width:100%; font-family:var(--mono); font-size:16px; font-weight:600; padding:11px 12px; border:1px solid var(--bd); border-radius:12px; background:var(--bg2); color:var(--t1); min-height:46px}
+.gu-in:focus{outline:0; border-color:var(--b)}
+.gu-lab{font-size:13px; font-weight:600; color:var(--t2); margin-bottom:4px; display:block}
+.mtable{width:100%; border-collapse:collapse; margin-top:12px; font-size:14px}
+.mtable th,.mtable td{padding:9px 8px; text-align:right; border-bottom:1px solid var(--bd)}
+.mtable th:first-child,.mtable td:first-child{text-align:left}
+.mtable th{background:var(--bg3); font-size:11px; text-transform:uppercase; letter-spacing:.7px; color:var(--t3); border-bottom:2px solid var(--bd2)}
+.mtable td{font-family:var(--mono)}
+.mtable tr:hover td{background:var(--bg-hover)}
+.mtable .hit{color:var(--g); font-weight:700}
+.mtable .never{color:var(--t4)}
+.qbox{border-left:3px solid var(--joy); background:var(--p-bg); border-radius:0 12px 12px 0; padding:12px 14px; margin-top:10px; font-size:15px}
+.qbox b{color:var(--joy)}
+</style>
+</head>
+<body class="younger">
+<canvas class="confetti" id="confetti"></canvas>
+<div class="shell">
+
+  <div class="masthead">
+    <h1>Money Snowball <span>❄️</span></h1>
+    <div class="sub">watch small money grow into BIG money</div>
+  </div>
+
+  <div class="agebar">
+    <div class="seg" role="tablist" aria-label="Choose age level">
+      <button id="ageY" class="on" onclick="setMode('younger')">🧒 Younger</button>
+      <button id="ageO" onclick="setMode('older')">🧑 Older</button>
+    </div>
+  </div>
+  <div class="agebar"><div class="hint" id="ageHint">Pick “Younger” for little kids, “Older” for around 11+ (adds the maths).</div></div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <!-- ============ STEP 0 — WOULD YOU RATHER ============ -->
+  <section class="step" data-step="0">
+    <div class="card">
+      <div class="eyebrow">Step 1 · A tricky choice</div>
+      <h2>Would you rather…</h2>
+      <p class="lead">Pick one. Then tap <b>Reveal</b> to see which is really bigger. 🤔</p>
+      <div class="choices" id="wyrChoices">
+        <div class="choice" data-pick="million" onclick="wyrPick('million')">
+          <div class="emoji">💵</div>
+          <div class="lbl">$1,000,000 right now</div>
+          <div class="cap">A whole million dollars today!</div>
+        </div>
+        <div class="choice" data-pick="coin" onclick="wyrPick('coin')">
+          <div class="emoji">🪙</div>
+          <div class="lbl">A magic 1&cent; coin…</div>
+          <div class="cap">…that <b>doubles every day</b> for 30 days</div>
+        </div>
+      </div>
+      <div class="btnrow center" style="justify-content:center">
+        <button class="btn btn-primary" id="wyrReveal" disabled onclick="wyrReveal()">Reveal! ✨</button>
+      </div>
+
+      <div id="wyrResult" style="display:none; margin-top:18px" class="center">
+        <div class="eyebrow">The magic coin on day <span id="wyrDay" class="mono">1</span></div>
+        <div class="big" id="wyrValue" style="font-size:clamp(40px,13vw,72px); color:var(--joy)">$0.01</div>
+        <div id="wyrVerdict" style="margin-top:12px; font-size:18px"></div>
+        <div class="factbox older-only">
+          Each day the coin doubles: day 1 = $0.01, day 2 = $0.02, day 3 = $0.04 …
+          On day 30 it is $0.01 × 2<sup>29</sup> = <b class="mono">$5,368,709</b>. Doubling starts slow, then explodes.
+        </div>
+      </div>
+    </div>
+    <div class="nav"><span></span><button class="btn btn-ghost" onclick="go(1)">Next: the snowball →</button></div>
+  </section>
+
+  <!-- ============ STEP 1 — THE SNOWBALL ============ -->
+  <section class="step" data-step="1">
+    <div class="card">
+      <div class="eyebrow">Step 2 · What is compounding?</div>
+      <h2>The money snowball</h2>
+      <p class="lead">Start with <b>$100</b>. Every year it grows <b>20%</b>. Tap <b>Grow!</b> and watch. ❄️</p>
+
+      <div class="snow-stage" id="snowStage">
+        <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <line x1="0" y1="205" x2="400" y2="180" stroke="var(--bd2)" stroke-width="3" stroke-linecap="round"/>
+          <g id="ball">
+            <circle id="ballC" cx="70" cy="170" r="26" fill="#fff" stroke="var(--b2)" stroke-width="3"/>
+            <circle cx="62" cy="162" r="5" fill="var(--sky2)"/>
+            <circle cx="78" cy="176" r="3.5" fill="var(--sky2)"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="snow-readout">
+        <span class="big" id="snowVal" style="font-size:clamp(34px,10vw,54px); color:var(--joy)">$100</span>
+        <span class="yeartag">after <b id="snowYear">0</b> years</span>
+      </div>
+      <div class="gain-line" id="snowGains" style="display:none">
+        <span>grew by <b style="color:var(--g)" id="snowGain">$0</b> this year</span>
+        <span class="older-only inline">…of which <b style="color:var(--p)" id="snowOnGain">$0</b> was earned on last year’s <em>profit</em> 🤯</span>
+      </div>
+
+      <div class="btnrow center" style="justify-content:center">
+        <button class="btn btn-sun" id="snowGrow" onclick="snowGrow()">Grow! 🌱</button>
+        <button class="btn btn-ghost" onclick="snowReset()">Start again</button>
+      </div>
+
+      <div id="snowMsg" class="note" style="display:none"></div>
+
+      <div class="factbox older-only" style="margin-top:16px">
+        <b>Why it speeds up:</b> in year 1 you earn 20% of $100 = $20. In year 2 you earn 20% of
+        <b>$120</b> = $24 — more than before, because you are earning money on your <em>earnings</em> too.
+        Leave it alone and the snowball rolls faster and faster. Warren Buffett calls his whole fortune a snowball.
+      </div>
+      <div class="note" id="snowSpendNote" style="display:none"></div>
+      <div class="btnrow" style="justify-content:center">
+        <button class="btn btn-ghost tiny" id="snowSpendBtn" onclick="snowToggleSpend()">🍦 What if I spend the profit each year?</button>
+      </div>
+    </div>
+    <div class="nav"><button class="btn btn-ghost" onclick="go(0)">← Back</button><button class="btn btn-ghost" onclick="go(2)">Next: doubling →</button></div>
+  </section>
+
+  <!-- ============ STEP 2 — DOUBLING MACHINE / RULE OF 72 ============ -->
+  <section class="step" data-step="2">
+    <div class="card">
+      <div class="eyebrow">Step 3 · How fast does money double?</div>
+      <h2>The doubling machine</h2>
+      <p class="lead">Drag the slider to change how fast money grows. The faster it grows, the sooner it <b>doubles</b>.</p>
+
+      <div class="rate-readout">
+        <div class="muted tiny">Growth each year</div>
+        <div class="big" style="font-size:clamp(34px,10vw,52px); color:var(--joy)"><span id="rateVal" class="mono">10</span>%</div>
+        <input class="slider" id="rateSlider" type="range" min="1" max="25" value="10" step="1" oninput="rateUpdate()">
+        <div style="font-size:19px; margin-top:6px">Your money doubles about every
+          <b class="mono" id="doubleYears" style="color:var(--joy)">7.2</b> years.</div>
+        <div class="older-only" style="margin-top:6px">
+          <span class="pill amber">Rule of 72</span>
+          <span class="tiny muted"> &nbsp;72 ÷ <span id="rf1" class="mono">10</span> = <span id="rf2" class="mono">7.2</span> years</span>
+        </div>
+      </div>
+
+      <div class="bars" id="bars"></div>
+
+      <div class="factbox">
+        <b>By age <span id="dbAge" class="mono">60</span>, starting at age 8</b>, a snowball growing
+        <b class="mono" id="dbRate">10</b>% a year would double about
+        <b class="mono" id="dbTimes">7</b> times — turning $1 into about
+        <b class="mono" id="dbMult" style="color:var(--g)">$128</b>. 🚀
+      </div>
+
+      <div class="note older-only">
+        The Rule of 72 is a clever <em>estimate</em>, not exact. At 20% it says 3.6 years; the true answer is about
+        3.8 years (using ln 2 ÷ ln 1.20). Close enough to do in your head — that is the point.
+      </div>
+    </div>
+    <div class="nav"><button class="btn btn-ghost" onclick="go(1)">← Back</button><button class="btn btn-ghost" onclick="go(3)">Next →</button></div>
+  </section>
+
+  <!-- ============ STEP 3 — GROW YOUR MONEY (kid calculator) ============ -->
+  <section class="step" data-step="3">
+    <div class="card">
+      <div class="eyebrow">Step 4 · Your turn</div>
+      <h2>Grow your money</h2>
+      <p class="lead">Set this up like it is really you. Then <b>guess</b> before you peek! 🙈</p>
+
+      <div class="ctrl">
+        <label>I am <b class="mono" id="kcAgeV" style="color:var(--joy)">8</b> years old</label>
+        <input class="slider" id="kcAge" type="range" min="5" max="17" value="8" step="1" oninput="kcInputs()">
+      </div>
+      <div class="ctrl">
+        <label>I save <b class="mono" id="kcWeekV" style="color:var(--joy)">$5</b> every week</label>
+        <input class="slider" id="kcWeek" type="range" min="1" max="50" value="5" step="1" oninput="kcInputs()">
+        <div class="tiny muted">That is <b class="mono" id="kcYear">$260</b> a year — pocket money, birthday money, chores.</div>
+      </div>
+      <div class="ctrl">
+        <label>Where do I keep it?</label>
+        <div class="opts" id="kcRates"></div>
+      </div>
+      <div class="ctrl">
+        <label>Let it grow until I am…</label>
+        <div class="opts" id="kcAges"></div>
+      </div>
+
+      <div id="kcGuessBox">
+        <div class="note">🙈 <b>Guess first — no peeking!</b> Write down what you think you will have. Guessing is what makes the answer fun.</div>
+        <div class="guessrow">
+          <span class="mono" style="font-size:22px; font-weight:700">$</span>
+          <input id="kcGuess" class="guessin" type="number" placeholder="my guess…" inputmode="numeric">
+          <button class="btn btn-primary" onclick="kcReveal()">Show me! ✨</button>
+        </div>
+      </div>
+
+      <div id="kcResult" style="display:none">
+        <div class="center">
+          <div class="eyebrow">At age <span class="mono" id="kcTargetAge">65</span> you would have about</div>
+          <div class="big" id="kcBig" style="font-size:clamp(36px,12vw,64px); color:var(--joy)">$0</div>
+          <div id="kcVsGuess" style="margin-top:8px; font-size:17px"></div>
+          <div id="kcUnits" class="tiny muted" style="margin-top:8px"></div>
+        </div>
+        <div class="splitrow">
+          <div class="splitcell"><div class="eyebrow">You put in</div><div class="big mono" id="kcPaid">$0</div></div>
+          <div class="splitcell grow"><div class="eyebrow">Your snowball made</div><div class="big mono" id="kcEarned">$0</div></div>
+        </div>
+        <div class="chart" id="kcChart"></div>
+        <div class="legend"><span><i style="background:var(--bd2)"></i>money you saved</span><span><i style="background:var(--joy)"></i>total with growing</span></div>
+        <div class="note" id="kcMsg"></div>
+        <div class="btnrow" style="justify-content:center">
+          <button class="btn btn-ghost" onclick="kcAgain()">🙈 Guess again</button>
+        </div>
+      </div>
+    </div>
+    <div class="nav"><button class="btn btn-ghost" onclick="go(2)">← Back</button><button class="btn btn-ghost" onclick="go(4)">Next: the birds →</button></div>
+  </section>
+
+  <!-- ============ STEP 4 — EARLY BIRD VS LATE BIRD ============ -->
+  <section class="step" data-step="4">
+    <div class="card">
+      <div class="eyebrow">Step 5 · The most important lesson</div>
+      <h2>Early Bird vs Late Bird</h2>
+      <p class="lead">Two kids. Both save <b>$5 a week</b>. Both grow it at <b>10%</b> a year. But they start at different times…</p>
+
+      <div class="birds">
+        <div class="bird" id="birdA">
+          <div class="emoji">🐦</div><h4>Amy the Early Bird</h4>
+          <div class="who">Saves from age <b>8 to 18</b> — just 10 years. Then she <b>stops for ever</b> and never adds another cent.</div>
+          <div class="tiny muted">She puts in <b class="mono" id="amyPaid">$2,600</b> total</div>
+          <div class="tot" id="amyTot">?</div>
+        </div>
+        <div class="bird" id="birdB">
+          <div class="emoji">🦉</div><h4>Ben the Late Bird</h4>
+          <div class="who">Waits, then saves from age <b>25 to 60</b> — a whole <b>35 years</b>, without stopping.</div>
+          <div class="tiny muted">He puts in <b class="mono" id="benPaid">$9,100</b> total</div>
+          <div class="tot" id="benTot">?</div>
+        </div>
+      </div>
+
+      <p class="lead center" style="margin-top:18px"><b>Who has more money at age 60?</b></p>
+      <div class="btnrow" style="justify-content:center">
+        <button class="btn btn-ghost" onclick="birdGuess('amy')">🐦 Amy</button>
+        <button class="btn btn-ghost" onclick="birdGuess('ben')">🦉 Ben</button>
+        <button class="btn btn-ghost" onclick="birdGuess('same')">🤝 About the same</button>
+      </div>
+
+      <div id="birdResult" style="display:none">
+        <div class="chart" id="birdChart"></div>
+        <div class="legend"><span><i style="background:var(--g)"></i>Amy (starts at 8)</span><span><i style="background:var(--b)"></i>Ben (starts at 25)</span></div>
+        <div class="note" id="birdMsg"></div>
+        <div class="factbox older-only">
+          <b>How can that be?</b> Ben put in <b>3.5×</b> more money than Amy, yet finishes with far less. Amy's
+          money had <b>52 years</b> to compound; Ben's had 35. Time does more work than the amount you save.
+          Every year you wait costs you the <em>biggest</em> doubling — the last one.
+        </div>
+      </div>
+    </div>
+    <div class="nav"><button class="btn btn-ghost" onclick="go(3)">← Back</button><button class="btn btn-ghost" onclick="go(5)">Next: real investing →</button></div>
+  </section>
+
+  <!-- ============ STEP 5 — WHERE DOES 10% COME FROM ============ -->
+  <section class="step" data-step="5">
+    <div class="card">
+      <div class="eyebrow">Step 6 · The honest bit</div>
+      <h2>Where does 10% come from?</h2>
+      <p class="lead">A snowball needs a hill. Some hills are steeper than others. 🏔️</p>
+
+      <div class="rung"><div class="emoji">🐷</div><div><b>Piggy bank</b><span class="tiny muted">Money just sits there. Safe — but sweets get pricier every year, so it slowly buys less.</span></div><div class="r">0%</div></div>
+      <div class="rung"><div class="emoji">🏦</div><div><b>The bank</b><span class="tiny muted">The bank pays you a little for looking after it. Safe, but a slow hill.</span></div><div class="r">~2%</div></div>
+      <div class="rung hi"><div class="emoji">🏢</div><div><b>Owning tiny pieces of great companies</b><span class="tiny muted">A <b>share</b> is a tiny slice of a real company. If the company sells more, your slice is worth more — and they pay you a bit of the profit too.</span></div><div class="r">~10%</div></div>
+
+      <div class="factbox" style="margin-top:16px">
+        🧩 <b>What is a share?</b> Imagine your favourite ice-cream shop is cut into a million tiny slices. Buy one
+        slice and you own a piece of the shop. If it opens more shops and sells more ice cream, your slice grows.
+        An <b>index fund</b> is a bucket holding a slice of <em>500 of the biggest companies at once</em> — so if a
+        few do badly, the others carry you.
+      </div>
+
+      <div class="chart" id="mktChart" style="margin-top:16px"></div>
+      <div class="tiny muted center">A picture of the <em>idea</em>: 20 bumpy years that still climb. An illustration, not real data —
+        notice the big crash in the middle, and that it kept going afterwards.</div>
+
+      <div class="warn">
+        ⚠️ <b>The honest part — this is important.</b> That 10% is what <em>history</em> did, not a promise. Some
+        years your money <b>goes down</b>, and it can feel horrible. In 2008 it fell by about half. People who
+        panicked and sold locked in the loss. People who stayed calm kept their snowball rolling. That is why you
+        only invest money you will not need for a long, long time.
+      </div>
+
+      <div class="factbox older-only">
+        Over the 20 years to the end of 2025, the S&amp;P 500 (a bucket of 500 big US companies) grew about
+        <b>10.9% a year</b> on average — through a crash, a pandemic and a trade war. Over the last 10 years it was
+        nearer 15%. Averages hide the bumps: the ride was never smooth, and the future does not have to copy the past.
+        <span class="tiny muted">Figures as cited by Adam Khoo; history, not a forecast.</span>
+      </div>
+    </div>
+    <div class="nav"><button class="btn btn-ghost" onclick="go(4)">← Back</button><button class="btn btn-ghost" onclick="go(6)">Next: for grown-ups →</button></div>
+  </section>
+
+  <!-- ============ STEP 6 — GROWN-UP MODE & PARENT GUIDE ============ -->
+  <section class="step" data-step="6">
+    <div class="card">
+      <div class="eyebrow">Step 7 · For the grown-ups</div>
+      <h2>Grown-up mode</h2>
+      <p class="lead">Adam Khoo's original model, rebuilt: your income, the slice you invest, and what it becomes.</p>
+
+      <div class="gu-grid">
+        <div><label class="gu-lab">Starting age</label><input class="gu-in" id="guAge" type="number" value="21" min="10" max="70" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">Starting annual income ($)</label><input class="gu-in" id="guInc" type="number" value="42000" min="0" step="1000" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">Annual income increase (%)</label><input class="gu-in" id="guGrow" type="number" value="5" min="0" max="20" step="0.5" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">% of income invested</label><input class="gu-in" id="guPct" type="number" value="20" min="0" max="100" step="1" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">Lump sum at the start ($)</label><input class="gu-in" id="guLump" type="number" value="0" min="0" step="1000" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">First-year investment</label><input class="gu-in" id="guFirst" type="text" value="" disabled></div>
+      </div>
+
+      <div class="eyebrow" style="margin-top:20px">Age you reach each milestone</div>
+      <div style="overflow-x:auto">
+        <table class="mtable" id="guTable">
+          <thead><tr><th>Return</th><th>$100k</th><th>$1m</th><th>$10m</th><th>$100m</th><th>At 65</th></tr></thead>
+          <tbody id="guBody"></tbody>
+        </table>
+      </div>
+
+      <div class="btnrow" style="justify-content:center; margin-top:16px">
+        <button class="btn btn-ghost" id="guScaleBtn" onclick="guToggleScale()">📈 Switch to log scale</button>
+      </div>
+      <div class="chart" id="guChart"></div>
+      <div class="legend" id="guLegend"></div>
+      <div class="tiny muted center" id="guScaleNote">Straight scale: only the fastest line is visible — that <em>is</em> the lesson. Switch to log to see them all.</div>
+
+      <div class="note">
+        Contributions are invested at the <b>end</b> of each year and the income grows every year, matching Adam's
+        spreadsheet. Returns are assumed steady; real markets are not. This is arithmetic, not a forecast, and
+        nothing here is financial advice.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="eyebrow">For parents</div>
+      <h2>How to teach this</h2>
+      <p class="lead">What actually worked for Adam: he did not lecture. He made his daughters <b>guess</b>, then showed them the number. The shock did the teaching.</p>
+      <div class="qbox"><b>Ask, do not tell.</b> At every reveal, make them commit to a guess out loud first. A wrong guess is the whole point — surprise is what sticks.</div>
+      <div class="qbox"><b>The two-cookie test.</b> “One cookie now, or two next week?” Then: “What if waiting turned one cookie into ten?” That is compounding, in cookies.</div>
+      <div class="qbox"><b>Make it real.</b> Match their savings — for every $1 they put in, add 20%. Let them <em>feel</em> a return arrive without working for it.</div>
+      <div class="qbox"><b>Let them pick the company.</b> A share in something they love and can see — a toy maker, a burger chain — beats any lecture about an index.</div>
+      <div class="qbox"><b>Never let them spend the profit.</b> The Step 2 “spend it” toggle is the lesson: eat the profit and the magic switches off.</div>
+      <div class="factbox">
+        Adam built his spreadsheet to inspire his own two daughters. They opened accounts at 18; a few years on, both
+        are up over 110% since they started. The spreadsheet was not the point — the <em>conversation</em> it started was.
+      </div>
+    </div>
+    <div class="nav"><button class="btn btn-ghost" onclick="go(5)">← Back</button><button class="btn btn-sun" onclick="finish()">I am a Compounding Champion! 🏆</button></div>
+  </section>
+
+  <div class="foot">
+    Made with ❤️ to teach kids about money. Inspired by
+    <a href="https://youtu.be/3qPLIYiejas" target="_blank" rel="noopener">Adam Khoo’s “Power of Compounding”</a>.
+    <br>Not investment advice. Built <!-- BUILD_DATE -->.
+  </div>
+</div>
+
+<script>
+/* =========================================================================
+   Money Snowball — logic. Pure client-side maths, no external data.
+   ========================================================================= */
+"use strict";
+
+/* ---------- shared compounding engine ---------- */
+// Future value of a lump sum plus a constant end-of-year saving, growing at ratePct/yr.
+function futureValue(lump, annualSaving, ratePct, years){
+  const r = ratePct/100;
+  if (r === 0) return lump + annualSaving*years;
+  return lump*Math.pow(1+r, years) + annualSaving*((Math.pow(1+r, years)-1)/r);
+}
+// Years for money to double at ratePct — the honest, exact version.
+function exactDoubleYears(ratePct){ return Math.log(2)/Math.log(1+ratePct/100); }
+// Rule of 72 estimate.
+function rule72(ratePct){ return 72/ratePct; }
+
+function fmt(n){ // whole-dollar, grouped
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+function fmt2(n){ // 2dp
+  return '$' + n.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+/* ---------- self-checks (dev; logged to console) ---------- */
+(function selfTest(){
+  const approx=(a,b,t)=>Math.abs(a-b)<=t;
+  const t=[];
+  // Snowball $100 @20%: 120, 144, 172.80, 207.36
+  t.push(['snow y1', approx(futureValue(100,0,20,1),120,1e-6)]);
+  t.push(['snow y3', approx(futureValue(100,0,20,3),172.8,1e-6)]);
+  t.push(['snow y4', approx(futureValue(100,0,20,4),207.36,1e-6)]);
+  // Penny doubling day 30 = 0.01 * 2^29
+  t.push(['penny d30', approx(0.01*Math.pow(2,29),5368709.12,0.01)]);
+  // Rule of 72 sample values
+  t.push(['r72 @2', approx(rule72(2),36,1e-9)]);
+  t.push(['r72 @20', approx(rule72(20),3.6,1e-9)]);
+  // Exact doubling @20% ≈ 3.80 yrs
+  t.push(['exact @20', approx(exactDoubleYears(20),3.80,0.01)]);
+  // Step 2 factbox must quote REAL compounding over 52 yrs (age 8 -> 60), not 2^(rule-72 doublings).
+  t.push(['52y @20 = 13105', approx(Math.pow(1.2,52),13105,2)]);
+  t.push(['52y @10 = 142', approx(Math.pow(1.1,52),142,1)]);
+  // Grown-up engine must reproduce Adam Khoo's model exactly. Cells read off his spreadsheet
+  // (start 35, income 84,000, +5%/yr, invest 20%) and milestones stated in his video.
+  const sheet=(r,i)=>Math.round(grownUpSeries(35,84000,5,20,0,r,40)[i].v);
+  t.push(['sheet 0% y1', sheet(0,0)===16800]);
+  t.push(['sheet 0% y2', sheet(0,1)===34440]);
+  t.push(['sheet 2% y2', sheet(2,1)===34776]);
+  t.push(['sheet 20% y2', sheet(20,1)===37800]);
+  const mile=(age,inc,r,target)=>{const p=grownUpSeries(age,inc,5,20,0,r,95); const h=p.find(x=>x.v>=target); return h?h.a:null;};
+  t.push(['21@10% $1m -> 44', mile(21,42000,10,1e6)===44]);
+  t.push(['21@10% $10m -> 65', mile(21,42000,10,1e7)===65]);
+  t.push(['21@10% $100m -> 88', mile(21,42000,10,1e8)===88]);
+  t.push(['21@20% $1m -> 37', mile(21,42000,20,1e6)===37]);
+  t.push(['21@20% $10m -> 49', mile(21,42000,20,1e7)===49]);
+  t.push(['35@20% $1m -> 48', mile(35,84000,20,1e6)===48]);
+  t.push(['35@20% $100m -> 72', mile(35,84000,20,1e8)===72]);
+  const fails=t.filter(x=>!x[1]);
+  if(fails.length) console.error('Money Snowball self-test FAILED:', fails);
+  else console.log('Money Snowball self-test passed ('+t.length+' checks).');
+})();
+
+/* ---------- age mode ---------- */
+function setMode(m){
+  document.body.classList.toggle('older', m==='older');
+  document.body.classList.toggle('younger', m==='younger');
+  document.getElementById('ageY').classList.toggle('on', m==='younger');
+  document.getElementById('ageO').classList.toggle('on', m==='older');
+  document.getElementById('ageHint').textContent = m==='older'
+    ? 'Older mode: shows the Rule-of-72 maths and extra “why” boxes.'
+    : 'Pick “Younger” for little kids, “Older” for around 11+ (adds the maths).';
+}
+
+/* ---------- tabs / steps ---------- */
+const STEPS = [
+  {n:0, icon:'🤔', label:'Choose'},
+  {n:1, icon:'❄️', label:'Snowball'},
+  {n:2, icon:'✖️', label:'Doubling'},
+  {n:3, icon:'🐷', label:'Grow it'},
+  {n:4, icon:'🐦', label:'Early bird'},
+  {n:5, icon:'🌳', label:'Investing'},
+  {n:6, icon:'👪', label:'Grown-ups'},
+];
+let current = 0;
+const visited = new Set([0]);
+function buildTabs(){
+  const el = document.getElementById('tabs');
+  el.innerHTML = STEPS.map(s=>
+    `<button class="tab" data-tab="${s.n}" onclick="go(${s.n})">
+       <span class="n">${s.n+1}</span>${s.icon} ${s.label}
+     </button>`).join('');
+}
+function go(n){
+  current = n; visited.add(n);
+  document.querySelectorAll('.step').forEach(s=>s.classList.toggle('active', +s.dataset.step===n));
+  document.querySelectorAll('.tab').forEach(t=>{
+    const i=+t.dataset.tab;
+    t.classList.toggle('active', i===n);
+    t.classList.toggle('done', visited.has(i) && i!==n);
+  });
+  // scroll active tab into view + jump to top of content
+  const at=document.querySelector('.tab.active'); if(at) at.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ---------- Step 0: would you rather ---------- */
+let wyrChoice=null;
+function wyrPick(which){
+  wyrChoice=which;
+  document.querySelectorAll('#wyrChoices .choice').forEach(c=>c.classList.toggle('picked', c.dataset.pick===which));
+  document.getElementById('wyrReveal').disabled=false;
+}
+function wyrReveal(){
+  const res=document.getElementById('wyrResult'); res.style.display='block'; res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
+  // animate the doubling coin day 1 -> 30
+  let day=1, cents=1; // day 1 = 1 cent
+  const dEl=document.getElementById('wyrDay'), vEl=document.getElementById('wyrValue');
+  clearInterval(window._wyr);
+  window._wyr=setInterval(()=>{
+    dEl.textContent=day; vEl.textContent=fmt2(cents/100);
+    if(day>=30){
+      clearInterval(window._wyr);
+      const coinFinal=0.01*Math.pow(2,29); // $5,368,709.12
+      const win = wyrChoice==='coin';
+      document.querySelector('#wyrChoices .choice[data-pick="coin"]').classList.add('win');
+      document.querySelector('#wyrChoices .choice[data-pick="million"]').classList.add('lose');
+      document.getElementById('wyrVerdict').innerHTML = win
+        ? `🎉 <b>You picked the magic coin — brilliant!</b> It beats a million dollars by over <b>$4 million</b>.`
+        : `😮 A million sounds huge… but the doubling coin becomes <b>${fmt(coinFinal)}</b> — that is <b>5×</b> bigger. Doubling is magic.`;
+      confettiBurst();
+      return;
+    }
+    day++; cents*=2;
+  }, 70);
+}
+
+/* ---------- Step 1: snowball ---------- */
+const SNOW_RATE=20, SNOW_START=100;
+let snowYear=0, snowVal=SNOW_START, snowSpend=false;
+function snowRender(gain, onGain){
+  document.getElementById('snowVal').textContent=fmt2(snowVal).replace('.00','');
+  document.getElementById('snowYear').textContent=snowYear;
+  // ball grows with sqrt of value; rolls to the right
+  const r=Math.min(92, 26*Math.sqrt(snowVal/SNOW_START));
+  const cx=70 + Math.min(300, (snowYear)*34);
+  const cy=170 - (r-26)*0.35;
+  const b=document.getElementById('ballC'); b.setAttribute('r', r.toFixed(1)); b.setAttribute('cx', cx.toFixed(1)); b.setAttribute('cy', cy.toFixed(1));
+  document.getElementById('ball').setAttribute('transform',`rotate(${snowYear*18} ${cx} ${cy})`);
+  const gl=document.getElementById('snowGains');
+  if(gain!=null){ gl.style.display='flex';
+    document.getElementById('snowGain').textContent=fmt2(gain).replace('.00','');
+    document.getElementById('snowOnGain').textContent=fmt2(onGain).replace('.00','');
+  } else gl.style.display='none';
+}
+function snowGrow(){
+  const gain = snowSpend ? SNOW_START*(SNOW_RATE/100) : snowVal*(SNOW_RATE/100);
+  // "earned on the profit" = this year's gain minus 20% of the original principal
+  const onGain = Math.max(0, gain - SNOW_START*(SNOW_RATE/100));
+  snowVal = snowSpend ? snowVal + SNOW_START*(SNOW_RATE/100) : snowVal + gain;
+  snowYear++;
+  snowRender(gain, onGain);
+  if(snowYear===4 && !snowSpend){
+    const m=document.getElementById('snowMsg'); m.style.display='block';
+    m.innerHTML='❄️ Your $100 has more than <b>doubled</b> in about 4 years — and each year it grew by more than the year before. That is compounding!';
+  }
+  if(snowYear>=12){ document.getElementById('snowGrow').disabled=true; }
+}
+function snowReset(){ snowYear=0; snowVal=SNOW_START; document.getElementById('snowGrow').disabled=false; document.getElementById('snowMsg').style.display='none'; snowRender(null); }
+function snowToggleSpend(){
+  snowSpend=!snowSpend;
+  const note=document.getElementById('snowSpendNote');
+  document.getElementById('snowSpendBtn').textContent = snowSpend ? '❄️ Keep the profit instead' : '🍦 What if I spend the profit each year?';
+  note.style.display='block';
+  note.innerHTML = snowSpend
+    ? '🍦 <b>Spend-it mode:</b> now you take out the $20 profit every year and eat it. Your snowball stops growing faster — it only ever earns $20 a year. The magic switches OFF.'
+    : '❄️ <b>Keep-it mode:</b> leave the profit in and the snowball rolls faster and faster. The magic is ON.';
+  snowReset();
+}
+
+/* ---------- Step 2: doubling machine ---------- */
+const RATE_ROWS=[2,4,10,15,20];
+const RATE_COLORS={2:'var(--r2)',4:'var(--a)',10:'var(--b2)',15:'var(--g2)',20:'var(--joy)'};
+function barColor(rate){
+  if(rate>=18) return 'var(--joy)'; if(rate>=12) return 'var(--g2)';
+  if(rate>=7) return 'var(--b2)'; if(rate>=3) return 'var(--a)'; return 'var(--r2)';
+}
+function buildBars(){
+  document.getElementById('bars').innerHTML=RATE_ROWS.map(rt=>{
+    const yrs=rule72(rt); const w=Math.min(100, yrs/40*100);
+    return `<div class="barrow" data-rate="${rt}">
+      <div class="rate">${rt}%</div>
+      <div class="bartrack"><div class="barfill" style="width:${w}%; background:${RATE_COLORS[rt]}"></div></div>
+      <div class="yrs">${yrs.toFixed(1)} yrs</div></div>`;
+  }).join('');
+}
+function rateUpdate(){
+  const rt=+document.getElementById('rateSlider').value;
+  const yrs=rule72(rt);
+  document.getElementById('rateVal').textContent=rt;
+  document.getElementById('doubleYears').textContent=yrs.toFixed(1);
+  document.getElementById('rf1').textContent=rt;
+  document.getElementById('rf2').textContent=yrs.toFixed(1);
+  // highlight nearest fixed bar row
+  let nearest=RATE_ROWS.reduce((a,b)=>Math.abs(b-rt)<Math.abs(a-rt)?b:a);
+  document.querySelectorAll('#bars .barrow').forEach(r=>r.classList.toggle('hot', +r.dataset.rate===nearest));
+  // Doublings by 60 starting at 8. Count the doublings off the EXACT doubling time, and take
+  // the dollar figure from real compounding — never from 2^(rule-of-72 doublings), which
+  // overstates at high rates (20% would claim $16,384 against a true $13,105) and understates at low ones.
+  const span=60-8;
+  const times=Math.floor(span/exactDoubleYears(rt));
+  const mult=Math.pow(1+rt/100, span);
+  document.getElementById('dbRate').textContent=rt;
+  document.getElementById('dbTimes').textContent=times;
+  document.getElementById('dbMult').textContent=fmt(mult);
+}
+
+/* ---------- confetti ---------- */
+function confettiBurst(){
+  const cv=document.getElementById('confetti'), ctx=cv.getContext('2d');
+  cv.width=innerWidth; cv.height=innerHeight;
+  const cols=['#7c3aed','#fbbf24','#22a366','#3b82f6','#be185d','#e74c3c'];
+  const P=Array.from({length:140},()=>({x:innerWidth/2,y:innerHeight*0.32,vx:(Math.random()-0.5)*11,vy:Math.random()*-11-3,g:0.32,s:6+Math.random()*7,c:cols[(Math.random()*cols.length)|0],a:1,rot:Math.random()*6}));
+  let f=0;
+  (function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height); f++;
+    P.forEach(p=>{p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.a-=0.008; p.rot+=0.2;
+      ctx.globalAlpha=Math.max(0,p.a); ctx.fillStyle=p.c;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6); ctx.restore();});
+    if(f<150) requestAnimationFrame(draw); else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+
+/* ---------- tiny SVG line chart (no CDN, animates, log-capable) ---------- */
+function drawChart(hostId, series, o){
+  o=o||{}; const host=document.getElementById(hostId); if(!host) return;
+  const W=620, H=o.h||230, P={l:10,r:10,t:18,b:24};
+  const base=series[0].pts, a0=base[0].a, a1=base[base.length-1].a;
+  const all=series.flatMap(s=>s.pts.map(p=>p.v));
+  let vmax=Math.max(...all)*1.06;
+  let vmin=o.log ? Math.max(1, Math.min(...all.filter(v=>v>0))) : 0;
+  if(o.log && vmax<=vmin) vmax=vmin*10;
+  const tf=v=>o.log?Math.log10(Math.max(v,vmin)):v;
+  const X=a=>P.l+((a-a0)/((a1-a0)||1))*(W-P.l-P.r);
+  const Y=v=>{const lo=tf(vmin),hi=tf(vmax); const t=(tf(v)-lo)/((hi-lo)||1); return H-P.b-t*(H-P.t-P.b);};
+  let g='';
+  for(let i=0;i<=4;i++){ const yy=P.t+i*(H-P.t-P.b)/4; g+=`<line class="gl" x1="${P.l}" y1="${yy}" x2="${W-P.r}" y2="${yy}"/>`; }
+  series.forEach(s=>{
+    const line=s.pts.map(p=>`${X(p.a).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ');
+    if(s.fill){
+      g+=`<polygon points="${X(a0).toFixed(1)},${(H-P.b)} ${line} ${X(a1).toFixed(1)},${(H-P.b)}" fill="${s.color}" opacity=".13"/>`;
+    }
+    g+=`<polyline points="${line}" fill="none" stroke="${s.color}" stroke-width="${s.w||3}" stroke-linejoin="round" stroke-linecap="round"${s.dash?` stroke-dasharray="${s.dash}"`:''}>
+        <animate attributeName="opacity" from="0" to="1" dur=".5s" fill="freeze"/></polyline>`;
+    const last=s.pts[s.pts.length-1];
+    if(s.tag) g+=`<text class="lb" x="${(X(last.a)-4).toFixed(1)}" y="${(Y(last.v)-7).toFixed(1)}" text-anchor="end" fill="${s.color}">${s.tag}</text>`;
+  });
+  // axes: age ticks + top value label
+  [a0, Math.round((a0+a1)/2), a1].forEach(a=>{
+    g+=`<text class="ax" x="${X(a).toFixed(1)}" y="${H-6}" text-anchor="middle">${o.xPrefix||''}${a}</text>`;
+  });
+  g+=`<text class="ax" x="${P.l}" y="${P.t-5}">${o.topLabel!=null?o.topLabel:fmt(vmax)}</text>`;
+  host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img">${g}</svg>`;
+}
+function unitsText(v){
+  const ice=Math.round(v/3), game=Math.round(v/70);
+  let s=`That is about <b class="mono">${ice.toLocaleString('en-US')}</b> 🍦 ice creams`;
+  if(v>=700) s+=` — or <b class="mono">${game.toLocaleString('en-US')}</b> 🎮 games`;
+  return s;
+}
+
+/* ---------- Step 3: kid calculator ---------- */
+const KC_RATES=[{k:0,e:'🐷',n:'Piggy bank'},{k:2,e:'🏦',n:'Bank'},{k:10,e:'🏢',n:'Index fund'},{k:20,e:'🚀',n:'Super-investor'}];
+const KC_AGES=[{a:18,e:'🎓'},{a:25,e:'🧑'},{a:65,e:'🎉'}];
+let kcRate=10, kcTarget=65;
+function buildKc(){
+  document.getElementById('kcRates').innerHTML=KC_RATES.map(r=>
+    `<button class="opt${r.k===kcRate?' on':''}" data-r="${r.k}" onclick="kcSetRate(${r.k})">${r.e} ${r.n} <small>${r.k}%</small></button>`).join('');
+  document.getElementById('kcAges').innerHTML=KC_AGES.map(x=>
+    `<button class="opt${x.a===kcTarget?' on':''}" data-a="${x.a}" onclick="kcSetAge(${x.a})">${x.e} ${x.a}</button>`).join('');
+}
+function kcSetRate(k){ kcRate=k; buildKc(); kcInputs(); }
+function kcSetAge(a){ kcTarget=a; buildKc(); kcInputs(); }
+function kcState(){
+  const age=+document.getElementById('kcAge').value, week=+document.getElementById('kcWeek').value;
+  return {age, week, rate:kcRate, target:Math.max(kcTarget, age+1)};
+}
+function kcInputs(){
+  const s=kcState();
+  document.getElementById('kcAgeV').textContent=s.age;
+  document.getElementById('kcWeekV').textContent='$'+s.week;
+  document.getElementById('kcYear').textContent=fmt(s.week*52);
+  if(document.getElementById('kcResult').style.display==='block') kcReveal(true);
+}
+function kcReveal(keep){
+  const s=kcState(), years=s.target-s.age, annual=s.week*52;
+  const total=futureValue(0, annual, s.rate, years), paid=annual*years, earned=total-paid;
+  document.getElementById('kcGuessBox').style.display = keep?'none':'none';
+  const res=document.getElementById('kcResult'); res.style.display='block';
+  if(!keep){ res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal'); confettiBurst(); }
+  document.getElementById('kcTargetAge').textContent=s.target;
+  document.getElementById('kcBig').textContent=fmt(total);
+  document.getElementById('kcPaid').textContent=fmt(paid);
+  document.getElementById('kcEarned').textContent=fmt(earned);
+  document.getElementById('kcUnits').innerHTML=unitsText(total);
+  // guess comparison
+  const gEl=document.getElementById('kcGuess'), guess=+gEl.value;
+  const vg=document.getElementById('kcVsGuess');
+  if(guess>0){
+    const ratio=total/guess;
+    vg.innerHTML = ratio>1.15 ? `You guessed <b class="mono">${fmt(guess)}</b> — the real answer is <b style="color:var(--joy)">${ratio.toFixed(1)}× bigger</b>! 🤯`
+      : ratio<0.87 ? `You guessed <b class="mono">${fmt(guess)}</b> — a bit too hopeful this time. 🙂`
+      : `You guessed <b class="mono">${fmt(guess)}</b> — wow, so close! 🎯`;
+  } else vg.innerHTML='';
+  // chart: saved vs total
+  const savedPts=[], totalPts=[];
+  for(let y=0;y<=years;y++){ savedPts.push({a:s.age+y, v:annual*y}); totalPts.push({a:s.age+y, v:futureValue(0,annual,s.rate,y)}); }
+  drawChart('kcChart', [
+    {name:'saved', color:'#d5d3ca', pts:savedPts, w:2.5, dash:'5 5'},
+    {name:'total', color:'#7c3aed', pts:totalPts, fill:true, tag:fmt(total)}
+  ], {xPrefix:'age '});
+  const m=document.getElementById('kcMsg');
+  if(s.rate===0){
+    m.innerHTML=`🐷 In a piggy bank your money never grows. You end with exactly what you put in — and by then, sweets cost more. This is the <b>only</b> option where the snowball never rolls.`;
+  } else {
+    const pct=Math.round(earned/total*100);
+    m.innerHTML=`🤯 Look closely: you only put in <b>${fmt(paid)}</b>, but you end up with <b>${fmt(total)}</b>.
+      <b>${pct}%</b> of your money was made by the snowball — not by you. You did the saving; <b>time</b> did the rest.`;
+  }
+}
+function kcAgain(){
+  document.getElementById('kcResult').style.display='none';
+  document.getElementById('kcGuessBox').style.display='block';
+  document.getElementById('kcGuess').value='';
+  document.getElementById('kcGuess').focus();
+}
+
+/* ---------- Step 4: early bird vs late bird ---------- */
+const BIRD_W=260, BIRD_R=10, BIRD_END=60;
+function birdPath(startAge, stopAge){
+  let v=0; const pts=[];
+  for(let a=8; a<=BIRD_END; a++){
+    if(a>=startAge) v = v*(1+BIRD_R/100) + (a<stopAge?BIRD_W:0);
+    pts.push({a, v});
+  }
+  return pts;
+}
+function birdGuess(pick){
+  const amy=birdPath(8,18), ben=birdPath(25,60);
+  const amyT=amy[amy.length-1].v, benT=ben[ben.length-1].v;
+  document.getElementById('amyTot').textContent=fmt(amyT);
+  document.getElementById('benTot').textContent=fmt(benT);
+  document.getElementById('birdA').classList.add('win');
+  document.getElementById('birdB').classList.add('lose');
+  const res=document.getElementById('birdResult'); res.style.display='block';
+  res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
+  drawChart('birdChart', [
+    {name:'Ben', color:'#2563eb', pts:ben, tag:fmt(benT)},
+    {name:'Amy', color:'#1a8754', pts:amy, fill:true, tag:fmt(amyT)}
+  ], {xPrefix:'age '});
+  const times=(amyT/benT).toFixed(1);
+  document.getElementById('birdMsg').innerHTML = (pick==='amy')
+    ? `🎉 <b>Correct — Amy wins, and it is not close.</b> She ends with <b>${fmt(amyT)}</b> against Ben's <b>${fmt(benT)}</b> — <b>${times}×</b> more, after saving for only 10 years and putting in <b>3.5× less money</b>. She stopped at 18 and still won.`
+    : `😮 <b>Amy wins — by a mile.</b> She ends with <b>${fmt(amyT)}</b>; Ben ends with <b>${fmt(benT)}</b>. Amy saved for just 10 years then stopped, and put in <b>3.5× less money</b> than Ben. Starting early beat saving more.`;
+  confettiBurst();
+}
+
+/* ---------- Step 5: market illustration ---------- */
+const MKT=[12,8,-5,16,10,22,-37,26,15,2,16,32,13,1,12,-4,31,18,-18,26];
+function drawMarket(){
+  let v=100; const pts=[{a:0,v}];
+  MKT.forEach((r,i)=>{ v=v*(1+r/100); pts.push({a:i+1, v}); });
+  drawChart('mktChart', [{name:'market', color:'#1a8754', pts, fill:true}], {h:190, xPrefix:'yr ', topLabel:''});
+}
+
+/* ---------- Step 6: grown-up mode (Adam's model) ---------- */
+// Adam's spreadsheet: income grows each year, you invest a % of it at the END of each year.
+// Recurrence: v = v*(1+r) + contribution_of_that_year.  Verified against his published cells.
+function grownUpSeries(startAge, income0, growPct, pctInvest, lump, ratePct, endAge){
+  const g=growPct/100, p=pctInvest/100, r=ratePct/100;
+  let v=lump; const pts=[];
+  for(let i=0; startAge+i<=endAge; i++){
+    v = v*(1+r) + income0*Math.pow(1+g,i)*p;
+    pts.push({a:startAge+i, v});
+  }
+  return pts;
+}
+function milestoneAge(pts, target){ const h=pts.find(p=>p.v>=target); return h?h.a:null; }
+const GU_RATES=[{r:0,c:'#b0b0a8'},{r:2,c:'#c0392b'},{r:4,c:'#b45309'},{r:10,c:'#2563eb'},{r:15,c:'#1a8754'},{r:20,c:'#7c3aed'}];
+let guLog=false;
+function guToggleScale(){
+  guLog=!guLog;
+  document.getElementById('guScaleBtn').textContent = guLog?'📉 Switch to straight scale':'📈 Switch to log scale';
+  document.getElementById('guScaleNote').innerHTML = guLog
+    ? 'Log scale: each gridline is <b>10× the one below</b>. Now every line is visible — and a straight line means steady compounding.'
+    : 'Straight scale: only the fastest line is visible — that <em>is</em> the lesson. Switch to log to see them all.';
+  guUpdate();
+}
+function guUpdate(){
+  const age=+document.getElementById('guAge').value||21;
+  const inc=+document.getElementById('guInc').value||0;
+  const grow=+document.getElementById('guGrow').value||0;
+  const pct=+document.getElementById('guPct').value||0;
+  const lump=+document.getElementById('guLump').value||0;
+  document.getElementById('guFirst').value=fmt(inc*pct/100)+' in year one';
+  const rows=[], series=[];
+  GU_RATES.forEach(g=>{
+    const pts=grownUpSeries(age, inc, grow, pct, lump, g.r, 90);
+    series.push({name:g.r+'%', color:g.c, pts, w:g.r>=20?3.5:2.5, fill:false});
+    const at65=pts.find(p=>p.a===65);
+    const cell=t=>{const a=milestoneAge(pts,t); return a!==null?`<td class="hit">${a}</td>`:'<td class="never">—</td>';};
+    rows.push(`<tr><td><b style="color:${g.c}">${g.r}%</b></td>${cell(1e5)}${cell(1e6)}${cell(1e7)}${cell(1e8)}<td>${at65?fmt(at65.v):'—'}</td></tr>`);
+  });
+  document.getElementById('guBody').innerHTML=rows.join('');
+  drawChart('guChart', series, {log:guLog, h:250, xPrefix:'age '});
+  document.getElementById('guLegend').innerHTML=GU_RATES.map(g=>`<span><i style="background:${g.c}"></i>${g.r}%</span>`).join('');
+}
+
+/* ---------- finish ---------- */
+function finish(){
+  confettiBurst();
+  setTimeout(confettiBurst, 400);
+  alert('🏆 Compounding Champion!\n\nYou now know the three secrets:\n\n1. Money can make money — and that money makes money too.\n2. The sooner you start, the more times it doubles.\n3. Never spend the profit. Let the snowball roll.\n\nNow go and explain it to a grown-up.');
+}
+
+/* ---------- init ---------- */
+buildTabs(); buildBars(); rateUpdate(); snowRender(null);
+buildKc(); kcInputs(); drawMarket(); guUpdate(); go(0);
+</script>
+</body>
+</html>
