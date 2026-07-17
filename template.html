@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="A snowball rolling downhill and growing. One cent, doubled for 30 days, equals $5,368,709.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Money Snowball ❄️ — teach your kids compounding">
-<meta name="twitter:description" content="Would you rather get a $10 ang pow every day for a month, or one magic 1-cent coin that doubles? Eight playful steps that teach kids how money grows."">
+<meta name="twitter:description" content="Would you rather get a $10 ang pow every day for a month, or one magic 1-cent coin that doubles? Eight playful steps that teach kids how money grows.">
 <meta name="twitter:image" content="https://phuazz.github.io/money-snowball/og.png">
 <meta name="theme-color" content="#eaf4ff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>❄️</text></svg>">
@@ -40,10 +40,6 @@
   --p:#7c3aed; --p-bg:rgba(124,58,237,0.06);
   --c:#0891b2; --c-bg:rgba(8,145,178,0.06);
   --pk:#be185d; --pk-bg:rgba(190,24,93,0.06);
-  /* -text variants per C:\dev\design.md — for TEXT; the values above are for
-     fills, borders and large type. --t3/--t4 fail WCAG AA at body size. */
-  --g-text:#146c43; --r-text:#a93226; --b-text:#1d4ed8; --a-text:#92400e;
-  --p-text:#7c3aed; --c-text:#0e7490; --pk-text:#be185d; --t3-text:#66665e;
   /* -text variants (design.md "Contrast"): use these for TEXT. The base colours above are for
      fills, borders, chart lines and large type — several fail WCAG AA at label size, and --t3
      (the caption colour) fails outright at 3.18. Readability is the whole job on a kids' page. */
@@ -83,15 +79,25 @@ body{
 /* Large italic clause — design.md keeps --t3 for exactly this; the -text variant is for label-size text. */
 .masthead .sub{font-family:var(--serif); font-style:italic; color:var(--t3-text); font-size:clamp(17px,4.5vw,22px); margin-top:4px}  /* tops out at 22px, so not "large text" — needs 4.5:1 */
 
-/* ---------- age toggle ---------- */
-.agebar{display:flex; justify-content:center; gap:10px; margin:16px 0 6px}
-.agebar .seg{display:inline-flex; background:var(--bg3); border:1px solid var(--bd); border-radius:999px; padding:4px; gap:4px}
-.agebar button{border:0; background:transparent; font-family:var(--sans); font-weight:700; font-size:15px; color:var(--t2); padding:9px 18px; border-radius:999px; cursor:pointer; min-height:44px}
-.agebar button.on{background:var(--bg2); color:var(--t1); box-shadow:var(--shadow-sm)}
-.agebar .hint{font-size:12px; color:var(--t3-text); text-align:center; margin-top:2px}
+/* ---------- control row (age + audio, one line) ---------- */
+.ctrlbar{display:flex; justify-content:center; align-items:center; gap:8px; margin:12px 0 4px; flex-wrap:wrap}
+.ctrlbar .seg{display:inline-flex; background:var(--bg3); border:1px solid var(--bd); border-radius:999px; padding:4px; gap:4px}
+.ctrlbar .seg button{border:0; background:transparent; font-family:var(--sans); font-weight:700; font-size:15px; color:var(--t2); padding:9px 16px; border-radius:999px; cursor:pointer; min-height:44px}
+.ctrlbar .seg button.on{background:var(--bg2); color:var(--t1); box-shadow:var(--shadow-sm)}
+.hint{font-size:12px; color:var(--t3-text); text-align:center; margin-top:2px}
+/* Onboarding text, not a permanent fixture — it has done its job once the child is moving. */
+body.started .hint{display:none}
+/* The masthead is the title on Step 1; on inner steps it shrinks to a strip so the lesson is
+   not shoved off-screen. Set once and never unset, so navigating back does not make it jump. */
+body.started .masthead{padding:8px 0 2px}
+body.started .masthead h1{font-size:clamp(19px,5vw,24px); letter-spacing:-.3px}
+body.started .masthead .sub{display:none}
 
 /* ---------- tabs ---------- */
-.tabs{display:flex; gap:6px; overflow-x:auto; padding:14px 2px 6px; scrollbar-width:none; -ms-overflow-style:none; scroll-snap-type:x proximity}
+/* Sticky: switching step should never cost a scroll back to the top. */
+.tabs{position:sticky; top:0; z-index:20; background:rgba(250,250,248,.94);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  display:flex; gap:6px; overflow-x:auto; padding:10px 2px 8px; scrollbar-width:none; -ms-overflow-style:none; scroll-snap-type:x proximity}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:0 0 auto; border:1px solid var(--bd); background:var(--bg2); color:var(--t2); border-radius:999px; padding:10px 15px; font-weight:600; font-size:14px; cursor:pointer; min-height:44px; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; scroll-snap-align:start; transition:transform .08s ease}
 .tab .n{display:inline-flex; width:22px; height:22px; border-radius:999px; background:var(--bg4); color:var(--t3-text); font-family:var(--mono); font-size:12px; align-items:center; justify-content:center; font-weight:700}
@@ -121,6 +127,11 @@ body.older .older-only{display:block}
 body.older .older-only.inline{display:inline}
 .younger-only{display:block}
 body.older .younger-only{display:none}
+.younger-only.inline{display:inline}
+body.older .younger-only.inline{display:none}
+/* Percent gloss: a 7-year-old does not know what a percent IS, so "10% a year" is noise to
+   them. Say it in money they can hold instead. Kid-tested, 2026-07-17. */
+.gloss{color:var(--p-text); font-weight:600}
 
 /* ---------- buttons ---------- */
 .btn{border:0; border-radius:14px; font-family:var(--sans); font-weight:700; font-size:17px; padding:15px 22px; cursor:pointer; min-height:52px; box-shadow:var(--shadow); transition:transform .08s ease, filter .15s ease}
@@ -211,7 +222,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
 .opt.on small{color:var(--joy)}
 .guesses{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px}
 @media(max-width:400px){.guesses{grid-template-columns:1fr}}
-.opt.guess{justify-content:center; font-family:var(--mono); font-weight:700; font-size:clamp(16px,4.6vw,19px); padding:16px 10px; min-height:60px}
+.opt.guess{justify-content:center; text-align:center; font-family:var(--sans); font-weight:700; font-size:clamp(15px,4.2vw,18px); padding:16px 12px; min-height:60px}
 .opt.guess:hover{border-color:var(--joy); transform:translateY(-2px)}
 .guessrow{display:flex; gap:8px; align-items:center; margin-top:12px; flex-wrap:wrap}
 .guessin{flex:1; min-width:130px; font-family:var(--mono); font-size:20px; font-weight:700; padding:12px 14px; border:2px solid var(--bd); border-radius:14px; background:var(--bg2); color:var(--t1); min-height:52px}
@@ -230,6 +241,19 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
 .chart .ax{fill:var(--t3-text); font-family:var(--mono)}
 .chart .lb{font-family:var(--mono); font-weight:700}
 .legend{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; font-size:14px; margin-top:4px}
+/* Step 3 home rows: the four "money homes" with their end value and, crucially, the MULTIPLE —
+   the multiple is the lesson (rate matters), the dollars are just the proof. */
+.homerows{display:flex; flex-direction:column; gap:8px; margin:14px 0 6px}
+.homerow{display:grid; grid-template-columns:34px 1fr auto; gap:10px; align-items:center;
+  padding:11px 13px; border:1px solid var(--bd); border-radius:14px; background:var(--bg2); animation:reveal .4s ease}
+.homerow .e{font-size:24px; text-align:center}
+.homerow .n{font-weight:600; font-size:15px}
+.homerow .v{font-family:var(--mono); font-weight:700; text-align:right; line-height:1.2}
+.homerow .v .x{display:block; font-size:12px; font-weight:600; color:var(--t3-text)}
+.homerow.index{border-color:var(--g-bg2); background:var(--g-bg)}
+.homerow.index .v, .homerow.index .v .x{color:var(--g-text)}
+.homerow.super{border-color:rgba(124,58,237,.32); background:var(--p-bg)}
+.homerow.super .v, .homerow.super .v .x{color:var(--p-text)}
 .legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:5px; vertical-align:-1px}
 
 /* ---------- bird race (step 4) ---------- */
@@ -287,10 +311,18 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
 .takeaway p b{color:var(--p-text)}
 
 /* ---------- audio controls ---------- */
-.audiobar{display:flex; justify-content:center; gap:8px; margin:10px 0 2px; flex-wrap:wrap}
 .abtn{border:1px solid var(--bd); background:var(--bg2); color:var(--t2); border-radius:999px;
   padding:9px 15px; font-family:var(--sans); font-weight:600; font-size:14px; cursor:pointer;
   min-height:44px; display:inline-flex; align-items:center; gap:7px}
+.abtn.icon{padding:0; width:46px; justify-content:center; font-size:19px}
+/* Read-aloud invite. Speech is gated behind a user gesture in every modern browser, so it
+   CANNOT be defaulted on — speaking on load fails silently, which is worse than off because it
+   looks enabled. Asking once is the way round it: the tap is the gesture, and the answer is
+   remembered, so it behaves like a default from then on without anything ever autoplaying. */
+.invite{background:var(--p-bg); border:2px solid rgba(124,58,237,.3); border-radius:var(--radius-kid);
+  padding:14px 16px; margin-bottom:14px; text-align:center}
+.invite .q{font-size:17px; font-weight:700}
+.invite .btnrow{justify-content:center; margin-top:10px}
 .abtn.on{background:var(--p-bg); border-color:var(--p-text); color:var(--p-text)}
 .abtn:active{transform:scale(.97)}
 .speaking{position:relative}
@@ -316,23 +348,33 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
        call, 2026-07-17. It used to sit at 154px, so "Support · S$5" was the first thing a
        7-year-old met, before the lesson. -->
 
-  <div class="agebar">
-    <div class="seg" role="tablist" aria-label="Choose age level">
+  <!-- ONE control row, not three. The old layout (masthead + age row + audio row + hint + tabs)
+       spent ~314px of an 812px phone on chrome before the lesson began, on EVERY step — so the
+       chart fell below the fold and the child had to ping-pong between the buttons and the
+       visual. Kid-tested complaint, 2026-07-17. -->
+  <div class="ctrlbar">
+    <div class="seg" role="group" aria-label="Choose age level">
       <button id="ageY" class="on" onclick="setMode('younger')">🧒 Younger</button>
       <button id="ageO" onclick="setMode('older')">🧑 Older</button>
     </div>
+    <button class="abtn on icon" id="sfxBtn" onclick="toggleSfx()" aria-label="Sound effects on" title="Sound effects">🔊</button>
+    <button class="abtn icon" id="sayBtn" onclick="toggleSay()" aria-label="Read aloud" title="Read aloud">📖</button>
   </div>
-  <div class="audiobar">
-    <button class="abtn on" id="sfxBtn" onclick="toggleSfx()">🔊 Sounds</button>
-    <button class="abtn" id="sayBtn" onclick="toggleSay()">📖 Read to me</button>
-  </div>
-  <div class="agebar"><div class="hint" id="ageHint">Pick “Younger” for little kids, “Older” for around 11+ (adds the maths).</div></div>
+  <div class="hint" id="ageHint">Pick “Younger” for little kids, “Older” for around 11+ (adds the maths).</div>
 
   <div class="tabs" id="tabs"></div>
 
   <!-- ============ STEP 0 — WOULD YOU RATHER ============ -->
   <section class="step" data-step="0">
     <div class="card">
+      <div class="invite" id="readInvite">
+        <div class="q">🔊 Shall I read this out loud to you?</div>
+        <div class="btnrow">
+          <button class="btn btn-primary" onclick="acceptRead(true)">Yes please</button>
+          <button class="btn btn-ghost" onclick="acceptRead(false)">No thanks</button>
+        </div>
+      </div>
+
       <div class="eyebrow">Step 1 · A tricky choice</div>
       <h2>Would you rather…</h2>
       <p class="lead">One month of pocket money. Pick one — then watch the race. 🏁</p>
@@ -384,6 +426,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       <p class="lead">Start with <b>$100</b>. Every year it grows <b>20%</b>. Tap <b>Grow!</b> and watch. ❄️</p>
 
       <p class="lead" style="margin-top:-4px">Two kids. Both start with <b>$100</b>. Both earn <b>20%</b> a year.
+        <span class="gloss younger-only inline">(20% means: every year, for every <b>$5</b> you have, you get <b>$1</b> more.)</span>
         One <b>keeps</b> the profit. One <b>spends</b> it on ice cream. Tap <b>Grow!</b> 🌱</p>
 
       <div class="snow-stage" id="snowStage">
@@ -483,7 +526,8 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
     <div class="card">
       <div class="eyebrow">Step 4 · Your turn</div>
       <h2>Grow your money</h2>
-      <p class="lead">Set this up like it is really you. Then <b>guess</b> before you peek! 🙈</p>
+      <p class="lead">Set it up like it is really you. The savings stay the same — but watch how much the
+        <b>money home</b> you pick changes where you end up. 🏠</p>
 
       <div class="ctrl">
         <label>I am <b class="mono" id="kcAgeV" style="color:var(--joy)">8</b> years old</label>
@@ -495,52 +539,36 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         <div class="tiny muted">That is <b class="mono" id="kcYear">$260</b> a year — pocket money, birthday money, chores.</div>
       </div>
       <div class="ctrl">
-        <label>Where do I keep it?</label>
-        <div class="opts" id="kcRates"></div>
-      </div>
-      <div class="ctrl">
-        <label>Let it grow until I am…</label>
+        <label>Leave it to grow until I am…</label>
         <div class="opts" id="kcAges"></div>
       </div>
 
+      <!-- The guess is now about the RATE, not a raw dollar figure. Anchored on the piggy bank
+           (which a child already understands = "just what I saved"), it asks HOW MANY TIMES more
+           investing gives you. The four options are qualitatively different (same / a few / 10x /
+           40x+), so a kid can reason and the answer is a real shock about the rate — not a
+           magnitude-blind coin-flip between four similar big numbers. -->
       <div id="kcGuessBox">
-        <div class="note younger-only">🙈 <b>Guess first — no peeking!</b> Which one do you think it will be? Tap it. Getting it wrong is the fun part.</div>
-        <div class="note older-only">🙈 <b>Guess first — no peeking!</b> Type what you think you will have. Guessing is what makes the answer land.</div>
-
-        <!-- The show/hide class goes on a WRAPPER, never on the element itself: .guessrow and
-             .guesses carry their own display (flex/grid), which collides with the utility class
-             at equal specificity and silently wins. -->
-        <!-- Younger: one tap, no keyboard, no blank box to freeze at. -->
-        <div class="younger-only"><div class="guesses" id="kcMcq"></div></div>
-
-        <!-- Older: typing a real number is a firmer commitment than picking from a list. -->
-        <div class="older-only">
-          <div class="guessrow">
-            <span class="mono" style="font-size:22px; font-weight:700">$</span>
-            <input id="kcGuess" class="guessin" type="text" placeholder="my guess…" inputmode="numeric" onblur="if(this.value.trim())groupMoney(this)">
-            <button class="btn btn-primary" onclick="kcReveal()">Show me! ✨</button>
-          </div>
-        </div>
+        <div class="note">🙈 <b>Guess first — no peeking!</b> A piggy bank just hands back the
+          <b class="mono" id="kcPiggyG">$14,820</b> you saved. But if you <b>invest</b> it instead — same money,
+          growing about 10% a year like an index fund — how much do you end up with by age
+          <span class="mono" id="kcTargetG">65</span>?</div>
+        <div class="guesses" id="kcMcq"></div>
       </div>
 
       <div id="kcResult" style="display:none">
-        <div class="center">
-          <div class="eyebrow">At age <span class="mono" id="kcTargetAge">65</span> you would have about</div>
-          <div class="big" id="kcBig" style="font-size:clamp(36px,12vw,64px); color:var(--joy)">$0</div>
-          <div id="kcVsGuess" style="margin-top:8px; font-size:17px"></div>
-          <div id="kcUnits" class="tiny muted" style="margin-top:8px"></div>
-        </div>
-        <div class="splitrow">
-          <div class="splitcell"><div class="eyebrow">You put in</div><div class="big mono" id="kcPaid">$0</div></div>
-          <div class="splitcell grow"><div class="eyebrow">Your snowball made</div><div class="big mono" id="kcEarned">$0</div></div>
-        </div>
+        <div class="center"><div class="eyebrow">Same <b class="mono" id="kcSavedLbl">$14,820</b> saved. Three different homes.</div></div>
         <div class="chart" id="kcChart"></div>
-        <div class="legend"><span><i style="background:var(--bd2)"></i>money you saved</span><span><i style="background:var(--joy)"></i>total with growing</span></div>
+        <div class="legend" id="kcLegend"></div>
+        <div class="homerows" id="kcHomes"></div>
+        <div id="kcVsGuess" class="center" style="margin-top:4px; font-size:17px"></div>
         <div class="note" id="kcMsg"></div>
-        <div class="takeaway" id="tk3"><div class="lbl">💡 What we just learned</div><p>You did the <b>saving</b>. <b>Time</b> did the rest. Most of that money was never yours to earn — the snowball made it while you got on with your life.</p></div>
+        <div class="takeaway" id="tk3"><div class="lbl">💡 What we just learned</div><p>Same $5 a week. The <b>home you choose</b> changes everything: a piggy bank hands back what you saved, the bank adds a little, and investing turns it into <b>many times more</b>. The longer you leave it, the bigger that gap grows.</p></div>
         <div class="btnrow" style="justify-content:center">
-          <button class="btn btn-ghost" onclick="kcAgain()">🙈 Guess again</button>
+          <button class="btn btn-sun" id="kcSuperBtn" onclick="kcRevealSuper()">🚀 And if you were as good as Warren Buffett?</button>
+          <button class="btn btn-ghost" onclick="kcAgain()">🙈 Try again</button>
         </div>
+        <div class="note" id="kcSuper" style="display:none; margin-top:10px"></div>
       </div>
     </div>
     <div class="nav"><button class="btn btn-ghost" onclick="go(2)">← Back</button><button class="btn btn-ghost" onclick="go(4)">Next: the birds →</button></div>
@@ -551,19 +579,21 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
     <div class="card">
       <div class="eyebrow">Step 5 · The most important lesson</div>
       <h2>Early Bird vs Late Bird</h2>
-      <p class="lead">Two kids. Both save <b>$5 a week</b>. Both grow it at <b>10%</b> a year. But they start at different times…</p>
+      <p class="lead">Two kids. Both get <b>$1,000</b> of ang pow money 🧧. Both grow it at <b>10%</b> a year.
+        <span class="gloss younger-only inline">(10% means: every year, for every <b>$10</b> you have, you get <b>$1</b> more.)</span>
+        The <b>only</b> difference is <b>when</b> they start.</p>
 
       <div class="birds">
         <div class="bird" id="birdA">
           <div class="emoji">🐦</div><h4>Amy the Early Bird</h4>
-          <div class="who">Saves from age <b>8 to 18</b> — just 10 years. Then she <b>stops for ever</b> and never adds another cent.</div>
-          <div class="tiny muted">She puts in <b class="mono" id="amyPaid">$2,600</b> total</div>
+          <div class="who">Puts her $1,000 in at <b>age 8</b>, and then leaves it completely alone.</div>
+          <div class="tiny muted">She puts in <b class="mono">$1,000</b></div>
           <div class="tot" id="amyTot">?</div>
         </div>
         <div class="bird" id="birdB">
           <div class="emoji">🦉</div><h4>Ben the Late Bird</h4>
-          <div class="who">Waits, then saves from age <b>25 to 60</b> — a whole <b>35 years</b>, without stopping.</div>
-          <div class="tiny muted">He puts in <b class="mono" id="benPaid">$9,100</b> total</div>
+          <div class="who">Keeps his $1,000 in a drawer. He only puts it in at <b>age 25</b>.</div>
+          <div class="tiny muted">He puts in <b class="mono">$1,000</b> — exactly the same</div>
           <div class="tot" id="benTot">?</div>
         </div>
       </div>
@@ -578,12 +608,15 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       <div id="birdResult" style="display:none">
         <div class="chart" id="birdChart"></div>
         <div class="legend"><span><i style="background:var(--g)"></i>Amy (starts at 8)</span><span><i style="background:var(--b)"></i>Ben (starts at 25)</span></div>
+        <div class="note" id="birdLive" style="display:none"></div>
         <div class="note" id="birdMsg"></div>
-        <div class="takeaway" id="tk4"><div class="lbl">💡 What we just learned</div><p><b>Starting early beats saving more.</b> Amy stopped at 18 and still won, with 3.5× less money in. Every year you wait costs you your <b>biggest</b> doubling — the last one.</p></div>
+        <div class="takeaway" id="tk4"><div class="lbl">💡 What we just learned</div><p><b>Starting early beats starting rich.</b> Amy and Ben put in exactly the same <b>$1,000</b>. Amy just started <b>17 years sooner</b> — and ended with about <b>5× more</b>. The years you wait are the ones that cost the most.</p></div>
         <div class="factbox older-only">
-          <b>How can that be?</b> Ben put in <b>3.5×</b> more money than Amy, yet finishes with far less. Amy's
-          money had <b>52 years</b> to compound; Ben's had 35. Time does more work than the amount you save.
-          Every year you wait costs you the <em>biggest</em> doubling — the last one.
+          <b>How can that be, if they put in the same $1,000?</b> Amy's money had <b>52 years</b> to compound;
+          Ben's had <b>35</b>. Those 17 extra years are not 17 years of <em>saving</em> — they are 17 years of
+          <b>doubling</b>, and they sit at the <em>start</em>, where every later doubling is built on top of them.
+          At 10% money doubles about every <b>7.3</b> years, so Amy gets roughly <b>2.3 more doublings</b> than
+          Ben — and 2.3 doublings is about <b>5×</b>. That is the whole gap.
         </div>
       </div>
     </div>
@@ -807,6 +840,12 @@ function rule72(ratePct){ return 72/ratePct; }
 function fmt(n){ // whole-dollar, grouped
   return '$' + Math.round(n).toLocaleString('en-US');
 }
+// Reveals happen below the fold on a phone. Bring the payoff to the child rather than making
+// them scroll to find it — the kid test said the scrolling broke their attention.
+function bringIntoView(el){
+  if(!el) return;
+  requestAnimationFrame(()=>{ try{ el.scrollIntoView({behavior:'smooth', block:'center'}); }catch(e){} });
+}
 /* Money inputs are grouped with thousands separators (house rule: every figure is grouped).
    This is why they cannot be type="number" — see the markup note. Read them with numOf(),
    never +el.value, which returns NaN for "42,000". Regroup on blur so the caret never jumps
@@ -862,18 +901,14 @@ function selfTest(){
   t.push(['start = 33 cones', conesFor(100,0)===33]);
   t.push(['invested 20y = 124 cones', conesFor(100*Math.pow(1.1,20),20)===124]);
   t.push(['prices ~2x in 24y @3%', approx(Math.pow(1.03,24),2.0328,0.001)]);
-  // Guess options: every set must offer exactly 4 choices containing the truth exactly once,
-  // and "always pick the biggest" must NOT be a winning strategy across setups.
-  let truthAlwaysMax=true, allWellFormed=true;
-  for(let seed=0; seed<9; seed++){
-    for(const tot of [130000, 219906, 3026162, 118292696]){
-      const o=kcOptionSet(tot, seed);
-      if(o.length!==4 || o.filter(x=>x.truth).length!==1) allWellFormed=false;
-      if(!o[o.length-1].truth) truthAlwaysMax=false;
-    }
-  }
-  t.push(['options: 4 incl. truth once', allWellFormed]);
-  t.push(['options: biggest is not always right', !truthAlwaysMax]);
+  // Step 3 rate comparison: "how many times more than a piggy bank" must be honest, and the
+  // correct bucket must MOVE with the horizon (so "pick the biggest" is not a strategy).
+  const idxMult=(age,wk,tgt)=>futureValue(0,wk*52,10,tgt-age)/futureValue(0,wk*52,0,tgt-age);
+  t.push(['rate mult 8->65 ~40x', approx(idxMult(8,5,65),40,3)]);
+  t.push(['rate mult 8->18 small', idxMult(8,5,18)<3]);
+  t.push(['bucket 8->65 is top', kcBucketOf(idxMult(8,5,65))===KC_BUCKETS.length-1]);
+  t.push(['bucket 8->18 not top', kcBucketOf(idxMult(8,5,18))<KC_BUCKETS.length-1]);
+  t.push(['4 guess buckets', KC_BUCKETS.length===4]);
   // Money inputs are grouped, so they must round-trip through numOf(): +"42,000" is NaN.
   t.push(['numOf parses grouped', numOf({value:'42,000'})===42000]);
   t.push(['numOf parses plain', numOf({value:'1500000'})===1500000]);
@@ -882,6 +917,16 @@ function selfTest(){
   // a spoiled lesson silently kills the predict-then-reveal mechanic the page runs on.
   const spoilt=[0,1,3,4].filter(n=>{ const e=document.getElementById('tk'+n); return e && e.classList.contains('show'); });
   t.push(['takeaways not spoiling guesses', spoilt.length===0]);
+  // Early Bird rebuild: identical $1,000 in, only the start age differs. If these drift, the
+  // step is claiming something the maths does not do.
+  t.push(['bird Amy@60 = 142,043', approx(birdEnd(BIRD_START), 1000*Math.pow(1.1,52), 0.5)]);
+  t.push(['bird Ben@60 = 28,102',  approx(birdEnd(BEN_STARTS), 1000*Math.pow(1.1,35), 0.5)]);
+  t.push(['bird ratio ~5.05x',     approx(birdEnd(BIRD_START)/birdEnd(BEN_STARTS), 5.05, 0.02)]);
+  t.push(['bird Ben flat until 25', birdPath(BEN_STARTS).filter(p=>p.a<BEN_STARTS).every(p=>p.v===0)]);
+  t.push(['bird same money in',    birdPath(BIRD_START).find(p=>p.a===BIRD_START).v === birdPath(BEN_STARTS).find(p=>p.a===BEN_STARTS).v]);
+  // The percent gloss must be arithmetically true, or we are teaching a lie in plain words.
+  t.push(['gloss: 20% of $5 = $1', Math.abs(5*0.20-1)<1e-9]);
+  t.push(['gloss: 10% of $10 = $1', Math.abs(10*0.10-1)<1e-9]);
   t.push(['every step has a takeaway', [0,1,2,3,4,5,6].every(n=>!!document.getElementById('tk'+n))]);
   const fails=t.filter(x=>!x[1]);
   if(fails.length) console.error('Money Snowball self-test FAILED:', fails);
@@ -934,6 +979,8 @@ function go(n){
   const at=document.querySelector('.tab.active'); if(at) at.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
   window.scrollTo({top:0, behavior:'smooth'});
   redrawCharts();   // this step's charts now have a real width, so their text can be sized properly
+  if(n>0) document.body.classList.add('started');  // shrink the masthead; set once, never unset
+  clearInterval(window._bird); clearInterval(window._kc);  // do not leave an animation running off-screen
   shutUp(); say(SAY[n]);
   if([2,5,6].includes(n)) showTake(n);   // no reveal on these, so the takeaway cannot spoil anything
 }
@@ -964,6 +1011,7 @@ function wyrRaceDraw(n){
 function wyrReveal(){
   const res=document.getElementById('wyrResult'); res.style.display='block';
   res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
+  bringIntoView(res);   // the race is below the fold on a phone; bring it to them
   document.querySelectorAll('#wyrChoices .choice').forEach(c=>c.classList.remove('win','lose'));
   const btn=document.getElementById('wyrReveal'); btn.disabled=true;
   const live=document.getElementById('wyrLive'); live.style.display='block';
@@ -1153,16 +1201,38 @@ function shutUp(){ if('speechSynthesis' in window) speechSynthesis.cancel();
 function toggleSay(){
   sayOn=!sayOn;
   const b=document.getElementById('sayBtn');
-  b.classList.toggle('on', sayOn); b.textContent = sayOn?'📖 Reading on':'📖 Read to me';
+  b.classList.toggle('on', sayOn);
+  b.setAttribute('aria-label', sayOn?'Reading aloud — tap to stop':'Read aloud');
+  try{ localStorage.setItem('ms_read', sayOn?'1':'0'); }catch(e){}
   if(sayOn){ voice=pickVoice(); say(SAY[current]); } else shutUp();
+}
+/* Read-aloud cannot be switched on by default: every modern browser gates speech behind a user
+   gesture, so speaking on load fails SILENTLY — worse than off, because it looks enabled.
+   So we ask once. The tap is the gesture, the answer is remembered, and on later visits it is
+   armed on the child's first touch. Nothing ever autoplays; it just behaves like a default. */
+function acceptRead(yes){
+  const inv=document.getElementById('readInvite'); if(inv) inv.style.display='none';
+  try{ localStorage.setItem('ms_read', yes?'1':'0'); }catch(e){}
+  if(yes && !sayOn) toggleSay();   // this click IS the gesture speech needs
+}
+function initRead(){
+  let pref=null;
+  try{ pref=localStorage.getItem('ms_read'); }catch(e){}
+  const inv=document.getElementById('readInvite');
+  if(pref===null) return;                       // first visit: leave the invite showing
+  if(inv) inv.style.display='none';
+  if(pref==='1'){
+    // Cannot speak yet (no gesture). Arm it on the first touch instead.
+    addEventListener('pointerdown', ()=>{ if(!sayOn) toggleSay(); }, {once:true});
+  }
 }
 // Set-up lines. Deliberately STOP before the question — the grown-up asks it.
 const SAY={
   0:"Would you rather get a ten dollar ang pow, every single day for a whole month? Or just one magic coin, that starts at one cent, and doubles every day? Have a think, and pick the one you want.",
   1:"Here are two kids. They both start with one hundred dollars, and both of them grow it by twenty percent every year. But one of them keeps the profit, and the other one spends it on ice cream. Tap the grow button, and watch what happens to each of them.",
   2:"Here is a machine that tells you how fast money doubles. Drag the slider to change how fast it grows, and see how many years it takes to double.",
-  3:"Now it is your turn. Set this up like it is really you. How old are you, how much can you save each week, and where will you keep it? Then, before you peek, have a guess at how much you will have.",
-  4:"Meet Amy and Ben. They both save five dollars a week, and they both grow it by ten percent a year. But Amy starts at eight years old and stops at eighteen, while Ben waits until he is twenty five. Who do you think has more money at sixty?",
+  3:"Now it is your turn. Set it up like it is really you. How old are you, and how much can you save each week? Then guess this: if you invest your money instead of leaving it in a piggy bank, how many times more do you think you would end up with?",
+  4:"Meet Amy and Ben. They each get one thousand dollars of ang pow money, and they both grow it at ten percent a year. Amy puts hers in when she is eight. Ben keeps his in a drawer, and only puts it in when he is twenty five. Exactly the same money. So who do you think has more at sixty?",
   5:"A snowball needs a hill to roll down. Some hills are much steeper than others. A piggy bank does not grow at all. A bank grows a little. And owning tiny pieces of great companies has grown the most.",
   6:"Imagine you keep one hundred dollars under your bed, where nobody can ever take it. It stays exactly one hundred dollars. So it is safe. Or is it? Drag the slider, and watch the ice creams.",
   7:"This part is for the grown-ups."
@@ -1170,8 +1240,8 @@ const SAY={
 const SAY_TAKE={
   0:"Doubling starts slow, and then it explodes. The magic coin looked like a total loser for two whole weeks, and it still won by nearly eighteen thousand times. Slow is not the same as losing.",
   1:"Money can make money, and that new money makes money too. But only if you never spend the profit.",
-  3:"You did the saving. Time did the rest. Most of that money was never yours to earn. The snowball made it while you got on with your life.",
-  4:"Starting early beats saving more. Amy stopped at eighteen and still won, with three and a half times less money in."
+  3:"Same five dollars a week. The home you choose changes everything. A piggy bank hands back what you saved, the bank adds a little, and investing turns it into many times more. And the longer you leave it, the bigger that gap grows.",
+  4:"Starting early beats starting rich. Amy and Ben put in exactly the same one thousand dollars. Amy just started seventeen years sooner, and she ended up with about five times more."
 };
 function showTake(n){
   const el=document.getElementById('tk'+n);
@@ -1258,151 +1328,204 @@ function unitsText(v){
 }
 
 /* ---------- Step 3: kid calculator ---------- */
-const KC_RATES=[{k:0,e:'🐷',n:'Piggy bank'},{k:2,e:'🏦',n:'Bank'},{k:10,e:'🏢',n:'Index fund'},{k:20,e:'🚀',n:'Super-investor'}];
 const KC_AGES=[{a:18,e:'🎓'},{a:25,e:'🧑'},{a:65,e:'🎉'}];
-let kcRate=10, kcTarget=65, kcGuessVal=null;
+// The three realistic homes race together; the 20% super-investor is a SEPARATE bonus so it
+// does not flatten the chart (over a lifetime it ends thousands of times the piggy bank).
+const KC_HOMES=[
+  {k:0,  e:'🐷', n:'Piggy bank', c:'#8a8a82', cls:''},
+  {k:2,  e:'🏦', n:'The bank',   c:'#2563eb', cls:''},
+  {k:10, e:'🏢', n:'Index fund', c:'#1a8754', cls:'index'},
+];
+const KC_SUPER={k:20, e:'🚀', n:'Super-investor', c:'#7c3aed', cls:'super'};
+let kcTarget=65, kcGuess=null, kcSuperShown=false;
 
-// Round to something a child can read aloud. "$3 million" beats "$3,026,162" as an option;
-// "m"/"k" would mean nothing to a 7-year-old, so spell it.
-function niceMoney(v){
-  if(v>=1e6){ const m=v/1e6; return '$'+(m>=10?Math.round(m):Math.round(m*10)/10)+' million'; }
-  if(v>=1000) return '$'+(Math.round(v/1000)*1000).toLocaleString('en-US');
-  return '$'+Math.max(1,Math.round(v));
-}
-/* Build four plausible options around the truth.
-   The decoy recipe VARIES with the inputs: a fixed recipe would park the answer in the same
-   slot every time, and a bright 11-year-old would crack "always pick the biggest" in two goes
-   and stop thinking. Deterministic on the inputs, so options stay put while a slider is dragged. */
-const KC_CONFIGS=[[0.05,0.3,3],[0.2,2,6],[0.1,0.35,0.7]];  // multipliers of the truth; count above/below varies
-function kcOptionSet(total, seed){
-  const cfg=KC_CONFIGS[Math.abs(seed)%KC_CONFIGS.length];
-  const opts=[{v:Math.round(total), truth:true}];
-  cfg.forEach(m=>{
-    const v=Math.round(total*m);
-    // keep decoys visibly distinct from the truth once rounded, and never zero
-    if(v>0 && Math.abs(v-total)/total > 0.15 && !opts.some(o=>niceMoney(o.v)===niceMoney(v))) opts.push({v, truth:false});
-  });
-  let pad=12;
-  while(opts.length<4 && pad<1e6){ // fallback if rounding collapsed a decoy
-    const v=Math.round(total*pad); pad*=4;
-    if(!opts.some(o=>niceMoney(o.v)===niceMoney(v))) opts.push({v, truth:false});
-  }
-  return opts.sort((a,b)=>a.v-b.v);
-}
+// The guess is a MULTIPLE, not a dollar figure — the old four-similar-big-numbers MCQ was a
+// magnitude-blind coin-flip (kid feedback, 2026-07-17). Four qualitatively different buckets;
+// the truth is whichever the real index-vs-piggy multiple lands in. That multiple grows with
+// the horizon (small over 10 years, ~40x over 57), so the correct bucket MOVES with the "grow
+// until" choice, and "always pick the biggest" is not a strategy.
+const KC_BUCKETS=[
+  {max:1.6,      label:'About the same'},
+  {max:6,        label:'A few times more'},
+  {max:22,       label:'About 10× more'},
+  {max:Infinity, label:'40× or way more!'},
+];
+function kcBucketOf(mult){ return KC_BUCKETS.findIndex(b=>mult<b.max); }
+function niceMult(m){ return m<1.15?'≈1×' : m>=100?Math.round(m/10)*10+'×' : m>=10?Math.round(m)+'×' : (Math.round(m*10)/10)+'×'; }
+
 function buildKc(){
-  document.getElementById('kcRates').innerHTML=KC_RATES.map(r=>
-    `<button class="opt${r.k===kcRate?' on':''}" data-r="${r.k}" onclick="kcSetRate(${r.k})">${r.e} ${r.n} <small>${r.k}%</small></button>`).join('');
   document.getElementById('kcAges').innerHTML=KC_AGES.map(x=>
-    `<button class="opt${x.a===kcTarget?' on':''}" data-a="${x.a}" onclick="kcSetAge(${x.a})">${x.e} ${x.a}</button>`).join('');
+    `<button class="opt${x.a===kcTarget?' on':''}" onclick="kcSetAge(${x.a})">${x.e} ${x.a}</button>`).join('');
 }
-function kcSetRate(k){ kcRate=k; buildKc(); kcInputs(); }
 function kcSetAge(a){ kcTarget=a; buildKc(); kcInputs(); }
 function kcState(){
   const age=+document.getElementById('kcAge').value, week=+document.getElementById('kcWeek').value;
-  return {age, week, rate:kcRate, target:Math.max(kcTarget, age+1)};
+  return {age, week, target:Math.max(kcTarget, age+1)};
+}
+// piggy = exactly what you saved; index = the same money invested at 10%. Their ratio is the lesson.
+function kcMult(){
+  const s=kcState(), yrs=s.target-s.age, a=s.week*52;
+  const piggy=futureValue(0,a,0,yrs), index=futureValue(0,a,10,yrs);
+  return {piggy, index, mult:index/piggy, yrs, annual:a};
 }
 function kcBuildMcq(){
-  const s=kcState(), years=s.target-s.age, annual=s.week*52;
-  const total=futureValue(0, annual, s.rate, years);
-  const seed=s.age + s.week + s.rate + s.target;   // stable for a given setup, varies across setups
-  document.getElementById('kcMcq').innerHTML = kcOptionSet(total, seed).map(o=>
-    `<button class="opt guess" onclick="kcPick(${o.v},${o.truth})">${niceMoney(o.v)}</button>`).join('');
+  const truth=kcBucketOf(kcMult().mult);
+  document.getElementById('kcMcq').innerHTML = KC_BUCKETS.map((b,i)=>
+    `<button class="opt guess" onclick="kcPick(${i},${i===truth})">${b.label}</button>`).join('');
 }
-function kcPick(v, isTruth){ sfx.pick(); kcGuessVal={v, truth:isTruth}; kcReveal(); }
+function kcPick(i, isTruth){ sfx.pick(); kcGuess={i, truth:isTruth}; kcReveal(); }
 function kcInputs(){
-  const s=kcState();
+  const s=kcState(), {piggy}=kcMult();
   document.getElementById('kcAgeV').textContent=s.age;
   document.getElementById('kcWeekV').textContent='$'+s.week;
   document.getElementById('kcYear').textContent=fmt(s.week*52);
+  document.getElementById('kcPiggyG').textContent=fmt(piggy);
+  document.getElementById('kcTargetG').textContent=s.target;
+  document.getElementById('kcSavedLbl').textContent=fmt(piggy);
   kcBuildMcq();
   if(document.getElementById('kcResult').style.display==='block') kcReveal(true);
 }
+function kcHomeSeries(rate, upto, age, annual){
+  const pts=[]; for(let y=0; age+y<=upto; y++) pts.push({a:age+y, v:futureValue(0,annual,rate,y)});
+  return pts;
+}
+function kcDrawRace(upto, age, annual, done){
+  drawChart('kcChart', KC_HOMES.map(h=>({
+    name:h.n, color:h.c, pts:kcHomeSeries(h.k, upto, age, annual),
+    fill:h.k===10, w:h.k===10?3.5:3, tag: done?fmt(futureValue(0,annual,h.k,upto-age)):''
+  })), {xPrefix:'age ', noFade:true});
+}
+function kcRenderHomes(homes, age, annual, target){
+  const piggy=futureValue(0,annual,0,target-age);
+  document.getElementById('kcHomes').innerHTML = homes.map(h=>{
+    const v=futureValue(0,annual,h.k,target-age), x=v/piggy;
+    const xtxt = h.k===0 ? 'just what you saved' : niceMult(x)+' your money';
+    return `<div class="homerow ${h.cls}"><span class="e">${h.e}</span>`+
+      `<span class="n">${h.n} <small class="mono" style="color:var(--t3-text)">${h.k}%</small></span>`+
+      `<span class="v">${fmt(v)}<span class="x">${xtxt}</span></span></div>`;
+  }).join('');
+}
 function kcReveal(keep){
-  const s=kcState(), years=s.target-s.age, annual=s.week*52;
-  const total=futureValue(0, annual, s.rate, years), paid=annual*years, earned=total-paid;
-  if(!keep && document.body.classList.contains('older')){
-    const typed=numOf(document.getElementById('kcGuess'));   // tolerate "200,000"
-    kcGuessVal = typed>0 ? {v:typed, truth:false} : null;
-  }
+  const s=kcState(), {piggy, index, mult, yrs, annual}=kcMult();
+  clearInterval(window._kc);   // dragging a slider mid-animation settles to the final state
   document.getElementById('kcGuessBox').style.display='none';
   const res=document.getElementById('kcResult'); res.style.display='block';
-  if(!keep){ res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
-    confettiBurst();
-    // No snowball at 0%, so no celebration and no "time did the rest" — that lesson is only
-    // true when something actually grew.
-    if(s.rate>0){ sfx.fanfare(); showTake(3); } else { sfx.sad(); hideTake(3); } }
-  document.getElementById('kcTargetAge').textContent=s.target;
-  document.getElementById('kcBig').textContent=fmt(total);
-  document.getElementById('kcPaid').textContent=fmt(paid);
-  document.getElementById('kcEarned').textContent=fmt(earned);
-  document.getElementById('kcUnits').innerHTML=unitsText(total);
-  // guess comparison — works for a tapped option or a typed number
-  const vg=document.getElementById('kcVsGuess');
-  if(kcGuessVal && kcGuessVal.v>0){
-    const guess=kcGuessVal.v, ratio=total/guess;
-    vg.innerHTML = kcGuessVal.truth ? `🎯 <b>Spot on — you nailed it!</b> Most grown-ups guess far too low.`
-      : ratio>1.15 ? `You picked <b class="mono">${niceMoney(guess)}</b> — the real answer is <b style="color:var(--joy)">${ratio.toFixed(1)}× bigger</b>! 🤯`
-      : ratio<0.87 ? `You picked <b class="mono">${niceMoney(guess)}</b> — that was <b>too</b> hopeful this time. 🙂`
-      : `You picked <b class="mono">${niceMoney(guess)}</b> — so close! 🎯`;
-  } else vg.innerHTML='';
-  // chart: saved vs total
-  const savedPts=[], totalPts=[];
-  for(let y=0;y<=years;y++){ savedPts.push({a:s.age+y, v:annual*y}); totalPts.push({a:s.age+y, v:futureValue(0,annual,s.rate,y)}); }
-  drawChart('kcChart', [
-    {name:'saved', color:'#d5d3ca', pts:savedPts, w:2.5, dash:'5 5'},
-    {name:'total', color:'#7c3aed', pts:totalPts, fill:true, tag:fmt(total)}
-  ], {xPrefix:'age '});
-  const m=document.getElementById('kcMsg');
-  if(s.rate===0){
-    m.innerHTML=`🐷 In a piggy bank your money never grows. You end with exactly what you put in — and by then, sweets cost more. This is the <b>only</b> option where the snowball never rolls.`;
+  document.getElementById('kcLegend').innerHTML = KC_HOMES.map(h=>`<span><i style="background:${h.c}"></i>${h.e} ${h.n}</span>`).join('');
+  // every fresh reveal resets the super bonus
+  kcSuperShown=false;
+  document.getElementById('kcSuper').style.display='none';
+  document.getElementById('kcSuperBtn').style.display='';
+  if(!keep){
+    res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
+    bringIntoView(res);
+    // play the three homes fanning apart from age -> target (~4s), then settle the rows
+    let a=s.age; kcDrawRace(a, s.age, annual, false);
+    clearInterval(window._kc);
+    window._kc=setInterval(()=>{
+      a++;
+      kcDrawRace(Math.min(a, s.target), s.age, annual, a>=s.target);
+      if(a>=s.target){
+        clearInterval(window._kc);
+        kcRenderHomes(KC_HOMES, s.age, annual, s.target);
+        confettiBurst(); sfx.fanfare(); showTake(3);
+      }
+    }, 70);
   } else {
-    const pct=Math.round(earned/total*100);
-    // The sharpest way to feel the growth: what you'd have to save WITHOUT it to land in the same place.
-    const needWeek=total/years/52, times=needWeek/s.week;
-    m.innerHTML=`🤯 Look closely: you only put in <b>${fmt(paid)}</b>, but you end up with <b>${fmt(total)}</b>.
-      <b>${pct}%</b> of that was made by the snowball — not by you. You did the saving; <b>time</b> did the rest.
-      <br><br>🐷 To reach the same <b>${fmt(total)}</b> with a piggy bank instead, you would have to save
-      <b>${fmt(needWeek)} every week</b> — about <b>${Math.round(times)}×</b> more than the ${fmt(s.week)} you are saving now.`;
+    kcDrawRace(s.target, s.age, annual, true);
+    kcRenderHomes(KC_HOMES, s.age, annual, s.target);
   }
+  // guess feedback — bucket, not dollar
+  const vg=document.getElementById('kcVsGuess'), truth=kcBucketOf(mult);
+  vg.innerHTML = !kcGuess ? '' : kcGuess.truth
+    ? `🎯 <b>Spot on!</b> Investing turns your ${fmt(piggy)} into <b>${fmt(index)}</b> — about <b>${niceMult(mult)}</b> more. Same money, better home.`
+    : `You guessed <b>“${KC_BUCKETS[kcGuess.i].label}”</b> — it is actually <b>“${KC_BUCKETS[truth].label}”</b>: <b>${fmt(index)}</b>, about <b>${niceMult(mult)}</b> your money. 🤯`;
+  // the horizon lesson — the whole point of the "grow until" buttons
+  document.getElementById('kcMsg').innerHTML =
+    `⏳ You left it <b>${yrs} years</b>. Tap the other “grow until” buttons — over a short time the homes look alike, `+
+    `but the longer you wait, the <b>more the money home matters</b>.`;
+}
+// The 20% super-investor, kept off the main chart so it does not flatten the other three.
+function kcRevealSuper(){
+  if(kcSuperShown) return; kcSuperShown=true;
+  const s=kcState(), {piggy, annual}=kcMult();
+  const v=futureValue(0,annual,KC_SUPER.k,s.target-s.age), x=v/piggy;
+  document.getElementById('kcSuperBtn').style.display='none';
+  const el=document.getElementById('kcSuper'); el.style.display='block';
+  el.innerHTML=`🚀 A <b>super-investor</b> growing money at <b>20%</b> a year would end with <b>${fmt(v)}</b> — `+
+    `about <b>${niceMult(x)}</b> your money. But that is Warren-Buffett rare. Almost nobody keeps up 20% for a `+
+    `whole life, which is why the honest, realistic home is the <b style="color:var(--g-text)">index fund</b>.`;
+  kcRenderHomes([...KC_HOMES, KC_SUPER], s.age, annual, s.target);
+  confettiBurst(); sfx.fanfare();
 }
 function kcAgain(){
-  kcGuessVal=null;
-  hideTake(3);   // next guess starts clean, with the lesson unspoiled
+  kcGuess=null; kcSuperShown=false;
+  clearInterval(window._kc);
+  hideTake(3);
   document.getElementById('kcResult').style.display='none';
   document.getElementById('kcGuessBox').style.display='block';
-  document.getElementById('kcGuess').value='';
   kcBuildMcq();
-  if(document.body.classList.contains('older')) document.getElementById('kcGuess').focus();
 }
 
-/* ---------- Step 4: early bird vs late bird ---------- */
-const BIRD_W=260, BIRD_R=10, BIRD_END=60;
-function birdPath(startAge, stopAge){
+/* ---------- Step 4: early bird vs late bird ----------
+   REBUILT 2026-07-17 after the kid test. The old version had Amy stop saving at 18 to land the
+   "put in 3.5x less and still won" flourish. That is an adult's punchline: it asks a child to
+   hold TWO variables at once (when you start AND how much you put in), and "why would she stop
+   for ever?" is an unmotivated rule they burn their attention resolving. The kids said it was
+   confusing and they were right.
+   Now both put in the SAME $1,000 of ang pow money and the only variable is WHEN. Nobody can
+   say "well she just saved more" — the money in is identical. And Ben's line sits flat on zero
+   until 25, so "he has not even started" is something you WATCH rather than something we claim. */
+const BIRD_LUMP=1000, BIRD_R=10, BIRD_START=8, BEN_STARTS=25, BIRD_END=60;
+function birdPath(investAt){
   let v=0; const pts=[];
-  for(let a=8; a<=BIRD_END; a++){
-    if(a>=startAge) v = v*(1+BIRD_R/100) + (a<stopAge?BIRD_W:0);
+  for(let a=BIRD_START; a<=BIRD_END; a++){
+    if(a===investAt) v=BIRD_LUMP;            // the ang pow goes in
+    else if(a>investAt) v=v*(1+BIRD_R/100);  // and is then left completely alone
     pts.push({a, v});
   }
   return pts;
 }
+const birdEnd=at=>birdPath(at)[birdPath(at).length-1].v;
+function birdDraw(upto, done){
+  const amy=birdPath(BIRD_START).filter(p=>p.a<=upto);
+  const ben=birdPath(BEN_STARTS).filter(p=>p.a<=upto);
+  drawChart('birdChart', [
+    {name:'Ben', color:'#2563eb', pts:ben, w:3, tag: done?fmt(ben[ben.length-1].v):''},
+    {name:'Amy', color:'#1a8754', pts:amy, fill:true, w:3.5, tag: done?fmt(amy[amy.length-1].v):''}
+  ], {xPrefix:'age ', noFade:true});
+}
 function birdGuess(pick){
-  const amy=birdPath(8,18), ben=birdPath(25,60);
-  const amyT=amy[amy.length-1].v, benT=ben[ben.length-1].v;
+  const amyT=birdEnd(BIRD_START), benT=birdEnd(BEN_STARTS);
   document.getElementById('amyTot').textContent=fmt(amyT);
   document.getElementById('benTot').textContent=fmt(benT);
   document.getElementById('birdA').classList.add('win');
   document.getElementById('birdB').classList.add('lose');
   const res=document.getElementById('birdResult'); res.style.display='block';
   res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
-  drawChart('birdChart', [
-    {name:'Ben', color:'#2563eb', pts:ben, tag:fmt(benT)},
-    {name:'Amy', color:'#1a8754', pts:amy, fill:true, tag:fmt(amyT)}
-  ], {xPrefix:'age '});
-  const times=(amyT/benT).toFixed(1);
-  document.getElementById('birdMsg').innerHTML = (pick==='amy')
-    ? `🎉 <b>Correct — Amy wins, and it is not close.</b> She ends with <b>${fmt(amyT)}</b> against Ben's <b>${fmt(benT)}</b> — <b>${times}×</b> more, after saving for only 10 years and putting in <b>3.5× less money</b>. She stopped at 18 and still won.`
-    : `😮 <b>Amy wins — by a mile.</b> She ends with <b>${fmt(amyT)}</b>; Ben ends with <b>${fmt(benT)}</b>. Amy saved for just 10 years then stopped, and put in <b>3.5× less money</b> than Ben. Starting early beat saving more.`;
-  confettiBurst(); sfx.fanfare(); showTake(4);
+  bringIntoView(res);                     // the chart is the point; do not make them hunt for it
+  document.getElementById('birdMsg').innerHTML='';
+  const live=document.getElementById('birdLive'); live.style.display='block';
+  live.innerHTML='🐦 Amy puts her $1,000 in at <b>8</b>. Now watch Ben — he has not even started…';
+  // Play it out a year at a time. The kids asked for slower and followable: ~5s for 52 years.
+  let a=BIRD_START; birdDraw(a, false);
+  clearInterval(window._bird);
+  window._bird=setInterval(()=>{
+    a++;
+    birdDraw(a, a>=BIRD_END);
+    if(a===BEN_STARTS){
+      live.innerHTML='🦉 <b>Ben finally starts at 25</b> — with the very same $1,000. But look how far ahead Amy already is.';
+      sfx.whoosh();
+    }
+    if(a>=BIRD_END){
+      clearInterval(window._bird);
+      const times=(amyT/benT).toFixed(1);
+      live.innerHTML=`🤯 <b>Same $1,000. Same 10%.</b> Amy ends with <b>${fmt(amyT)}</b>, Ben with <b>${fmt(benT)}</b> — <b>${times}×</b> more, purely for starting earlier.`;
+      document.getElementById('birdMsg').innerHTML = (pick==='amy')
+        ? `🎉 <b>Correct — Amy wins, and it is not close.</b> Waiting 17 years cost Ben <b>${fmt(amyT-benT)}</b>. He did not put in a single cent less. He just started later.`
+        : `😮 <b>Amy wins — by a mile.</b> Both put in exactly <b>$1,000</b>, so this is not about saving harder. Waiting 17 years cost Ben <b>${fmt(amyT-benT)}</b>.`;
+      confettiBurst(); sfx.fanfare(); showTake(4);
+    }
+  }, 95);
 }
 
 /* ---------- Step 5: market illustration ---------- */
@@ -1533,7 +1656,7 @@ function finish(){
 
 /* ---------- init ---------- */
 buildTabs(); buildBars(); rateUpdate(); snowRender(null);
-buildKc(); kcInputs(); drawMarket(); infUpdate(); guUpdate(); go(0);
+buildKc(); kcInputs(); drawMarket(); infUpdate(); guUpdate(); initRead(); go(0);
 selfTest();   // last: every const it checks is initialised by now
 </script>
 </body>
