@@ -62,8 +62,34 @@ doubling coin rather than a million dollars.
    parents, including the sweets-on-the-table version that needs no screen and the
    "ask a grandparent what noodles cost" question.
 
+## Sound and narration — two different jobs
+
+**Sound effects carry the excitement** (`sfx.*`, Web Audio, **zero files** so the page stays
+self-contained): a tick through the boring first fortnight of the Step 0 race, a whoosh as the
+coin overtakes on day 15, a pitch that climbs with the snowball (the sound compounds too), a
+fanfare on reveals, and a deliberately flat *sad* tone for the piggy bank. On by default.
+
+**Narration is a reading aid, not a hype man** (`say()`, Web Speech). Its justification is that
+a 7-year-old **cannot read** "compounding" or a 40-word factbox — not excitement. Measured: the
+Web Speech API exposes only `rate`/`pitch`/`volume`, **no emotion control at all**, and a
+typical Windows box offers just Microsoft David/Mark/Zira. A flat robot faking delight is worse
+than silence, so the buzz comes from sound, not speech. Off by default; voice quality varies by
+device (iOS is much better) and that is out of our hands.
+
+**The design rule that matters: the voice reads the set-up and the takeaway, and STOPS at the
+question.** This page's whole method is "make them guess out loud". A narrator that asks *and*
+answers turns a conversation into a video and kills the mechanic. The parent asks. Always.
+
+**Takeaways** (`#tk0`–`#tk6`) close each step with the lesson in one line. They are hidden on
+any step that asks for a guess until after the reveal — a pre-revealed lesson silently destroys
+predict-then-reveal, so a self-check asserts none of steps 0/1/3/4 start visible. They are also
+retractable: the Step 3 lesson ("time did the rest") is **false** for the piggy bank, where the
+child ends with exactly what they put in, so it is withheld at 0%.
+
 ## Status
 
+- **2026-07-17** — Sound effects, opt-in narration, per-step takeaways; contrast corrected to
+  the `design.md` `-text` tokens (`--t3` fails at label size). 32 self-checks pass.
 - **2026-07-17** — Readability pass: chart text was rendering at ~4px on a phone (viewBox
   scaling) and is now sized from the measured scale; money inputs comma-grouped; kid-facing
   captions bumped off the 13px adult-dashboard size. 30 self-checks pass in-browser.
