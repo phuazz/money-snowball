@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Money Snowball ❄️ — the magic of growing money</title>
-<meta name="description" content="A playful dashboard that teaches kids the power of compounding. Inspired by Adam Khoo. Made to teach my kids, and yours.">
+<meta name="description" content="A playful dashboard that teaches kids the power of compounding. Would you rather have $10 a day for a month, or a 1-cent coin that doubles? Made to teach my kids, and yours.">
 
 <!-- Link previews (WhatsApp / Telegram / iMessage / Facebook). Crawlers will not render an
      SVG or a data URI, so og:image points at a real PNG built by scripts/make_og.py.
@@ -263,30 +263,38 @@ body.older .older-only.inline{display:inline}
     <div class="card">
       <div class="eyebrow">Step 1 · A tricky choice</div>
       <h2>Would you rather…</h2>
-      <p class="lead">Pick one. Then tap <b>Reveal</b> to see which is really bigger. 🤔</p>
+      <p class="lead">One month of pocket money. Pick one — then watch the race. 🏁</p>
       <div class="choices" id="wyrChoices">
-        <div class="choice" data-pick="million" onclick="wyrPick('million')">
+        <div class="choice" data-pick="cash" onclick="wyrPick('cash')">
           <div class="emoji">💵</div>
-          <div class="lbl">$1,000,000 right now</div>
-          <div class="cap">A whole million dollars today!</div>
+          <div class="lbl">$10 every day</div>
+          <div class="cap">Every single day for 30 days.<br>That is <b>$300</b>!</div>
         </div>
         <div class="choice" data-pick="coin" onclick="wyrPick('coin')">
           <div class="emoji">🪙</div>
-          <div class="lbl">A magic 1&cent; coin…</div>
-          <div class="cap">…that <b>doubles every day</b> for 30 days</div>
+          <div class="lbl">One magic 1&cent; coin</div>
+          <div class="cap">Starts at <b>one cent</b>.<br>But it <b>doubles every day</b>.</div>
         </div>
       </div>
       <div class="btnrow center" style="justify-content:center">
-        <button class="btn btn-primary" id="wyrReveal" disabled onclick="wyrReveal()">Reveal! ✨</button>
+        <button class="btn btn-primary" id="wyrReveal" disabled onclick="wyrReveal()">Start the race! 🏁</button>
       </div>
 
-      <div id="wyrResult" style="display:none; margin-top:18px" class="center">
-        <div class="eyebrow">The magic coin on day <span id="wyrDay" class="mono">1</span></div>
-        <div class="big" id="wyrValue" style="font-size:clamp(40px,13vw,72px); color:var(--joy)">$0.01</div>
-        <div id="wyrVerdict" style="margin-top:12px; font-size:18px"></div>
+      <div id="wyrResult" style="display:none; margin-top:18px">
+        <div class="center"><div class="eyebrow">Day <span id="wyrDay" class="mono">1</span> of 30</div></div>
+        <div class="splitrow">
+          <div class="splitcell"><div class="eyebrow">💵 $10 a day</div><div class="big mono" id="wyrCash" style="color:var(--b)">$10</div></div>
+          <div class="splitcell"><div class="eyebrow">🪙 Magic coin</div><div class="big mono" id="wyrCoin" style="color:var(--joy)">$0.01</div></div>
+        </div>
+        <div class="chart" id="wyrChart"></div>
+        <div class="legend"><span><i style="background:var(--b)"></i>$10 a day</span><span><i style="background:var(--joy)"></i>the magic coin</span></div>
+        <div class="note" id="wyrLive" style="display:none"></div>
+        <div id="wyrVerdict" class="center" style="margin-top:12px; font-size:18px"></div>
         <div class="factbox older-only">
-          Each day the coin doubles: day 1 = $0.01, day 2 = $0.02, day 3 = $0.04 …
-          On day 30 it is $0.01 × 2<sup>29</sup> = <b class="mono">$5,368,709</b>. Doubling starts slow, then explodes.
+          On day 30 the coin is $0.01 × 2<sup>29</sup> = <b class="mono">$5,368,709</b>. But look again at the first
+          two weeks: the coin <b>loses for 14 days straight</b>. That is the real lesson — growing by doubling looks
+          like a failure right up until it does not, which is exactly when most people give up.
+          And if the other choice had been a whole <b>million dollars</b>? The coin still wins.
         </div>
       </div>
     </div>
@@ -300,24 +308,31 @@ body.older .older-only.inline{display:inline}
       <h2>The money snowball</h2>
       <p class="lead">Start with <b>$100</b>. Every year it grows <b>20%</b>. Tap <b>Grow!</b> and watch. ❄️</p>
 
+      <p class="lead" style="margin-top:-4px">Two kids. Both start with <b>$100</b>. Both earn <b>20%</b> a year.
+        One <b>keeps</b> the profit. One <b>spends</b> it on ice cream. Tap <b>Grow!</b> 🌱</p>
+
       <div class="snow-stage" id="snowStage">
         <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-          <line x1="0" y1="205" x2="400" y2="180" stroke="var(--bd2)" stroke-width="3" stroke-linecap="round"/>
-          <g id="ball">
-            <circle id="ballC" cx="70" cy="170" r="26" fill="#fff" stroke="var(--b2)" stroke-width="3"/>
-            <circle cx="62" cy="162" r="5" fill="var(--sky2)"/>
-            <circle cx="78" cy="176" r="3.5" fill="var(--sky2)"/>
-          </g>
+          <line x1="10" y1="200" x2="390" y2="200" stroke="var(--bd2)" stroke-width="3" stroke-linecap="round"/>
+          <circle id="ballKeep" cx="110" cy="176" r="24" fill="#fff" stroke="#1a8754" stroke-width="3"/>
+          <circle id="ballSpend" cx="300" cy="176" r="24" fill="#fff" stroke="#3b82f6" stroke-width="3"/>
+          <text x="110" y="216" text-anchor="middle" font-size="12" font-family="DM Sans" fill="#5c5c56">keeps it 🐿️</text>
+          <text x="300" y="216" text-anchor="middle" font-size="12" font-family="DM Sans" fill="#5c5c56">spends it 🍦</text>
         </svg>
       </div>
 
-      <div class="snow-readout">
-        <span class="big" id="snowVal" style="font-size:clamp(34px,10vw,54px); color:var(--joy)">$100</span>
-        <span class="yeartag">after <b id="snowYear">0</b> years</span>
+      <div class="center"><span class="yeartag">after <b id="snowYear">0</b> years</span></div>
+      <div class="splitrow">
+        <div class="splitcell grow"><div class="eyebrow">🐿️ Keeps the profit</div>
+          <div class="big mono" id="snowKeepV">$100</div></div>
+        <div class="splitcell"><div class="eyebrow">🍦 Eats the profit</div>
+          <div class="big mono" id="snowSpendV" style="color:var(--t2)">$100</div>
+          <div class="tiny muted">…and <b class="mono" id="snowEaten">$0</b> of ice cream, all gone</div></div>
       </div>
+
       <div class="gain-line" id="snowGains" style="display:none">
-        <span>grew by <b style="color:var(--g)" id="snowGain">$0</b> this year</span>
-        <span class="older-only inline">…of which <b style="color:var(--p)" id="snowOnGain">$0</b> was earned on last year’s <em>profit</em> 🤯</span>
+        <span>🐿️ grew by <b style="color:var(--g)" id="snowGain">$0</b> this year</span>
+        <span class="older-only inline">…of which <b style="color:var(--p)" id="snowOnGain">$0</b> was earned on past <em>profit</em> 🤯</span>
       </div>
 
       <div class="btnrow center" style="justify-content:center">
@@ -328,13 +343,10 @@ body.older .older-only.inline{display:inline}
       <div id="snowMsg" class="note" style="display:none"></div>
 
       <div class="factbox older-only" style="margin-top:16px">
-        <b>Why it speeds up:</b> in year 1 you earn 20% of $100 = $20. In year 2 you earn 20% of
-        <b>$120</b> = $24 — more than before, because you are earning money on your <em>earnings</em> too.
-        Leave it alone and the snowball rolls faster and faster. Warren Buffett calls his whole fortune a snowball.
-      </div>
-      <div class="note" id="snowSpendNote" style="display:none"></div>
-      <div class="btnrow" style="justify-content:center">
-        <button class="btn btn-ghost tiny" id="snowSpendBtn" onclick="snowToggleSpend()">🍦 What if I spend the profit each year?</button>
+        <b>Why one speeds up and one never does:</b> in year 1 both earn 20% of $100 = $20. In year 2 the squirrel
+        earns 20% of <b>$120</b> = $24 — more than last year, because the profit is now earning too. The ice-cream
+        kid is always back at $100, so they earn $20 for ever. Same money, same 20%, completely different lives.
+        Warren Buffett calls his whole fortune a snowball.
       </div>
     </div>
     <div class="nav"><button class="btn btn-ghost" onclick="go(0)">← Back</button><button class="btn btn-ghost" onclick="go(2)">Next: doubling →</button></div>
@@ -366,6 +378,18 @@ body.older .older-only.inline{display:inline}
         <b class="mono" id="dbRate">10</b>% a year would double about
         <b class="mono" id="dbTimes">7</b> times — turning $1 into about
         <b class="mono" id="dbMult" style="color:var(--g)">$128</b>. 🚀
+      </div>
+
+      <div class="factbox" style="margin-top:14px">
+        🤯 <b>Here is the surprising part:</b> it takes only <b class="mono">20</b> doublings to turn
+        <b>1</b> into <b class="mono">1,048,576</b> — over a million. And just <b class="mono">30</b> to pass a
+        <b>billion</b>. Doubling does not need <em>many</em> steps. It needs <b>time to take them</b>.
+      </div>
+
+      <div class="note older-only">
+        📄 <b>Go and try this now:</b> fold a piece of paper in half. Again. Again. Almost nobody gets past
+        <b>7</b> folds — but if you <em>could</em> fold it <b class="mono">42</b> times, it would be thick enough to
+        reach past the <b>Moon</b> (about 440,000 km). Every fold just doubles it. That is the same maths as your money.
       </div>
 
       <div class="note older-only">
@@ -505,10 +529,10 @@ body.older .older-only.inline{display:inline}
       </div>
 
       <div class="factbox older-only">
-        Over the 20 years to the end of 2025, the S&amp;P 500 (a bucket of 500 big US companies) grew about
-        <b>10.9% a year</b> on average — through a crash, a pandemic and a trade war. Over the last 10 years it was
-        nearer 15%. Averages hide the bumps: the ride was never smooth, and the future does not have to copy the past.
-        <span class="tiny muted">Figures as cited by Adam Khoo; history, not a forecast.</span>
+        Measured over <em>decades</em> rather than years, a broad bucket of big companies has historically grown at
+        roughly <b>10% a year</b> on average — through crashes, a pandemic and wars. But "average" hides the ride:
+        single years have swung from losing about a third to gaining about a third. The average is the reward for
+        <b>sitting still</b> through all of it. Nobody promises the future copies the past — this is history, not a forecast.
       </div>
     </div>
     <div class="nav"><button class="btn btn-ghost" onclick="go(4)">← Back</button><button class="btn btn-ghost" onclick="go(6)">Next: for grown-ups →</button></div>
@@ -519,7 +543,7 @@ body.older .older-only.inline{display:inline}
     <div class="card">
       <div class="eyebrow">Step 7 · For the grown-ups</div>
       <h2>Grown-up mode</h2>
-      <p class="lead">Adam Khoo's original model, rebuilt: your income, the slice you invest, and what it becomes.</p>
+      <p class="lead">The same maths, on a grown-up salary: your income, the slice you invest, and what it becomes.</p>
 
       <div class="gu-grid">
         <div><label class="gu-lab">Starting age</label><input class="gu-in" id="guAge" type="number" value="21" min="10" max="70" oninput="guUpdate()"></div>
@@ -546,24 +570,25 @@ body.older .older-only.inline{display:inline}
       <div class="tiny muted center" id="guScaleNote">Straight scale: only the fastest line is visible — that <em>is</em> the lesson. Switch to log to see them all.</div>
 
       <div class="note">
-        Contributions are invested at the <b>end</b> of each year and the income grows every year, matching Adam's
-        spreadsheet. Returns are assumed steady; real markets are not. This is arithmetic, not a forecast, and
-        nothing here is financial advice.
+        Contributions are invested at the <b>end</b> of each year, and the income grows every year. Returns are
+        assumed steady; real markets are not. This is arithmetic, not a forecast, and nothing here is financial advice.
       </div>
     </div>
 
     <div class="card">
       <div class="eyebrow">For parents</div>
       <h2>How to teach this</h2>
-      <p class="lead">What actually worked for Adam: he did not lecture. He made his daughters <b>guess</b>, then showed them the number. The shock did the teaching.</p>
-      <div class="qbox"><b>Ask, do not tell.</b> At every reveal, make them commit to a guess out loud first. A wrong guess is the whole point — surprise is what sticks.</div>
+      <p class="lead">Do not lecture. Make them <b>guess</b>, then show them the number. The shock does the teaching — the page is only the prop.</p>
+      <div class="qbox"><b>Ask, do not tell.</b> At every reveal, make them commit to a guess <em>out loud</em> first. A wrong guess is the whole point; surprise is what sticks. A child who is told a fact forgets it. A child who is <em>wrong</em> remembers.</div>
+      <div class="qbox"><b>Do it with sweets, at the table — no screen.</b> Put out 1 sweet. Then 2, then 4, 8, 16 — five days, in front of them. Then ask: “how many by day 21?” It is <b>1,048,576</b>. The physical start and the absurd finish is the entire lesson, and it works on a five-year-old.</div>
       <div class="qbox"><b>The two-cookie test.</b> “One cookie now, or two next week?” Then: “What if waiting turned one cookie into ten?” That is compounding, in cookies.</div>
-      <div class="qbox"><b>Make it real.</b> Match their savings — for every $1 they put in, add 20%. Let them <em>feel</em> a return arrive without working for it.</div>
-      <div class="qbox"><b>Let them pick the company.</b> A share in something they love and can see — a toy maker, a burger chain — beats any lecture about an index.</div>
-      <div class="qbox"><b>Never let them spend the profit.</b> The Step 2 “spend it” toggle is the lesson: eat the profit and the magic switches off.</div>
+      <div class="qbox"><b>Make it real — be the market.</b> Match their savings: for every $1 they put in, add 20% at the end of the month. Let them <em>feel</em> a return arrive without working for it. Nothing else lands like that.</div>
+      <div class="qbox"><b>Let them pick the company.</b> A share in something they love and can see — a toy maker, a burger chain — beats any lecture about an index fund.</div>
+      <div class="qbox"><b>Never let them spend the profit.</b> Step 2 is the whole point: the squirrel and the ice-cream kid start identical. Eat the profit and the magic switches off, permanently.</div>
       <div class="factbox">
-        Adam built his spreadsheet to inspire his own two daughters. They opened accounts at 18; a few years on, both
-        are up over 110% since they started. The spreadsheet was not the point — the <em>conversation</em> it started was.
+        <b>Expect the boring bit.</b> In Step 1 the magic coin loses for 14 straight days, and in real life the
+        boring stretch lasts years. That is not a flaw in the plan — it <em>is</em> the plan. Almost everyone who
+        gives up on compounding gives up during the flat part, right before it gets interesting.
       </div>
 
       <div class="sharebox">
@@ -580,8 +605,7 @@ body.older .older-only.inline{display:inline}
   </section>
 
   <div class="foot">
-    Made with ❤️ to teach kids about money. Inspired by
-    <a href="https://youtu.be/3qPLIYiejas" target="_blank" rel="noopener">Adam Khoo’s “Power of Compounding”</a>.
+    Made with ❤️ to teach kids about money. Free to use and to pass on.
     <br>Not investment advice. Built <!-- BUILD_DATE -->.
   </div>
 </div>
@@ -629,8 +653,9 @@ function fmt2(n){ // 2dp
   // Step 2 factbox must quote REAL compounding over 52 yrs (age 8 -> 60), not 2^(rule-72 doublings).
   t.push(['52y @20 = 13105', approx(Math.pow(1.2,52),13105,2)]);
   t.push(['52y @10 = 142', approx(Math.pow(1.1,52),142,1)]);
-  // Grown-up engine must reproduce Adam Khoo's model exactly. Cells read off his spreadsheet
-  // (start 35, income 84,000, +5%/yr, invest 20%) and milestones stated in his video.
+  // Grown-up engine: reference values for the standard growing-contribution model
+  // (income grows 5%/yr, 20% of it invested at the END of each year). These are simply the
+  // correct outputs for those inputs — they are the regression guard for the recurrence below.
   const sheet=(r,i)=>Math.round(grownUpSeries(35,84000,5,20,0,r,40)[i].v);
   t.push(['sheet 0% y1', sheet(0,0)===16800]);
   t.push(['sheet 0% y2', sheet(0,1)===34440]);
@@ -692,49 +717,77 @@ function go(n){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 
-/* ---------- Step 0: would you rather ---------- */
+/* ---------- Step 0: the race ----------
+   $10/day is a number a child can actually feel; "$1,000,000" is not — to a 7-year-old both
+   a million and five million are just "infinity dollars", so the surprise lands on nothing.
+   Racing the two also exposes the better lesson: the coin LOSES for the first 14 days. */
+const coinOn=d=>0.01*Math.pow(2,d-1);   // day 1 = 1 cent, doubling
+const cashOn=d=>10*d;                   // $10 every day
+const money=v=>v<1000?fmt2(v):fmt(v);
 let wyrChoice=null;
 function wyrPick(which){
   wyrChoice=which;
   document.querySelectorAll('#wyrChoices .choice').forEach(c=>c.classList.toggle('picked', c.dataset.pick===which));
   document.getElementById('wyrReveal').disabled=false;
 }
+function wyrRaceDraw(n){
+  const coin=[], cash=[];
+  for(let d=1; d<=n; d++){ coin.push({a:d, v:coinOn(d)}); cash.push({a:d, v:cashOn(d)}); }
+  // The axis rescales itself as the coin explodes — that rescaling IS the drama.
+  drawChart('wyrChart', [
+    {name:'cash', color:'#2563eb', pts:cash, w:3},
+    {name:'coin', color:'#7c3aed', pts:coin, fill:true, w:3.5}
+  ], {xPrefix:'day ', h:210, noFade:true});
+}
 function wyrReveal(){
-  const res=document.getElementById('wyrResult'); res.style.display='block'; res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
-  // animate the doubling coin day 1 -> 30
-  let day=1, cents=1; // day 1 = 1 cent
-  const dEl=document.getElementById('wyrDay'), vEl=document.getElementById('wyrValue');
+  const res=document.getElementById('wyrResult'); res.style.display='block';
+  res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
+  document.querySelectorAll('#wyrChoices .choice').forEach(c=>c.classList.remove('win','lose'));
+  const btn=document.getElementById('wyrReveal'); btn.disabled=true;
+  const live=document.getElementById('wyrLive'); live.style.display='block';
+  live.innerHTML='😴 Watch the coin. It is <b>losing badly</b>. Boring, right? Keep watching…';
+  document.getElementById('wyrVerdict').innerHTML='';
+  let n=1; wyrRaceDraw(1);
   clearInterval(window._wyr);
   window._wyr=setInterval(()=>{
-    dEl.textContent=day; vEl.textContent=fmt2(cents/100);
-    if(day>=30){
+    n++;
+    document.getElementById('wyrDay').textContent=n;
+    document.getElementById('wyrCoin').textContent=money(coinOn(n));
+    document.getElementById('wyrCash').textContent=money(cashOn(n));
+    wyrRaceDraw(n);
+    if(n===15) live.innerHTML='🏁 <b>Day 15 — the coin just took the lead!</b> It needed half the month just to catch up. Now watch…';
+    else if(n===23) live.innerHTML='🚀 <b>Wheeee!</b> The $10 line looks flat now — but it is still climbing $10 every day. It simply cannot keep up.';
+    if(n>=30){
       clearInterval(window._wyr);
-      const coinFinal=0.01*Math.pow(2,29); // $5,368,709.12
-      const win = wyrChoice==='coin';
-      document.querySelector('#wyrChoices .choice[data-pick="coin"]').classList.add('win');
-      document.querySelector('#wyrChoices .choice[data-pick="million"]').classList.add('lose');
-      document.getElementById('wyrVerdict').innerHTML = win
-        ? `🎉 <b>You picked the magic coin — brilliant!</b> It beats a million dollars by over <b>$4 million</b>.`
-        : `😮 A million sounds huge… but the doubling coin becomes <b>${fmt(coinFinal)}</b> — that is <b>5×</b> bigger. Doubling is magic.`;
+      const ratio=Math.round(coinOn(30)/cashOn(30));
+      live.innerHTML=`🤯 <b>The coin wins by ${ratio.toLocaleString('en-US')} times.</b> Same month, same start. One of them just <b>doubled</b>.`;
+      document.querySelector('.choice[data-pick="coin"]').classList.add('win');
+      document.querySelector('.choice[data-pick="cash"]').classList.add('lose');
+      document.getElementById('wyrVerdict').innerHTML = (wyrChoice==='coin')
+        ? `🎉 <b>You picked the magic coin — brilliant!</b> <b>${fmt(coinOn(30))}</b> against $300.`
+        : `😮 $300 felt like the safe pick… but the coin finishes on <b>${fmt(coinOn(30))}</b>. Doubling is magic.`;
       confettiBurst();
-      return;
+      btn.disabled=false; btn.textContent='Race again 🔁';
     }
-    day++; cents*=2;
-  }, 70);
+  }, 115);
 }
 
-/* ---------- Step 1: snowball ---------- */
+/* ---------- Step 1: the two snowballs ----------
+   Racing keeper against spender side by side beats a toggle: the child WATCHES the gap open,
+   rather than reading that it would. The spender's pot never leaves $100 — that is the lesson. */
 const SNOW_RATE=20, SNOW_START=100;
-let snowYear=0, snowVal=SNOW_START, snowSpend=false;
+let snowYear=0;
 function snowRender(gain, onGain){
-  document.getElementById('snowVal').textContent=fmt2(snowVal).replace('.00','');
+  const keep=SNOW_START*Math.pow(1+SNOW_RATE/100, snowYear);
+  const eaten=SNOW_START*(SNOW_RATE/100)*snowYear;
   document.getElementById('snowYear').textContent=snowYear;
-  // ball grows with sqrt of value; rolls to the right
-  const r=Math.min(92, 26*Math.sqrt(snowVal/SNOW_START));
-  const cx=70 + Math.min(300, (snowYear)*34);
-  const cy=170 - (r-26)*0.35;
-  const b=document.getElementById('ballC'); b.setAttribute('r', r.toFixed(1)); b.setAttribute('cx', cx.toFixed(1)); b.setAttribute('cy', cy.toFixed(1));
-  document.getElementById('ball').setAttribute('transform',`rotate(${snowYear*18} ${cx} ${cy})`);
+  document.getElementById('snowKeepV').textContent=fmt2(keep).replace('.00','');
+  document.getElementById('snowSpendV').textContent='$100';
+  document.getElementById('snowEaten').textContent=fmt(eaten);
+  // radius by sqrt(value) so area reads as the amount; both balls sit on the line at y=200
+  const rk=Math.min(86, 24*Math.sqrt(keep/SNOW_START));
+  const bk=document.getElementById('ballKeep'); bk.setAttribute('r', rk.toFixed(1)); bk.setAttribute('cy', (200-rk).toFixed(1));
+  const bs=document.getElementById('ballSpend'); bs.setAttribute('r','24'); bs.setAttribute('cy','176');
   const gl=document.getElementById('snowGains');
   if(gain!=null){ gl.style.display='flex';
     document.getElementById('snowGain').textContent=fmt2(gain).replace('.00','');
@@ -742,28 +795,24 @@ function snowRender(gain, onGain){
   } else gl.style.display='none';
 }
 function snowGrow(){
-  const gain = snowSpend ? SNOW_START*(SNOW_RATE/100) : snowVal*(SNOW_RATE/100);
-  // "earned on the profit" = this year's gain minus 20% of the original principal
-  const onGain = Math.max(0, gain - SNOW_START*(SNOW_RATE/100));
-  snowVal = snowSpend ? snowVal + SNOW_START*(SNOW_RATE/100) : snowVal + gain;
+  const before=SNOW_START*Math.pow(1+SNOW_RATE/100, snowYear);
+  const gain=before*(SNOW_RATE/100);
+  const onGain=Math.max(0, gain - SNOW_START*(SNOW_RATE/100)); // the bit earned on past profit
   snowYear++;
   snowRender(gain, onGain);
-  if(snowYear===4 && !snowSpend){
-    const m=document.getElementById('snowMsg'); m.style.display='block';
-    m.innerHTML='❄️ Your $100 has more than <b>doubled</b> in about 4 years — and each year it grew by more than the year before. That is compounding!';
-  }
-  if(snowYear>=12){ document.getElementById('snowGrow').disabled=true; }
+  const m=document.getElementById('snowMsg');
+  const keep=SNOW_START*Math.pow(1+SNOW_RATE/100, snowYear);
+  if(snowYear===4){ m.style.display='block';
+    m.innerHTML='❄️ The squirrel has already <b>doubled</b> — and grows by more every year. The ice-cream kid is still on $100, and always will be.'; }
+  else if(snowYear===12){ m.style.display='block';
+    m.innerHTML=`🐿️ After 12 years the squirrel has <b>${fmt(keep)}</b> — nearly <b>9×</b> the start — while the ice-cream kid still has $100. Neither of them saved another cent.`; }
+  if(snowYear>=12) document.getElementById('snowGrow').disabled=true;
 }
-function snowReset(){ snowYear=0; snowVal=SNOW_START; document.getElementById('snowGrow').disabled=false; document.getElementById('snowMsg').style.display='none'; snowRender(null); }
-function snowToggleSpend(){
-  snowSpend=!snowSpend;
-  const note=document.getElementById('snowSpendNote');
-  document.getElementById('snowSpendBtn').textContent = snowSpend ? '❄️ Keep the profit instead' : '🍦 What if I spend the profit each year?';
-  note.style.display='block';
-  note.innerHTML = snowSpend
-    ? '🍦 <b>Spend-it mode:</b> now you take out the $20 profit every year and eat it. Your snowball stops growing faster — it only ever earns $20 a year. The magic switches OFF.'
-    : '❄️ <b>Keep-it mode:</b> leave the profit in and the snowball rolls faster and faster. The magic is ON.';
-  snowReset();
+function snowReset(){
+  snowYear=0;
+  document.getElementById('snowGrow').disabled=false;
+  document.getElementById('snowMsg').style.display='none';
+  snowRender(null);
 }
 
 /* ---------- Step 2: doubling machine ---------- */
@@ -838,8 +887,10 @@ function drawChart(hostId, series, o){
     if(s.fill){
       g+=`<polygon points="${X(a0).toFixed(1)},${(H-P.b)} ${line} ${X(a1).toFixed(1)},${(H-P.b)}" fill="${s.color}" opacity=".13"/>`;
     }
-    g+=`<polyline points="${line}" fill="none" stroke="${s.color}" stroke-width="${s.w||3}" stroke-linejoin="round" stroke-linecap="round"${s.dash?` stroke-dasharray="${s.dash}"`:''}>
-        <animate attributeName="opacity" from="0" to="1" dur=".5s" fill="freeze"/></polyline>`;
+    // The fade-in is for one-shot reveals. Suppress it when redrawing frame-by-frame (o.noFade),
+    // or every frame restarts a 0.5s fade and the line flickers instead of drawing.
+    const fade = o.noFade ? '' : '<animate attributeName="opacity" from="0" to="1" dur=".5s" fill="freeze"/>';
+    g+=`<polyline points="${line}" fill="none" stroke="${s.color}" stroke-width="${s.w||3}" stroke-linejoin="round" stroke-linecap="round"${s.dash?` stroke-dasharray="${s.dash}"`:''}>${fade}</polyline>`;
     const last=s.pts[s.pts.length-1];
     if(s.tag) g+=`<text class="lb" x="${(X(last.a)-4).toFixed(1)}" y="${(Y(last.v)-7).toFixed(1)}" text-anchor="end" fill="${s.color}">${s.tag}</text>`;
   });
@@ -912,8 +963,12 @@ function kcReveal(keep){
     m.innerHTML=`🐷 In a piggy bank your money never grows. You end with exactly what you put in — and by then, sweets cost more. This is the <b>only</b> option where the snowball never rolls.`;
   } else {
     const pct=Math.round(earned/total*100);
+    // The sharpest way to feel the growth: what you'd have to save WITHOUT it to land in the same place.
+    const needWeek=total/years/52, times=needWeek/s.week;
     m.innerHTML=`🤯 Look closely: you only put in <b>${fmt(paid)}</b>, but you end up with <b>${fmt(total)}</b>.
-      <b>${pct}%</b> of your money was made by the snowball — not by you. You did the saving; <b>time</b> did the rest.`;
+      <b>${pct}%</b> of that was made by the snowball — not by you. You did the saving; <b>time</b> did the rest.
+      <br><br>🐷 To reach the same <b>${fmt(total)}</b> with a piggy bank instead, you would have to save
+      <b>${fmt(needWeek)} every week</b> — about <b>${Math.round(times)}×</b> more than the ${fmt(s.week)} you are saving now.`;
   }
 }
 function kcAgain(){
@@ -961,9 +1016,9 @@ function drawMarket(){
   drawChart('mktChart', [{name:'market', color:'#1a8754', pts, fill:true}], {h:190, xPrefix:'yr ', topLabel:''});
 }
 
-/* ---------- Step 6: grown-up mode (Adam's model) ---------- */
-// Adam's spreadsheet: income grows each year, you invest a % of it at the END of each year.
-// Recurrence: v = v*(1+r) + contribution_of_that_year.  Verified against his published cells.
+/* ---------- Step 6: grown-up mode ---------- */
+// Standard growing-contribution model: income grows each year, a fixed % of it is invested at
+// the END of each year.  Recurrence: v = v*(1+r) + contribution_of_that_year.
 function grownUpSeries(startAge, income0, growPct, pctInvest, lump, ratePct, endAge){
   const g=growPct/100, p=pctInvest/100, r=ratePct/100;
   let v=lump; const pts=[];
