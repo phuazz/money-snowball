@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Money Snowball ❄️ — the magic of growing money</title>
-<meta name="description" content="A playful dashboard that teaches kids the power of compounding. Would you rather have $10 a day for a month, or a 1-cent coin that doubles? Made to teach my kids, and yours.">
+<meta name="description" content="A playful dashboard that teaches kids the power of compounding. Would you rather get a $10 ang pow every day for a month, or one magic 1-cent coin that doubles? Made to teach my kids, and yours.">
 
 <!-- Link previews (WhatsApp / Telegram / iMessage / Facebook). Crawlers will not render an
      SVG or a data URI, so og:image points at a real PNG built by scripts/make_og.py.
@@ -13,14 +13,14 @@
 <meta property="og:url" content="https://phuazz.github.io/money-snowball/">
 <meta property="og:site_name" content="Money Snowball">
 <meta property="og:title" content="Money Snowball ❄️ — teach your kids compounding">
-<meta property="og:description" content="Would you rather have $1,000,000, or a 1-cent coin that doubles every day for a month? Seven playful steps that teach kids (7-12) how money grows. Free, no sign-up.">
+<meta property="og:description" content="Would you rather get a $10 ang pow every day for a month, or one magic 1-cent coin that doubles? Eight playful steps that teach kids (7-12) how money grows. Free, no sign-up.">
 <meta property="og:image" content="https://phuazz.github.io/money-snowball/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="A snowball rolling downhill and growing. One cent, doubled for 30 days, equals $5,368,709.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Money Snowball ❄️ — teach your kids compounding">
-<meta name="twitter:description" content="Would you rather have $1,000,000, or a 1-cent coin that doubles every day for a month? Seven playful steps that teach kids how money grows.">
+<meta name="twitter:description" content="Would you rather get a $10 ang pow every day for a month, or one magic 1-cent coin that doubles? Eight playful steps that teach kids how money grows."">
 <meta name="twitter:image" content="https://phuazz.github.io/money-snowball/og.png">
 <meta name="theme-color" content="#eaf4ff">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>❄️</text></svg>">
@@ -137,7 +137,12 @@ body.older .younger-only{display:none}
 @media(max-width:520px){.choices{grid-template-columns:1fr}}
 .choice{border:2px solid var(--bd); border-radius:var(--radius-kid); background:var(--bg2); padding:20px 16px; text-align:center; cursor:pointer; transition:transform .1s ease, border-color .15s ease, box-shadow .15s ease; min-height:160px; display:flex; flex-direction:column; justify-content:center; gap:8px}
 .choice:hover{transform:translateY(-3px); box-shadow:var(--shadow-lg)}
-.choice .emoji{font-size:52px; line-height:1}
+.choice .emoji{font-size:56px; line-height:1; animation:bob 2.8s ease-in-out infinite}
+.choice:last-child .emoji{animation-delay:.6s}   /* offset so the two do not bob in lockstep */
+@keyframes bob{50%{transform:translateY(-7px) rotate(-4deg)}}
+.choice.picked .emoji{animation:chosen .45s ease}
+@keyframes chosen{40%{transform:scale(1.28) rotate(7deg)}}
+@media(prefers-reduced-motion:reduce){.choice .emoji{animation:none}}
 .choice .lbl{font-weight:700; font-size:17px}
 .choice .cap{font-size:14.5px; color:var(--t3-text)}   /* carries "That is $300!" — the anchor of the hook */
 .choice.picked{border-color:var(--joy); box-shadow:0 0 0 4px rgba(124,58,237,.12)}
@@ -177,6 +182,19 @@ body.older .younger-only{display:none}
 .factbox{background:var(--b-bg); border:1px solid var(--b-bg2); border-radius:14px; padding:12px 14px; font-size:14px; margin-top:12px}
 .stub{border:2px dashed var(--bd2); background:repeating-linear-gradient(45deg,var(--bg3),var(--bg3) 10px,var(--bg2) 10px,var(--bg2) 20px); text-align:center; color:var(--t2)}
 .stub .emoji{font-size:44px}
+
+/* ---------- support tile (Stripe test) ---------- */
+.support{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;
+  background:var(--g-bg); border:1px solid var(--g-bg2); border-radius:var(--radius-kid);
+  padding:14px 18px; margin:10px 0 4px}
+.support .blurb{font-size:15px; color:var(--t2); text-align:left; max-width:340px}
+.support .blurb b{color:var(--t1)}
+.btn-pay{background:var(--g); color:#fff; font-size:16px; min-height:46px; padding:12px 20px;
+  display:inline-flex; align-items:center; gap:8px; white-space:nowrap}
+.btn-pay:hover{filter:brightness(1.06)}
+.mocktag{display:block; text-align:center; font-family:var(--mono); font-size:11px;
+  letter-spacing:.4px; color:var(--a-text); background:var(--sun-bg);
+  border:1px dashed rgba(180,83,9,.4); border-radius:8px; padding:4px 8px; margin:0 auto 10px; max-width:420px}
 .nav{display:flex; justify-content:space-between; gap:10px; margin-top:18px}
 .foot{text-align:center; color:var(--t3-text); font-size:13px; margin-top:34px; line-height:1.7}
 .foot a{color:var(--b-text); text-decoration:none}
@@ -295,6 +313,29 @@ body.older .younger-only{display:none}
     <div class="sub">watch small money grow into BIG money</div>
   </div>
 
+  <!-- ============ STRIPE TEST — MOCK, NOT LIVE ============
+       Local experiment only. Do not ship without a decision.
+
+       The real integration is two lines and no backend. In the <head>:
+           <script async src="https://js.stripe.com/v3/buy-button.js"></script>
+       and here, in place of the .support div below:
+           <stripe-buy-button
+             buy-button-id="buy_btn_XXXXXXXXXXXX"
+             publishable-key="pk_test_XXXXXXXXXXXX">
+           </stripe-buy-button>
+       Both values come from dashboard.stripe.com → Payment Links → Buy Button.
+       The publishable key is public by design; it is safe in client-side HTML.
+       The secret key (sk_...) is NOT and must never appear in this file.
+
+       Everything below is a stand-in so the tile can be seen and sized. It
+       deliberately collects nothing and reaches no payment processor. -->
+  <div class="mocktag">MOCK — no real Stripe, no card, no money</div>
+  <div class="support">
+    <div class="blurb">Money Snowball is <b>free, forever</b>. If it helped a kid in your
+      life get it, you can chip in for the next lesson. ☕</div>
+    <button class="btn btn-pay" onclick="mockCheckout()">Support · $5</button>
+  </div>
+
   <div class="agebar">
     <div class="seg" role="tablist" aria-label="Choose age level">
       <button id="ageY" class="on" onclick="setMode('younger')">🧒 Younger</button>
@@ -316,15 +357,17 @@ body.older .younger-only{display:none}
       <h2>Would you rather…</h2>
       <p class="lead">One month of pocket money. Pick one — then watch the race. 🏁</p>
       <div class="choices" id="wyrChoices">
+        <!-- 🧧 not 💵: a green US banknote is not money any Singaporean child has held.
+             An ang pow is the one form of money every SG kid is thrilled to receive. -->
         <div class="choice" data-pick="cash" onclick="wyrPick('cash')">
-          <div class="emoji">💵</div>
-          <div class="lbl">$10 every day</div>
-          <div class="cap">Every single day for 30 days.<br>That is <b>$300</b>!</div>
+          <div class="emoji">🧧</div>
+          <div class="lbl">A $10 ang pow, every day</div>
+          <div class="cap">Every single day for 30 days.<br>That is <b>$300</b> — like CNY all month!</div>
         </div>
         <div class="choice" data-pick="coin" onclick="wyrPick('coin')">
           <div class="emoji">🪙</div>
           <div class="lbl">One magic 1&cent; coin</div>
-          <div class="cap">Starts at <b>one cent</b>.<br>But it <b>doubles every day</b>.</div>
+          <div class="cap">The <b>tiniest</b> coin there is.<br>But it <b>doubles every day</b>.</div>
         </div>
       </div>
       <div class="btnrow center" style="justify-content:center">
@@ -334,11 +377,11 @@ body.older .younger-only{display:none}
       <div id="wyrResult" style="display:none; margin-top:18px">
         <div class="center"><div class="eyebrow">Day <span id="wyrDay" class="mono">1</span> of 30</div></div>
         <div class="splitrow">
-          <div class="splitcell"><div class="eyebrow">💵 $10 a day</div><div class="big mono" id="wyrCash" style="color:var(--b)">$10</div></div>
+          <div class="splitcell"><div class="eyebrow">🧧 $10 ang pow a day</div><div class="big mono" id="wyrCash" style="color:var(--b)">$10</div></div>
           <div class="splitcell"><div class="eyebrow">🪙 Magic coin</div><div class="big mono" id="wyrCoin" style="color:var(--joy)">$0.01</div></div>
         </div>
         <div class="chart" id="wyrChart"></div>
-        <div class="legend"><span><i style="background:var(--b)"></i>$10 a day</span><span><i style="background:var(--joy)"></i>the magic coin</span></div>
+        <div class="legend"><span><i style="background:var(--b)"></i>the ang pow</span><span><i style="background:var(--joy)"></i>the magic coin</span></div>
         <div class="note" id="wyrLive" style="display:none"></div>
         <div id="wyrVerdict" class="center" style="margin-top:12px; font-size:18px"></div>
         <div class="takeaway" id="tk0"><div class="lbl">💡 What we just learned</div><p>Doubling starts <b>slow</b>, then explodes. The magic coin looked like a total loser for two whole weeks — and still won by 17,896 times. Slow is not the same as losing.</p></div>
@@ -939,7 +982,7 @@ function wyrReveal(){
     wyrRaceDraw(n);
     if(n<15 && n%3===0) sfx.tick();
     if(n===15){ live.innerHTML='🏁 <b>Day 15 — the coin just took the lead!</b> It needed half the month just to catch up. Now watch…'; sfx.whoosh(); }
-    else if(n===23) live.innerHTML='🚀 <b>Wheeee!</b> The $10 line looks flat now — but it is still climbing $10 every day. It simply cannot keep up.';
+    else if(n===23) live.innerHTML='🚀 <b>Wheeee!</b> The ang pow line looks flat now — but it is still climbing $10 every day. It simply cannot keep up.';
     if(n>=30){
       clearInterval(window._wyr);
       const ratio=Math.round(coinOn(30)/cashOn(30));
@@ -1118,7 +1161,7 @@ function toggleSay(){
 }
 // Set-up lines. Deliberately STOP before the question — the grown-up asks it.
 const SAY={
-  0:"Would you rather have ten dollars every single day for a month? Or just one magic coin, that starts at one cent, and doubles every day? Have a think, and pick the one you want.",
+  0:"Would you rather get a ten dollar ang pow, every single day for a whole month? Or just one magic coin, that starts at one cent, and doubles every day? Have a think, and pick the one you want.",
   1:"Here are two kids. They both start with one hundred dollars, and both of them grow it by twenty percent every year. But one of them keeps the profit, and the other one spends it on ice cream. Tap the grow button, and watch what happens to each of them.",
   2:"Here is a machine that tells you how fast money doubles. Drag the slider to change how fast it grows, and see how many years it takes to double.",
   3:"Now it is your turn. Set this up like it is really you. How old are you, how much can you save each week, and where will you keep it? Then, before you peek, have a guess at how much you will have.",
@@ -1206,10 +1249,14 @@ function paintChart(hostId, series, o){
   g+=`<text class="ax" font-size="${axFS}" x="${P.l}" y="${P.t-5}">${o.topLabel!=null?o.topLabel:fmt(vmax)}</text>`;
   host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img">${g}</svg>`;
 }
+// Big numbers mean nothing to a child until they are priced in something they want.
+// Singapore prices: ice-cream-uncle cone ~$3, bubble tea ~$5, a console game ~$70.
 function unitsText(v){
-  const ice=Math.round(v/3), game=Math.round(v/70);
-  let s=`That is about <b class="mono">${ice.toLocaleString('en-US')}</b> 🍦 ice creams`;
-  if(v>=700) s+=` — or <b class="mono">${game.toLocaleString('en-US')}</b> 🎮 games`;
+  const ice=Math.round(v/3), bbt=Math.round(v/5), game=Math.round(v/70);
+  const n=x=>x.toLocaleString('en-US');
+  let s=`That is about <b class="mono">${n(ice)}</b> 🍦 ice creams`;
+  if(v>=60)  s+=` — or <b class="mono">${n(bbt)}</b> 🧋 bubble teas`;
+  if(v>=700) s+=` — or <b class="mono">${n(game)}</b> 🎮 games`;
   return s;
 }
 
@@ -1452,10 +1499,15 @@ function infUpdate(){
 
 /* ---------- sharing ---------- */
 const SHARE_URL='https://phuazz.github.io/money-snowball/';
-const SHARE_TEXT='Would you rather have $1,000,000, or a 1-cent coin that doubles every day for a month? A free, playful way to teach kids how money grows.';
+const SHARE_TEXT='Would you rather get a $10 ang pow every day for a month, or one magic 1-cent coin that doubles? A free, playful way to teach kids how money grows.';
 function toast(msg){
   const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
   clearTimeout(window._toast); window._toast=setTimeout(()=>el.classList.remove('show'), 2400);
+}
+// STRIPE TEST — stand-in for the Buy Button. A real <stripe-buy-button> would hand off to
+// Stripe's own hosted checkout page here; this reaches nothing and takes nothing.
+function mockCheckout(){
+  toast('🧪 Mock only — real Stripe would open checkout here');
 }
 async function shareIt(){
   // Native share sheet on phones (where this actually gets passed between parents); fall back to copy.

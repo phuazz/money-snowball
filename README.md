@@ -17,6 +17,17 @@ An age toggle (**Younger ≈7 / Older ≈11**) adjusts vocabulary, number sizes,
 whether the Rule-of-72 formula and the grown-up calculator are shown. One page serves a
 range of ages.
 
+### It is built for Singaporean kids specifically
+
+The audience is not "children" in the abstract. **💵 is a US banknote no SG child has held**, so
+the hook offers a **$10 ang pow** 🧧 — the one form of money every Singaporean kid is genuinely
+thrilled to receive, and "like CNY all month" needs no explaining here. Relatable units are
+priced locally too: ice-cream-uncle cone ~$3, **bubble tea ~$5**, console game ~$70.
+
+When the framing changes, it has to change *everywhere* it is echoed: the card, the live race
+readout, the chart legend, the narration line, the meta description, and the share text all say
+ang pow, or the page contradicts itself mid-lesson.
+
 ### Design principle: every quantity must be one a child can feel
 
 The examples are chosen so that **both sides of every comparison are comprehensible**.

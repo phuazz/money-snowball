@@ -89,6 +89,7 @@ def build_og() -> None:
 
     # The hook — the number that does the teaching
     hook = "1 cent, doubled for 30 days  =  $5,368,709"
+    # (kept as the number; the ang pow framing lives on the page, where the child sees it)
     hw = d.textbbox((0, 0), hook, font=f_hook)[2]
     pad_x, pad_y, by = 30, 16, 496
     d.rounded_rectangle(
