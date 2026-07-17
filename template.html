@@ -100,7 +100,7 @@ body{
 .big{font-family:var(--mono); font-weight:700; letter-spacing:-1px; line-height:1}
 .center{text-align:center}
 .muted{color:var(--t3)}
-.tiny{font-size:13px}
+.tiny{font-size:14px}   /* kid-facing captions: 13px is an adult-dashboard size, too tight here */
 .pill{display:inline-block; padding:4px 12px; border-radius:999px; font-size:13px; font-weight:700}
 .pill.blue{background:var(--b-bg2); color:var(--b)}
 .pill.green{background:var(--g-bg2); color:var(--g)}
@@ -128,7 +128,7 @@ body.older .younger-only{display:none}
 .choice:hover{transform:translateY(-3px); box-shadow:var(--shadow-lg)}
 .choice .emoji{font-size:52px; line-height:1}
 .choice .lbl{font-weight:700; font-size:17px}
-.choice .cap{font-size:13px; color:var(--t3)}
+.choice .cap{font-size:14.5px; color:var(--t3)}   /* carries "That is $300!" — the anchor of the hook */
 .choice.picked{border-color:var(--joy); box-shadow:0 0 0 4px rgba(124,58,237,.12)}
 .choice.win{border-color:var(--g); box-shadow:0 0 0 4px var(--g-bg2)}
 .choice.lose{opacity:.6}
@@ -138,8 +138,8 @@ body.older .younger-only{display:none}
   background:linear-gradient(180deg, var(--sky) 0%, #ffffff 100%)}
 .snow-stage svg{position:absolute; inset:0; width:100%; height:100%}
 .snow-readout{display:flex; justify-content:center; align-items:baseline; gap:10px; margin-top:6px}
-.yeartag{font-family:var(--mono); font-size:13px; color:var(--t3)}
-.gain-line{display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:8px; font-size:14px}
+.yeartag{font-family:var(--mono); font-size:14px; color:var(--t3)}
+.gain-line{display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:8px; font-size:15px}
 .gain-line b{font-family:var(--mono)}
 
 /* ---------- rule of 72 bars ---------- */
@@ -196,9 +196,12 @@ body.older .younger-only{display:none}
 .chart{width:100%; margin:6px 0}
 .chart svg{width:100%; height:auto; display:block; overflow:visible}
 .chart .gl{stroke:var(--bg4); stroke-width:1}
-.chart .ax{fill:var(--t3); font-family:var(--mono); font-size:9px}
-.chart .lb{font-family:var(--mono); font-size:10px; font-weight:700}
-.legend{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; font-size:13px; margin-top:4px}
+/* No font-size here on purpose: SVG text is in viewBox user units, so a fixed px value is
+   scaled by the container and shrinks to ~4px on a phone. drawChart() sizes it from the
+   measured scale instead. */
+.chart .ax{fill:var(--t3); font-family:var(--mono)}
+.chart .lb{font-family:var(--mono); font-weight:700}
+.legend{display:flex; gap:14px; flex-wrap:wrap; justify-content:center; font-size:14px; margin-top:4px}
 .legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:5px; vertical-align:-1px}
 
 /* ---------- bird race (step 4) ---------- */
@@ -207,7 +210,7 @@ body.older .younger-only{display:none}
 .bird{border:2px solid var(--bd); border-radius:var(--radius-kid); padding:16px; text-align:center; background:var(--bg2)}
 .bird .emoji{font-size:40px}
 .bird h4{margin:4px 0 2px; font-size:18px}
-.bird .who{font-size:13px; color:var(--t3); min-height:38px}
+.bird .who{font-size:14.5px; color:var(--t3); min-height:38px}
 .bird .tot{font-family:var(--mono); font-weight:700; font-size:clamp(20px,5.5vw,26px); margin-top:8px}
 .bird.win{border-color:var(--g); background:var(--g-bg)}
 .bird.win .tot{color:var(--g)}
@@ -452,7 +455,7 @@ body.older .younger-only{display:none}
         <div class="older-only">
           <div class="guessrow">
             <span class="mono" style="font-size:22px; font-weight:700">$</span>
-            <input id="kcGuess" class="guessin" type="number" placeholder="my guess…" inputmode="numeric">
+            <input id="kcGuess" class="guessin" type="text" placeholder="my guess…" inputmode="numeric" onblur="if(this.value.trim())groupMoney(this)">
             <button class="btn btn-primary" onclick="kcReveal()">Show me! ✨</button>
           </div>
         </div>
@@ -629,12 +632,15 @@ body.older .younger-only{display:none}
       <h2>Grown-up mode</h2>
       <p class="lead">The same maths, on a grown-up salary: your income, the slice you invest, and what it becomes.</p>
 
+      <!-- Money fields are type="text" + inputmode="numeric", NOT type="number": the HTML spec
+           requires type="number" to hold a valid floating-point number, so a comma makes the
+           value invalid and the browser discards it. Grouping is worth more than the spinners. -->
       <div class="gu-grid">
         <div><label class="gu-lab">Starting age</label><input class="gu-in" id="guAge" type="number" value="21" min="10" max="70" oninput="guUpdate()"></div>
-        <div><label class="gu-lab">Starting annual income ($)</label><input class="gu-in" id="guInc" type="number" value="42000" min="0" step="1000" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">Starting annual income ($)</label><input class="gu-in money" id="guInc" type="text" inputmode="numeric" value="42,000" oninput="guUpdate()" onblur="groupMoney(this); guUpdate()"></div>
         <div><label class="gu-lab">Annual income increase (%)</label><input class="gu-in" id="guGrow" type="number" value="5" min="0" max="20" step="0.5" oninput="guUpdate()"></div>
         <div><label class="gu-lab">% of income invested</label><input class="gu-in" id="guPct" type="number" value="20" min="0" max="100" step="1" oninput="guUpdate()"></div>
-        <div><label class="gu-lab">Lump sum at the start ($)</label><input class="gu-in" id="guLump" type="number" value="0" min="0" step="1000" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">Lump sum at the start ($)</label><input class="gu-in money" id="guLump" type="text" inputmode="numeric" value="0" oninput="guUpdate()" onblur="groupMoney(this); guUpdate()"></div>
         <div><label class="gu-lab">First-year investment</label><input class="gu-in" id="guFirst" type="text" value="" disabled></div>
       </div>
 
@@ -716,6 +722,12 @@ function rule72(ratePct){ return 72/ratePct; }
 function fmt(n){ // whole-dollar, grouped
   return '$' + Math.round(n).toLocaleString('en-US');
 }
+/* Money inputs are grouped with thousands separators (house rule: every figure is grouped).
+   This is why they cannot be type="number" — see the markup note. Read them with numOf(),
+   never +el.value, which returns NaN for "42,000". Regroup on blur so the caret never jumps
+   while typing. */
+function numOf(el){ const n=parseFloat(String(el.value).replace(/[^\d.]/g,'')); return isFinite(n)?n:0; }
+function groupMoney(el){ const n=numOf(el); el.value = n ? Math.round(n).toLocaleString('en-US') : '0'; }
 function fmt2(n){ // 2dp
   return '$' + n.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
 }
@@ -777,6 +789,10 @@ function selfTest(){
   }
   t.push(['options: 4 incl. truth once', allWellFormed]);
   t.push(['options: biggest is not always right', !truthAlwaysMax]);
+  // Money inputs are grouped, so they must round-trip through numOf(): +"42,000" is NaN.
+  t.push(['numOf parses grouped', numOf({value:'42,000'})===42000]);
+  t.push(['numOf parses plain', numOf({value:'1500000'})===1500000]);
+  t.push(['numOf empty -> 0', numOf({value:''})===0]);
   const fails=t.filter(x=>!x[1]);
   if(fails.length) console.error('Money Snowball self-test FAILED:', fails);
   else console.log('Money Snowball self-test passed ('+t.length+' checks).');
@@ -827,7 +843,9 @@ function go(n){
   // scroll active tab into view + jump to top of content
   const at=document.querySelector('.tab.active'); if(at) at.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'});
   window.scrollTo({top:0, behavior:'smooth'});
+  redrawCharts();   // this step's charts now have a real width, so their text can be sized properly
 }
+addEventListener('resize', ()=>{ clearTimeout(window._rs); window._rs=setTimeout(redrawCharts, 150); });
 
 /* ---------- Step 0: the race ----------
    $10/day is a number a child can actually feel; "$1,000,000" is not — to a 7-year-old both
@@ -981,9 +999,25 @@ function confettiBurst(){
 }
 
 /* ---------- tiny SVG line chart (no CDN, animates, log-capable) ---------- */
-function drawChart(hostId, series, o){
-  o=o||{}; const host=document.getElementById(hostId); if(!host) return;
+// Remember every chart so it can be redrawn once its step is visible and on resize:
+// text size depends on the container width, which is 0 while a step is display:none.
+const CHART_STATE={};
+function drawChart(hostId, series, o){ CHART_STATE[hostId]={series, o:o||{}}; paintChart(hostId, series, o||{}); }
+function redrawCharts(){
+  Object.keys(CHART_STATE).forEach(id=>{
+    const h=document.getElementById(id);
+    if(h && h.clientWidth) paintChart(id, CHART_STATE[id].series, CHART_STATE[id].o);
+  });
+}
+function paintChart(hostId, series, o){
+  const host=document.getElementById(hostId); if(!host) return;
   const W=620, H=o.h||230, P={l:10,r:10,t:18,b:24};
+  // SVG text is measured in viewBox user units, so the container scales it: at 264px wide
+  // against a 620-unit box, a "9px" label lands at ~4px on screen. Size text from the real
+  // scale so it renders legibly at any width. (Guard the hidden case, clientWidth === 0.)
+  const scale=(host.clientWidth||W)/W;
+  const upx=n=>Math.round(n/Math.max(scale,0.05));   // wanted on-screen px -> user units
+  const axFS=upx(12), lbFS=upx(13);
   const base=series[0].pts, a0=base[0].a, a1=base[base.length-1].a;
   const all=series.flatMap(s=>s.pts.map(p=>p.v));
   let vmax=Math.max(...all)*1.06;
@@ -1004,13 +1038,13 @@ function drawChart(hostId, series, o){
     const fade = o.noFade ? '' : '<animate attributeName="opacity" from="0" to="1" dur=".5s" fill="freeze"/>';
     g+=`<polyline points="${line}" fill="none" stroke="${s.color}" stroke-width="${s.w||3}" stroke-linejoin="round" stroke-linecap="round"${s.dash?` stroke-dasharray="${s.dash}"`:''}>${fade}</polyline>`;
     const last=s.pts[s.pts.length-1];
-    if(s.tag) g+=`<text class="lb" x="${(X(last.a)-4).toFixed(1)}" y="${(Y(last.v)-7).toFixed(1)}" text-anchor="end" fill="${s.color}">${s.tag}</text>`;
+    if(s.tag) g+=`<text class="lb" font-size="${lbFS}" x="${(X(last.a)-4).toFixed(1)}" y="${(Y(last.v)-7).toFixed(1)}" text-anchor="end" fill="${s.color}">${s.tag}</text>`;
   });
   // axes: age ticks + top value label
   [a0, Math.round((a0+a1)/2), a1].forEach(a=>{
-    g+=`<text class="ax" x="${X(a).toFixed(1)}" y="${H-6}" text-anchor="middle">${o.xPrefix||''}${a}</text>`;
+    g+=`<text class="ax" font-size="${axFS}" x="${X(a).toFixed(1)}" y="${H-6}" text-anchor="middle">${o.xPrefix||''}${a}</text>`;
   });
-  g+=`<text class="ax" x="${P.l}" y="${P.t-5}">${o.topLabel!=null?o.topLabel:fmt(vmax)}</text>`;
+  g+=`<text class="ax" font-size="${axFS}" x="${P.l}" y="${P.t-5}">${o.topLabel!=null?o.topLabel:fmt(vmax)}</text>`;
   host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img">${g}</svg>`;
 }
 function unitsText(v){
@@ -1084,7 +1118,7 @@ function kcReveal(keep){
   const s=kcState(), years=s.target-s.age, annual=s.week*52;
   const total=futureValue(0, annual, s.rate, years), paid=annual*years, earned=total-paid;
   if(!keep && document.body.classList.contains('older')){
-    const typed=+document.getElementById('kcGuess').value;
+    const typed=numOf(document.getElementById('kcGuess'));   // tolerate "200,000"
     kcGuessVal = typed>0 ? {v:typed, truth:false} : null;
   }
   document.getElementById('kcGuessBox').style.display='none';
@@ -1196,10 +1230,10 @@ function guToggleScale(){
 }
 function guUpdate(){
   const age=+document.getElementById('guAge').value||21;
-  const inc=+document.getElementById('guInc').value||0;
+  const inc=numOf(document.getElementById('guInc'));      // "42,000" -> 42000
   const grow=+document.getElementById('guGrow').value||0;
   const pct=+document.getElementById('guPct').value||0;
-  const lump=+document.getElementById('guLump').value||0;
+  const lump=numOf(document.getElementById('guLump'));
   document.getElementById('guFirst').value=fmt(inc*pct/100)+' in year one';
   const rows=[], series=[];
   GU_RATES.forEach(g=>{

@@ -64,8 +64,11 @@ doubling coin rather than a million dollars.
 
 ## Status
 
+- **2026-07-17** — Readability pass: chart text was rendering at ~4px on a phone (viewBox
+  scaling) and is now sized from the measured scale; money inputs comma-grouped; kid-facing
+  captions bumped off the 13px adult-dashboard size. 30 self-checks pass in-browser.
 - **2026-07-17** — Guess input now age-appropriate: tap-one-of-four in Younger, typed
-  number in Older. 27 self-checks pass in-browser.
+  number in Older.
 - **2026-07-17** — Added Step 6 (inflation, priced in ice creams): the cost of *not*
   investing. 8 steps. Mobile clean.
 - **2026-07-17** — Examples reworked so every quantity is one a child can feel (see the
@@ -93,6 +96,14 @@ doubling coin rather than a million dollars.
   in Step 5, so nominal is compared with nominal). After 20 years a cone is $5.42, so $100
   buys 18 cones against 33 at the start, while $100 invested buys 124. All pinned by
   self-checks.
+- **Chart text is sized from the measured scale, not a declared px** (`paintChart`). SVG text
+  inside a `viewBox` is in user units, so the container rescales it: a "9px" axis label rendered
+  at **3.8px** on a phone (620-unit box at 264px = 0.425× scale), and the 10px label carrying the
+  payoff number at 4.3px. Charts repaint on tab-show and debounced `resize` because a hidden tab
+  measures `clientWidth === 0`. See `design.md`.
+- **Money inputs are `type="text" inputmode="numeric"`, grouped on blur** — `type="number"` cannot
+  hold a comma (the spec requires a valid float, so the browser discards it). Read them with
+  `numOf()`; `+"42,000"` is `NaN`. See `design.md`.
 - **Guess options (`kcOptionSet`) vary their decoy recipe with the inputs.** A fixed recipe
   puts the truth in the same slot every time, so "always pick the biggest" becomes a winning
   strategy and the child stops thinking. The recipe is seeded from the inputs — stable while
