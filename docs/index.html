@@ -183,7 +183,7 @@ body.older .younger-only{display:none}
 .stub{border:2px dashed var(--bd2); background:repeating-linear-gradient(45deg,var(--bg3),var(--bg3) 10px,var(--bg2) 10px,var(--bg2) 20px); text-align:center; color:var(--t2)}
 .stub .emoji{font-size:44px}
 
-/* ---------- support tile (Stripe test) ---------- */
+/* ---------- support tile (Stripe Payment Link) ---------- */
 .support{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;
   background:var(--g-bg); border:1px solid var(--g-bg2); border-radius:var(--radius-kid);
   padding:14px 18px; margin:16px 0 4px}
@@ -192,7 +192,8 @@ body.older .younger-only{display:none}
 .btn-pay{background:var(--g); color:#fff; font-size:16px; min-height:46px; padding:12px 20px;
   display:inline-flex; align-items:center; gap:8px; white-space:nowrap}
 .btn-pay:hover{filter:brightness(1.06)}
-#stripeMount{min-height:46px}
+/* .btn is a <button> rule; the tile's pay control is an <a>, so restore what the anchor loses */
+a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
 .nav{display:flex; justify-content:space-between; gap:10px; margin-top:18px}
 .foot{text-align:center; color:var(--t3-text); font-size:13px; margin-top:34px; line-height:1.7}
 .foot a{color:var(--b-text); text-decoration:none}
@@ -311,18 +312,21 @@ body.older .younger-only{display:none}
     <div class="sub">watch small money grow into BIG money</div>
   </div>
 
-  <!-- Stripe Buy Button, at the masthead by owner's decision (2026-07-17). Both attribute
-       values are PUBLIC by design and belong in client-side HTML; the secret key (sk_...)
-       plays no part here and must never appear in this file. Card details are entered on
-       Stripe's own hosted checkout, so no payment data touches this page.
-       NOTE: sitting above the fold means buy-button.js can no longer be lazy — it loads on
-       every visit, including every child's. That is the cost of this placement; see
-       mountStripe(). A Stripe Payment Link (a plain <a href>, no script) would buy back
-       both properties if this ever gets revisited. -->
+  <!-- Stripe Payment Link. A plain anchor by design: no script, no custom element, nothing
+       from js.stripe.com on this page at all. The previous Buy Button needed buy-button.js on
+       every visit (a child's included) to render, and its buy_btn_ id 404'd at Stripe, so the
+       page shipped "Something went wrong" for hours while an iframe-size check called it
+       verified. An <a href> cannot fail that way: it works or the link is dead.
+       Card details are entered on Stripe's hosted checkout; nothing sensitive touches this
+       page and no key of any kind is needed here.
+       LABEL MUST MATCH STRIPE: the link charges SGD 5.00 ("Donate Now"). Re-check the live
+       link before editing this label — a price that drifts from the checkout is a lie to a
+       parent, not a typo. Checkout shows the merchant as P2 Managed Services Pte Ltd. -->
   <div class="support">
     <div class="blurb">Money Snowball is <b>free, forever</b>. If it helped a kid in your
       life get it, you can chip in for the next lesson. ☕</div>
-    <div id="stripeMount"></div>
+    <a class="btn btn-pay" href="https://buy.stripe.com/fZu7sL3090nhgWk3K52go01"
+       target="_blank" rel="noopener noreferrer">Support · S$5</a>
   </div>
 
   <div class="agebar">
@@ -1494,31 +1498,9 @@ function toast(msg){
   const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
   clearTimeout(window._toast); window._toast=setTimeout(()=>el.classList.remove('show'), 2400);
 }
-/* ---------- Stripe support tile (masthead) ----------
-   Mounts on DOM ready. The tile is above the fold, so it cannot be deferred the way the
-   Step 8 version was: buy-button.js now loads on every visit, including every child's, and
-   it fingerprints on load. That is a known and accepted cost of the masthead placement, not
-   an oversight — a Stripe Payment Link (plain <a href>, no script at all) would restore the
-   no-third-party-script property while keeping the button right here.
-   Both attribute values are public by design; no secret key is involved anywhere. */
-const STRIPE_BUY_BUTTON_ID='buy_btn_1Tu3E4Hukz9ebSJYQhFQzYIW';
-const STRIPE_PUBLISHABLE_KEY='pk_live_51N8kfaHukz9ebSJYcn6MNGFSOqlKvTmVLOWyzKVT7f9lReOhaqkN4b9im6XKdWpR9hyx23lM2O4KX31fpDMfo5S400C81HJOoN';
-let stripeMounted=false;
-function mountStripe(){
-  if(stripeMounted) return; stripeMounted=true;
-  const mount=document.getElementById('stripeMount'); if(!mount) return;
-  const s=document.createElement('script');
-  s.async=true; s.src='https://js.stripe.com/v3/buy-button.js';
-  s.onerror=()=>{ mount.innerHTML='<a class="btn btn-pay" href="https://phuazz.github.io/money-snowball/" onclick="return false" style="opacity:.6">Support unavailable</a>'; };
-  document.head.appendChild(s);
-  // The custom element can sit in the DOM before the script defines it; it upgrades on load.
-  const el=document.createElement('stripe-buy-button');
-  el.setAttribute('buy-button-id', STRIPE_BUY_BUTTON_ID);
-  el.setAttribute('publishable-key', STRIPE_PUBLISHABLE_KEY);
-  mount.appendChild(el);
-}
-if(document.readyState==='loading') addEventListener('DOMContentLoaded', mountStripe);
-else mountStripe();
+/* The support tile is a plain <a href> to a Stripe Payment Link — see the masthead markup.
+   There is deliberately no JS here: no key, no buy-button.js, no custom element to upgrade,
+   and nothing that can render an error box the page cannot see into. */
 async function shareIt(){
   // Native share sheet on phones (where this actually gets passed between parents); fall back to copy.
   if(navigator.share){
