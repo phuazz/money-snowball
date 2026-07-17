@@ -108,6 +108,8 @@ body{
 .older-only{display:none}
 body.older .older-only{display:block}
 body.older .older-only.inline{display:inline}
+.younger-only{display:block}
+body.older .younger-only{display:none}
 
 /* ---------- buttons ---------- */
 .btn{border:0; border-radius:14px; font-family:var(--sans); font-weight:700; font-size:17px; padding:15px 22px; cursor:pointer; min-height:52px; box-shadow:var(--shadow); transition:transform .08s ease, filter .15s ease}
@@ -179,6 +181,10 @@ body.older .older-only.inline{display:inline}
 .opt small{font-family:var(--mono); color:var(--t3); font-weight:700}
 .opt.on{border-color:var(--joy); background:rgba(124,58,237,.06); color:var(--t1)}
 .opt.on small{color:var(--joy)}
+.guesses{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px}
+@media(max-width:400px){.guesses{grid-template-columns:1fr}}
+.opt.guess{justify-content:center; font-family:var(--mono); font-weight:700; font-size:clamp(16px,4.6vw,19px); padding:16px 10px; min-height:60px}
+.opt.guess:hover{border-color:var(--joy); transform:translateY(-2px)}
 .guessrow{display:flex; gap:8px; align-items:center; margin-top:12px; flex-wrap:wrap}
 .guessin{flex:1; min-width:130px; font-family:var(--mono); font-size:20px; font-weight:700; padding:12px 14px; border:2px solid var(--bd); border-radius:14px; background:var(--bg2); color:var(--t1); min-height:52px}
 .guessin:focus{outline:0; border-color:var(--joy)}
@@ -433,11 +439,22 @@ body.older .older-only.inline{display:inline}
       </div>
 
       <div id="kcGuessBox">
-        <div class="note">🙈 <b>Guess first — no peeking!</b> Write down what you think you will have. Guessing is what makes the answer fun.</div>
-        <div class="guessrow">
-          <span class="mono" style="font-size:22px; font-weight:700">$</span>
-          <input id="kcGuess" class="guessin" type="number" placeholder="my guess…" inputmode="numeric">
-          <button class="btn btn-primary" onclick="kcReveal()">Show me! ✨</button>
+        <div class="note younger-only">🙈 <b>Guess first — no peeking!</b> Which one do you think it will be? Tap it. Getting it wrong is the fun part.</div>
+        <div class="note older-only">🙈 <b>Guess first — no peeking!</b> Type what you think you will have. Guessing is what makes the answer land.</div>
+
+        <!-- The show/hide class goes on a WRAPPER, never on the element itself: .guessrow and
+             .guesses carry their own display (flex/grid), which collides with the utility class
+             at equal specificity and silently wins. -->
+        <!-- Younger: one tap, no keyboard, no blank box to freeze at. -->
+        <div class="younger-only"><div class="guesses" id="kcMcq"></div></div>
+
+        <!-- Older: typing a real number is a firmer commitment than picking from a list. -->
+        <div class="older-only">
+          <div class="guessrow">
+            <span class="mono" style="font-size:22px; font-weight:700">$</span>
+            <input id="kcGuess" class="guessin" type="number" placeholder="my guess…" inputmode="numeric">
+            <button class="btn btn-primary" onclick="kcReveal()">Show me! ✨</button>
+          </div>
         </div>
       </div>
 
@@ -748,6 +765,18 @@ function selfTest(){
   t.push(['start = 33 cones', conesFor(100,0)===33]);
   t.push(['invested 20y = 124 cones', conesFor(100*Math.pow(1.1,20),20)===124]);
   t.push(['prices ~2x in 24y @3%', approx(Math.pow(1.03,24),2.0328,0.001)]);
+  // Guess options: every set must offer exactly 4 choices containing the truth exactly once,
+  // and "always pick the biggest" must NOT be a winning strategy across setups.
+  let truthAlwaysMax=true, allWellFormed=true;
+  for(let seed=0; seed<9; seed++){
+    for(const tot of [130000, 219906, 3026162, 118292696]){
+      const o=kcOptionSet(tot, seed);
+      if(o.length!==4 || o.filter(x=>x.truth).length!==1) allWellFormed=false;
+      if(!o[o.length-1].truth) truthAlwaysMax=false;
+    }
+  }
+  t.push(['options: 4 incl. truth once', allWellFormed]);
+  t.push(['options: biggest is not always right', !truthAlwaysMax]);
   const fails=t.filter(x=>!x[1]);
   if(fails.length) console.error('Money Snowball self-test FAILED:', fails);
   else console.log('Money Snowball self-test passed ('+t.length+' checks).');
@@ -760,8 +789,11 @@ function setMode(m){
   document.getElementById('ageY').classList.toggle('on', m==='younger');
   document.getElementById('ageO').classList.toggle('on', m==='older');
   document.getElementById('ageHint').textContent = m==='older'
-    ? 'Older mode: shows the Rule-of-72 maths and extra “why” boxes.'
+    ? 'Older mode: type your own guess, plus the Rule-of-72 maths and extra “why” boxes.'
     : 'Pick “Younger” for little kids, “Older” for around 11+ (adds the maths).';
+  // The two modes guess differently (tap vs type), so drop a half-made guess rather than
+  // leave the wrong control showing a stale answer.
+  if(typeof kcBuildMcq==='function' && document.getElementById('kcResult')) kcAgain();
 }
 
 /* ---------- tabs / steps ---------- */
@@ -991,7 +1023,35 @@ function unitsText(v){
 /* ---------- Step 3: kid calculator ---------- */
 const KC_RATES=[{k:0,e:'🐷',n:'Piggy bank'},{k:2,e:'🏦',n:'Bank'},{k:10,e:'🏢',n:'Index fund'},{k:20,e:'🚀',n:'Super-investor'}];
 const KC_AGES=[{a:18,e:'🎓'},{a:25,e:'🧑'},{a:65,e:'🎉'}];
-let kcRate=10, kcTarget=65;
+let kcRate=10, kcTarget=65, kcGuessVal=null;
+
+// Round to something a child can read aloud. "$3 million" beats "$3,026,162" as an option;
+// "m"/"k" would mean nothing to a 7-year-old, so spell it.
+function niceMoney(v){
+  if(v>=1e6){ const m=v/1e6; return '$'+(m>=10?Math.round(m):Math.round(m*10)/10)+' million'; }
+  if(v>=1000) return '$'+(Math.round(v/1000)*1000).toLocaleString('en-US');
+  return '$'+Math.max(1,Math.round(v));
+}
+/* Build four plausible options around the truth.
+   The decoy recipe VARIES with the inputs: a fixed recipe would park the answer in the same
+   slot every time, and a bright 11-year-old would crack "always pick the biggest" in two goes
+   and stop thinking. Deterministic on the inputs, so options stay put while a slider is dragged. */
+const KC_CONFIGS=[[0.05,0.3,3],[0.2,2,6],[0.1,0.35,0.7]];  // multipliers of the truth; count above/below varies
+function kcOptionSet(total, seed){
+  const cfg=KC_CONFIGS[Math.abs(seed)%KC_CONFIGS.length];
+  const opts=[{v:Math.round(total), truth:true}];
+  cfg.forEach(m=>{
+    const v=Math.round(total*m);
+    // keep decoys visibly distinct from the truth once rounded, and never zero
+    if(v>0 && Math.abs(v-total)/total > 0.15 && !opts.some(o=>niceMoney(o.v)===niceMoney(v))) opts.push({v, truth:false});
+  });
+  let pad=12;
+  while(opts.length<4 && pad<1e6){ // fallback if rounding collapsed a decoy
+    const v=Math.round(total*pad); pad*=4;
+    if(!opts.some(o=>niceMoney(o.v)===niceMoney(v))) opts.push({v, truth:false});
+  }
+  return opts.sort((a,b)=>a.v-b.v);
+}
 function buildKc(){
   document.getElementById('kcRates').innerHTML=KC_RATES.map(r=>
     `<button class="opt${r.k===kcRate?' on':''}" data-r="${r.k}" onclick="kcSetRate(${r.k})">${r.e} ${r.n} <small>${r.k}%</small></button>`).join('');
@@ -1004,17 +1064,30 @@ function kcState(){
   const age=+document.getElementById('kcAge').value, week=+document.getElementById('kcWeek').value;
   return {age, week, rate:kcRate, target:Math.max(kcTarget, age+1)};
 }
+function kcBuildMcq(){
+  const s=kcState(), years=s.target-s.age, annual=s.week*52;
+  const total=futureValue(0, annual, s.rate, years);
+  const seed=s.age + s.week + s.rate + s.target;   // stable for a given setup, varies across setups
+  document.getElementById('kcMcq').innerHTML = kcOptionSet(total, seed).map(o=>
+    `<button class="opt guess" onclick="kcPick(${o.v},${o.truth})">${niceMoney(o.v)}</button>`).join('');
+}
+function kcPick(v, isTruth){ kcGuessVal={v, truth:isTruth}; kcReveal(); }
 function kcInputs(){
   const s=kcState();
   document.getElementById('kcAgeV').textContent=s.age;
   document.getElementById('kcWeekV').textContent='$'+s.week;
   document.getElementById('kcYear').textContent=fmt(s.week*52);
+  kcBuildMcq();
   if(document.getElementById('kcResult').style.display==='block') kcReveal(true);
 }
 function kcReveal(keep){
   const s=kcState(), years=s.target-s.age, annual=s.week*52;
   const total=futureValue(0, annual, s.rate, years), paid=annual*years, earned=total-paid;
-  document.getElementById('kcGuessBox').style.display = keep?'none':'none';
+  if(!keep && document.body.classList.contains('older')){
+    const typed=+document.getElementById('kcGuess').value;
+    kcGuessVal = typed>0 ? {v:typed, truth:false} : null;
+  }
+  document.getElementById('kcGuessBox').style.display='none';
   const res=document.getElementById('kcResult'); res.style.display='block';
   if(!keep){ res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal'); confettiBurst(); }
   document.getElementById('kcTargetAge').textContent=s.target;
@@ -1022,14 +1095,14 @@ function kcReveal(keep){
   document.getElementById('kcPaid').textContent=fmt(paid);
   document.getElementById('kcEarned').textContent=fmt(earned);
   document.getElementById('kcUnits').innerHTML=unitsText(total);
-  // guess comparison
-  const gEl=document.getElementById('kcGuess'), guess=+gEl.value;
+  // guess comparison — works for a tapped option or a typed number
   const vg=document.getElementById('kcVsGuess');
-  if(guess>0){
-    const ratio=total/guess;
-    vg.innerHTML = ratio>1.15 ? `You guessed <b class="mono">${fmt(guess)}</b> — the real answer is <b style="color:var(--joy)">${ratio.toFixed(1)}× bigger</b>! 🤯`
-      : ratio<0.87 ? `You guessed <b class="mono">${fmt(guess)}</b> — a bit too hopeful this time. 🙂`
-      : `You guessed <b class="mono">${fmt(guess)}</b> — wow, so close! 🎯`;
+  if(kcGuessVal && kcGuessVal.v>0){
+    const guess=kcGuessVal.v, ratio=total/guess;
+    vg.innerHTML = kcGuessVal.truth ? `🎯 <b>Spot on — you nailed it!</b> Most grown-ups guess far too low.`
+      : ratio>1.15 ? `You picked <b class="mono">${niceMoney(guess)}</b> — the real answer is <b style="color:var(--joy)">${ratio.toFixed(1)}× bigger</b>! 🤯`
+      : ratio<0.87 ? `You picked <b class="mono">${niceMoney(guess)}</b> — that was <b>too</b> hopeful this time. 🙂`
+      : `You picked <b class="mono">${niceMoney(guess)}</b> — so close! 🎯`;
   } else vg.innerHTML='';
   // chart: saved vs total
   const savedPts=[], totalPts=[];
@@ -1052,10 +1125,12 @@ function kcReveal(keep){
   }
 }
 function kcAgain(){
+  kcGuessVal=null;
   document.getElementById('kcResult').style.display='none';
   document.getElementById('kcGuessBox').style.display='block';
   document.getElementById('kcGuess').value='';
-  document.getElementById('kcGuess').focus();
+  kcBuildMcq();
+  if(document.body.classList.contains('older')) document.getElementById('kcGuess').focus();
 }
 
 /* ---------- Step 4: early bird vs late bird ---------- */

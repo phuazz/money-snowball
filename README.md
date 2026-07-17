@@ -42,7 +42,9 @@ doubling coin rather than a million dollars.
    0% / bank 2% / index fund 10% / super-investor 20%), guess, then reveal. Splits the
    result into "you put in" vs "your snowball made", and answers the question that makes
    it tangible: to reach the same total in a piggy bank you would need to save ~40× more
-   each week.
+   each week. **The guess adapts to age**: Younger taps one of four options (no keyboard,
+   nothing to freeze at — a blank box gets skipped, and a skipped guess kills the reveal);
+   Older types a number, which is a firmer commitment than picking from a list.
 4. **Early Bird vs Late Bird** — Amy saves from 8 to 18 then stops; Ben saves from 25 to
    60. Amy ends with **$249,619** against Ben's **$77,513**, having put in 3.5× less.
    Starting early beats saving more.
@@ -62,8 +64,10 @@ doubling coin rather than a million dollars.
 
 ## Status
 
+- **2026-07-17** — Guess input now age-appropriate: tap-one-of-four in Younger, typed
+  number in Older. 27 self-checks pass in-browser.
 - **2026-07-17** — Added Step 6 (inflation, priced in ice creams): the cost of *not*
-  investing. 8 steps, 25 self-checks pass in-browser. Mobile clean.
+  investing. 8 steps. Mobile clean.
 - **2026-07-17** — Examples reworked so every quantity is one a child can feel (see the
   design principle above), and the page now stands on its own with no third-party
   credit. Mobile clean (no overflow, all tap targets ≥44px). Self-contained: no failed
@@ -89,6 +93,15 @@ doubling coin rather than a million dollars.
   in Step 5, so nominal is compared with nominal). After 20 years a cone is $5.42, so $100
   buys 18 cones against 33 at the start, while $100 invested buys 124. All pinned by
   self-checks.
+- **Guess options (`kcOptionSet`) vary their decoy recipe with the inputs.** A fixed recipe
+  puts the truth in the same slot every time, so "always pick the biggest" becomes a winning
+  strategy and the child stops thinking. The recipe is seeded from the inputs — stable while
+  a slider is dragged, different across setups — and a self-check asserts the biggest option
+  is not always right.
+- **Put `.younger-only` / `.older-only` on a WRAPPER, never on an element that has its own
+  `display`.** `.guessrow{display:flex}` and `.older-only{display:none}` are both single-class
+  (0,1,0), so the later rule in the sheet silently wins: the typing row showed in Younger mode
+  *and* rendered as `block` instead of `flex` in Older. Neither was visible in the diff.
 - **`selfTest()` must be called from init at the bottom, never as an IIFE at the top.** It
   references `const`s declared further down (`conePrice`, `grownUpSeries`); touching a
   `const` before its initialiser runs throws a TDZ `ReferenceError` that aborts the whole
