@@ -40,6 +40,10 @@
   --p:#7c3aed; --p-bg:rgba(124,58,237,0.06);
   --c:#0891b2; --c-bg:rgba(8,145,178,0.06);
   --pk:#be185d; --pk-bg:rgba(190,24,93,0.06);
+  /* -text variants per C:\dev\design.md — for TEXT; the values above are for
+     fills, borders and large type. --t3/--t4 fail WCAG AA at body size. */
+  --g-text:#146c43; --r-text:#a93226; --b-text:#1d4ed8; --a-text:#92400e;
+  --p-text:#7c3aed; --c-text:#0e7490; --pk-text:#be185d; --t3-text:#66665e;
   /* -text variants (design.md "Contrast"): use these for TEXT. The base colours above are for
      fills, borders, chart lines and large type — several fail WCAG AA at label size, and --t3
      (the caption colour) fails outright at 3.18. Readability is the whole job on a kids' page. */
@@ -77,7 +81,7 @@ body{
 .masthead h1{font-family:var(--serif); font-weight:400; font-size:clamp(38px,10vw,60px); line-height:1.02; letter-spacing:-1px; margin:0}
 .masthead h1 .flake{ -webkit-background-clip:text; background-clip:text; }
 /* Large italic clause — design.md keeps --t3 for exactly this; the -text variant is for label-size text. */
-.masthead .sub{font-family:var(--serif); font-style:italic; color:var(--t3); font-size:clamp(17px,4.5vw,22px); margin-top:4px}
+.masthead .sub{font-family:var(--serif); font-style:italic; color:var(--t3-text); font-size:clamp(17px,4.5vw,22px); margin-top:4px}  /* tops out at 22px, so not "large text" — needs 4.5:1 */
 
 /* ---------- age toggle ---------- */
 .agebar{display:flex; justify-content:center; gap:10px; margin:16px 0 6px}
@@ -245,7 +249,7 @@ body.older .younger-only{display:none}
 .mtable td{font-family:var(--mono)}
 .mtable tr:hover td{background:var(--bg-hover)}
 .mtable .hit{color:var(--g-text); font-weight:700}
-.mtable .never{color:var(--t4)}
+.mtable .never{color:var(--t3-text)}  /* --t4 is 2.09:1 — decorative only, never text */
 .qbox{border-left:3px solid var(--joy); background:var(--p-bg); border-radius:0 12px 12px 0; padding:12px 14px; margin-top:10px; font-size:15px}
 .qbox b{color:var(--joy)}
 /* ---------- ice-cream counter (step 6) ---------- */
@@ -1378,7 +1382,10 @@ function grownUpSeries(startAge, income0, growPct, pctInvest, lump, ratePct, end
   return pts;
 }
 function milestoneAge(pts, target){ const h=pts.find(p=>p.v>=target); return h?h.a:null; }
-const GU_RATES=[{r:0,c:'#b0b0a8'},{r:2,c:'#c0392b'},{r:4,c:'#b45309'},{r:10,c:'#2563eb'},{r:15,c:'#1a8754'},{r:20,c:'#7c3aed'}];
+// -text values: each colour is used as a chart line, a legend swatch AND as
+// 14px bold table text, so it must clear 4.5:1. The old #b0b0a8 row measured
+// 2.18:1 — unreadable, on a number the table exists to show.
+const GU_RATES=[{r:0,c:'#66665e'},{r:2,c:'#a93226'},{r:4,c:'#92400e'},{r:10,c:'#1d4ed8'},{r:15,c:'#146c43'},{r:20,c:'#7c3aed'}];
 let guLog=false;
 function guToggleScale(){
   guLog=!guLog;
