@@ -13,3 +13,6 @@ venv/
 
 # Node (local dev only)
 node_modules/
+
+# Local operator config — stays out of the public repo (matches sg-property-decision)
+.claude/
