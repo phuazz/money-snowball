@@ -48,16 +48,26 @@ doubling coin rather than a million dollars.
    Starting early beats saving more.
 5. **Where does ~10% come from?** — a gentle, honest intro to owning pieces of great
    companies, including the part where markets fall by half and it feels horrible.
-6. **Grown-Up Mode + Parent Guide** — the same maths on a grown-up salary: income →
+6. **The Sneaky Thief 🥷 (inflation)** — the answer to the obvious rebuttal Step 5 invites
+   ("fine, I will keep it under my bed"). Prices the piggy bank in **ice creams**: $100
+   still says $100, but buys **33 cones today and 18 in twenty years** — 45% of its power
+   gone, with the lost cones greying out where they stood. The same $100 invested buys
+   **124**. Punchline: your money did not shrink, the price grew — which is why nobody
+   ever sends you a bill. Older mode lands the callback: at 3%, prices double every
+   **72 ÷ 3 = 24 years**. The Rule of 72 also works *against* you.
+7. **Grown-Up Mode + Parent Guide** — the same maths on a grown-up salary: income →
    net-worth model (milestone table + linear/log chart), plus discussion prompts for
-   parents, including the sweets-on-the-table version that needs no screen.
+   parents, including the sweets-on-the-table version that needs no screen and the
+   "ask a grandparent what noodles cost" question.
 
 ## Status
 
+- **2026-07-17** — Added Step 6 (inflation, priced in ice creams): the cost of *not*
+  investing. 8 steps, 25 self-checks pass in-browser. Mobile clean.
 - **2026-07-17** — Examples reworked so every quantity is one a child can feel (see the
   design principle above), and the page now stands on its own with no third-party
-  credit. 20 self-checks pass in-browser. Mobile clean (no overflow, all tap targets
-  ≥44px). Self-contained: no failed requests, no `data/`.
+  credit. Mobile clean (no overflow, all tap targets ≥44px). Self-contained: no failed
+  requests, no `data/`.
 - **2026-07-16** — All seven steps built and verified. Deployed public + hub-listed.
 
 ## Concepts / maths
@@ -75,6 +85,15 @@ doubling coin rather than a million dollars.
 - Step 0 race: the coin passes $10/day on **day 15** and finishes 17,896× ahead
   ($5,368,709 vs $300). The chart's y-axis deliberately rescales itself each frame — the
   rescaling is what conveys the explosion.
+- Step 6 inflation: $3 cone at 3%/yr, invested at 10% (kept consistent with the ~10% rung
+  in Step 5, so nominal is compared with nominal). After 20 years a cone is $5.42, so $100
+  buys 18 cones against 33 at the start, while $100 invested buys 124. All pinned by
+  self-checks.
+- **`selfTest()` must be called from init at the bottom, never as an IIFE at the top.** It
+  references `const`s declared further down (`conePrice`, `grownUpSeries`); touching a
+  `const` before its initialiser runs throws a TDZ `ReferenceError` that aborts the whole
+  script and serves a blank page. This shipped-broken once and was caught only by driving
+  the page, not by reading it.
 - **Step 2 trap avoided:** the "$1 becomes…" figure uses real compounding, never
   `2^(rule-of-72 doublings)` — that shortcut overstates by 25% at 20% ($16,384 against a
   true $13,105) and understates at 10% ($128 against $142). Guarded by a self-check.
