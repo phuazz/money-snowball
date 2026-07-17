@@ -5,6 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Money Snowball ❄️ — the magic of growing money</title>
 <meta name="description" content="A playful dashboard that teaches kids the power of compounding. Inspired by Adam Khoo. Made to teach my kids, and yours.">
+
+<!-- Link previews (WhatsApp / Telegram / iMessage / Facebook). Crawlers will not render an
+     SVG or a data URI, so og:image points at a real PNG built by scripts/make_og.py.
+     Absolute URLs are required: crawlers do not resolve relative paths. -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://phuazz.github.io/money-snowball/">
+<meta property="og:site_name" content="Money Snowball">
+<meta property="og:title" content="Money Snowball ❄️ — teach your kids compounding">
+<meta property="og:description" content="Would you rather have $1,000,000, or a 1-cent coin that doubles every day for a month? Seven playful steps that teach kids (7-12) how money grows. Free, no sign-up.">
+<meta property="og:image" content="https://phuazz.github.io/money-snowball/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A snowball rolling downhill and growing. One cent, doubled for 30 days, equals $5,368,709.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Money Snowball ❄️ — teach your kids compounding">
+<meta name="twitter:description" content="Would you rather have $1,000,000, or a 1-cent coin that doubles every day for a month? Seven playful steps that teach kids how money grows.">
+<meta name="twitter:image" content="https://phuazz.github.io/money-snowball/og.png">
+<meta name="theme-color" content="#eaf4ff">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='88'>❄️</text></svg>">
+<link rel="apple-touch-icon" href="icon-180.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -211,10 +232,15 @@ body.older .older-only.inline{display:inline}
 .mtable .never{color:var(--t4)}
 .qbox{border-left:3px solid var(--joy); background:var(--p-bg); border-radius:0 12px 12px 0; padding:12px 14px; margin-top:10px; font-size:15px}
 .qbox b{color:var(--joy)}
+.sharebox{margin-top:20px; padding:16px; border:1px solid var(--bd); border-radius:var(--radius-kid); background:linear-gradient(180deg,var(--sky) 0%,var(--bg2) 100%)}
+.sharebox p{font-size:15px; color:var(--t2)}
+.toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(90px); background:var(--t1); color:#fff; padding:13px 22px; border-radius:999px; font-weight:600; font-size:15px; box-shadow:var(--shadow-lg); z-index:60; opacity:0; transition:transform .3s cubic-bezier(.2,.8,.2,1), opacity .3s ease; pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0); opacity:1}
 </style>
 </head>
 <body class="younger">
 <canvas class="confetti" id="confetti"></canvas>
+<div class="toast" id="toast"></div>
 <div class="shell">
 
   <div class="masthead">
@@ -539,6 +565,16 @@ body.older .older-only.inline{display:inline}
         Adam built his spreadsheet to inspire his own two daughters. They opened accounts at 18; a few years on, both
         are up over 110% since they started. The spreadsheet was not the point — the <em>conversation</em> it started was.
       </div>
+
+      <div class="sharebox">
+        <div class="eyebrow">Pass it on</div>
+        <p style="margin:6px 0 0">Know another parent who would enjoy this? It is free, has no sign-up and no ads.</p>
+        <div class="btnrow">
+          <button class="btn btn-primary" id="shareBtn" onclick="shareIt()">📤 Share this</button>
+          <button class="btn btn-ghost" onclick="copyLink()">🔗 Copy link</button>
+        </div>
+        <div class="tiny mono muted" style="margin-top:10px" id="shareUrl">phuazz.github.io/money-snowball</div>
+      </div>
     </div>
     <div class="nav"><button class="btn btn-ghost" onclick="go(5)">← Back</button><button class="btn btn-sun" onclick="finish()">I am a Compounding Champion! 🏆</button></div>
   </section>
@@ -546,7 +582,7 @@ body.older .older-only.inline{display:inline}
   <div class="foot">
     Made with ❤️ to teach kids about money. Inspired by
     <a href="https://youtu.be/3qPLIYiejas" target="_blank" rel="noopener">Adam Khoo’s “Power of Compounding”</a>.
-    <br>Not investment advice. Built 2026-07-16.
+    <br>Not investment advice. Built 2026-07-17.
   </div>
 </div>
 
@@ -966,6 +1002,33 @@ function guUpdate(){
   document.getElementById('guBody').innerHTML=rows.join('');
   drawChart('guChart', series, {log:guLog, h:250, xPrefix:'age '});
   document.getElementById('guLegend').innerHTML=GU_RATES.map(g=>`<span><i style="background:${g.c}"></i>${g.r}%</span>`).join('');
+}
+
+/* ---------- sharing ---------- */
+const SHARE_URL='https://phuazz.github.io/money-snowball/';
+const SHARE_TEXT='Would you rather have $1,000,000, or a 1-cent coin that doubles every day for a month? A free, playful way to teach kids how money grows.';
+function toast(msg){
+  const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
+  clearTimeout(window._toast); window._toast=setTimeout(()=>el.classList.remove('show'), 2400);
+}
+async function shareIt(){
+  // Native share sheet on phones (where this actually gets passed between parents); fall back to copy.
+  if(navigator.share){
+    try{ await navigator.share({title:'Money Snowball ❄️', text:SHARE_TEXT, url:SHARE_URL}); return; }
+    catch(e){ if(e && e.name==='AbortError') return; }  // user dismissed the sheet — not an error
+  }
+  copyLink();
+}
+async function copyLink(){
+  try{
+    await navigator.clipboard.writeText(SHARE_URL);
+    toast('🔗 Link copied — now go and paste it');
+  }catch(e){
+    // clipboard blocked (insecure context / permissions): select the URL so it can be copied by hand
+    const el=document.getElementById('shareUrl'); const r=document.createRange();
+    r.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(r);
+    toast('Press Ctrl/⌘+C to copy');
+  }
 }
 
 /* ---------- finish ---------- */
