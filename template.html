@@ -368,7 +368,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         </div>
       </div>
 
-      <div class="eyebrow">Step 1 · A tricky choice</div>
+      <div class="eyebrow">A tricky choice</div>
       <h2>Would you rather…</h2>
       <p class="lead">One month of pocket money. Pick one — then watch the race. 🏁</p>
       <div class="choices" id="wyrChoices">
@@ -408,13 +408,13 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         </div>
       </div>
     </div>
-    <div class="nav"><span></span><button class="btn btn-ghost" onclick="go(1)">Next: the snowball →</button></div>
+    <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button><button class="btn btn-ghost nav-next" onclick="goNext()">Next →</button></div>
   </section>
 
   <!-- ============ STEP 1 — THE SNOWBALL ============ -->
   <section class="step" data-step="1">
     <div class="card">
-      <div class="eyebrow">Step 2 · What is compounding?</div>
+      <div class="eyebrow">What is compounding?</div>
       <h2>The money snowball</h2>
       <p class="lead">Start with <b>$100</b>. Every year it grows <b>20%</b>. Tap <b>Grow!</b> and watch. ❄️</p>
 
@@ -461,13 +461,13 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         Warren Buffett calls his whole fortune a snowball.
       </div>
     </div>
-    <div class="nav"><button class="btn btn-ghost" onclick="go(0)">← Back</button><button class="btn btn-ghost" onclick="go(2)">Next: doubling →</button></div>
+    <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button><button class="btn btn-ghost nav-next" onclick="goNext()">Next →</button></div>
   </section>
 
   <!-- ============ STEP 2 — DOUBLING MACHINE / RULE OF 72 ============ -->
   <section class="step" data-step="2">
     <div class="card">
-      <div class="eyebrow">Step 3 · How fast does money double?</div>
+      <div class="eyebrow">How fast does money double?</div>
       <h2>The doubling machine</h2>
       <p class="lead">Drag the slider to change how fast money grows. The faster it grows, the sooner it <b>doubles</b>.</p>
 
@@ -511,13 +511,13 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         3.8 years (using ln 2 ÷ ln 1.20). Close enough to do in your head — that is the point.
       </div>
     </div>
-    <div class="nav"><button class="btn btn-ghost" onclick="go(1)">← Back</button><button class="btn btn-ghost" onclick="go(3)">Next →</button></div>
+    <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button><button class="btn btn-ghost nav-next" onclick="goNext()">Next →</button></div>
   </section>
 
   <!-- ============ STEP 3 — GROW YOUR MONEY (kid calculator) ============ -->
   <section class="step" data-step="3">
     <div class="card">
-      <div class="eyebrow">Step 4 · Your turn</div>
+      <div class="eyebrow">Your turn</div>
       <h2>Grow your money</h2>
       <p class="lead">Set it up like it is really you. The savings stay the same — but watch how much the
         <b>money home</b> you pick changes where you end up. 🏠</p>
@@ -564,13 +564,13 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         <div class="note" id="kcSuper" style="display:none; margin-top:10px"></div>
       </div>
     </div>
-    <div class="nav"><button class="btn btn-ghost" onclick="go(2)">← Back</button><button class="btn btn-ghost" onclick="go(4)">Next: the birds →</button></div>
+    <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button><button class="btn btn-ghost nav-next" onclick="goNext()">Next →</button></div>
   </section>
 
   <!-- ============ STEP 4 — EARLY BIRD VS LATE BIRD ============ -->
   <section class="step" data-step="4">
     <div class="card">
-      <div class="eyebrow">Step 5 · The most important lesson</div>
+      <div class="eyebrow">The most important lesson</div>
       <h2>Early Bird vs Late Bird</h2>
       <p class="lead">Two kids. Both get <b>$1,000</b> of ang pow money 🧧. Both grow it at <b>10%</b> a year.
         <span class="gloss younger-only inline">(10% means: every year, for every <b>$10</b> you have, you get <b>$1</b> more.)</span>
@@ -613,13 +613,13 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         </div>
       </div>
     </div>
-    <div class="nav"><button class="btn btn-ghost" onclick="go(3)">← Back</button><button class="btn btn-ghost" onclick="go(5)">Next: real investing →</button></div>
+    <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button><button class="btn btn-ghost nav-next" onclick="goNext()">Next →</button></div>
   </section>
 
   <!-- ============ STEP 5 — WHERE DOES 10% COME FROM ============ -->
   <section class="step" data-step="5">
     <div class="card">
-      <div class="eyebrow">Step 6 · The honest bit</div>
+      <div class="eyebrow">The honest bit</div>
       <h2>Where does 10% come from?</h2>
       <p class="lead">A snowball needs a hill. Some hills are steeper than others. 🏔️</p>
 
@@ -654,7 +654,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         <b>sitting still</b> through all of it. Nobody promises the future copies the past — this is history, not a forecast.
       </div>
     </div>
-    <div class="nav"><button class="btn btn-ghost" onclick="go(4)">← Back</button><button class="btn btn-ghost" onclick="go(6)">Next: for grown-ups →</button></div>
+    <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button><button class="btn btn-ghost nav-next" onclick="goNext()">Next →</button></div>
   </section>
 
   <!-- ============ STEP 6 — GROWN-UP MODE & PARENT GUIDE ============ -->
@@ -665,7 +665,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
        actually works: the grandparent question in the parent guide below. -->
   <section class="step" data-step="6">
     <div class="card">
-      <div class="eyebrow">Step 7 · For the grown-ups</div>
+      <div class="eyebrow">For the grown-ups</div>
       <h2>Grown-up mode</h2>
       <p class="lead">The same maths, on a grown-up salary: your income, the slice you invest, and what it becomes.</p>
 
@@ -730,7 +730,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       </div>
 
     </div>
-    <div class="nav"><button class="btn btn-ghost" onclick="go(5)">← Back</button><button class="btn btn-sun" onclick="finish()">I am a Compounding Champion! 🏆</button></div>
+    <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button><button class="btn btn-sun" onclick="finish()">I am a Compounding Champion! 🏆</button></div>
   </section>
 
   <!-- Stripe Payment Link, at the end of the page. A plain anchor by design: no key, no
@@ -859,6 +859,11 @@ function selfTest(){
   t.push(['gloss: 20% of $5 = $1', Math.abs(5*0.20-1)<1e-9]);
   t.push(['gloss: 10% of $10 = $1', Math.abs(10*0.10-1)<1e-9]);
   t.push(['every teaching step has a takeaway', [0,1,2,3,4,5].every(n=>!!document.getElementById('tk'+n))]);
+  // Younger path is the short one: hook, snowball, early bird, grown-ups.
+  t.push(['7 steps total', STEPS.length===7]);
+  t.push(['younger path = 4 steps', STEPS.filter(s=>s.young).length===4]);
+  t.push(['younger path is 0,1,4,6', STEPS.filter(s=>s.young).map(s=>s.n).join(',')==='0,1,4,6']);
+  t.push(['every step still exists in DOM', STEPS.every(s=>!!document.querySelector('.step[data-step="'+s.n+'"]'))]);
   const fails=t.filter(x=>!x[1]);
   if(fails.length) console.error('Money Snowball self-test FAILED:', fails);
   else console.log('Money Snowball self-test passed ('+t.length+' checks).');
@@ -871,30 +876,45 @@ function setMode(m){
   document.getElementById('ageY').classList.toggle('on', m==='younger');
   document.getElementById('ageO').classList.toggle('on', m==='older');
   document.getElementById('ageHint').textContent = m==='older'
-    ? 'Older mode: type your own guess, plus the Rule-of-72 maths and extra “why” boxes.'
-    : 'Pick “Younger” for little kids, “Older” for around 11+ (adds the maths).';
+    ? 'Older: the full 7-step version, with the Rule-of-72 maths and extra “why” boxes.'
+    : 'Younger: a short 4-step path for little kids. Tap “Older” for the full 7-step version.';
   // The two modes guess differently (tap vs type), so drop a half-made guess rather than
   // leave the wrong control showing a stale answer.
   if(typeof kcBuildMcq==='function' && document.getElementById('kcResult')) kcAgain();
+  // The visible step set changes with mode: rebuild the tabs, and if the current step is not in
+  // the new path, fall back to the nearest earlier step that is (else refresh in place).
+  buildTabs();
+  const a=activeSteps().map(s=>s.n);
+  if(!a.includes(current)){
+    go([...a].reverse().find(n=>n<=current) ?? a[0]);
+  } else {
+    document.querySelectorAll('.tab').forEach(t=>{ const i=+t.dataset.tab; t.classList.toggle('active',i===current); t.classList.toggle('done', visited.has(i)&&i!==current); });
+    updateNav();
+  }
 }
 
 /* ---------- tabs / steps ---------- */
+// young:true = the SHORT Younger path (hook → snowball → early bird → grown-ups): the three
+// moments that land for a 7-year-old, plus the parent guide. Older shows all seven. The abstract
+// middle (Doubling / Grow-it / Investing) is Older-only. To move a step into Younger, just flag
+// it young:true — the tabs and Next/Back navigation adapt on their own.
 const STEPS = [
-  {n:0, icon:'🤔', label:'Choose'},
-  {n:1, icon:'❄️', label:'Snowball'},
+  {n:0, icon:'🤔', label:'Choose', young:true},
+  {n:1, icon:'❄️', label:'Snowball', young:true},
   {n:2, icon:'✖️', label:'Doubling'},
   {n:3, icon:'🐷', label:'Grow it'},
-  {n:4, icon:'🐦', label:'Early bird'},
+  {n:4, icon:'🐦', label:'Early bird', young:true},
   {n:5, icon:'🌳', label:'Investing'},
-  {n:6, icon:'👪', label:'Grown-ups'},
+  {n:6, icon:'👪', label:'Grown-ups', young:true},
 ];
+function activeSteps(){ const older=document.body.classList.contains('older'); return STEPS.filter(s=>older||s.young); }
 let current = 0;
 const visited = new Set([0]);
 function buildTabs(){
   const el = document.getElementById('tabs');
-  el.innerHTML = STEPS.map(s=>
+  el.innerHTML = activeSteps().map((s,i)=>
     `<button class="tab" data-tab="${s.n}" onclick="go(${s.n})">
-       <span class="n">${s.n+1}</span>${s.icon} ${s.label}
+       <span class="n">${i+1}</span>${s.icon} ${s.label}
      </button>`).join('');
 }
 function go(n){
@@ -913,6 +933,17 @@ function go(n){
   clearInterval(window._bird); clearInterval(window._kc);  // do not leave an animation running off-screen
   shutUp(); say(SAY[n]);
   if([2,5].includes(n)) showTake(n);   // no reveal on these, so the takeaway cannot spoil anything
+  updateNav();
+}
+// Next/Back walk the ACTIVE path, so Younger skips the hidden middle steps automatically.
+function goNext(){ const a=activeSteps().map(s=>s.n), i=a.indexOf(current); if(i>=0 && i<a.length-1) go(a[i+1]); }
+function goPrev(){ const a=activeSteps().map(s=>s.n), i=a.indexOf(current); if(i>0) go(a[i-1]); }
+function updateNav(){
+  const a=activeSteps(), idx=a.findIndex(s=>s.n===current), sec=document.querySelector('.step.active');
+  if(!sec) return;
+  const prev=sec.querySelector('.nav-prev'), next=sec.querySelector('.nav-next');
+  if(prev) prev.style.visibility = idx>0 ? 'visible' : 'hidden';   // hide "Back" on the first step
+  if(next){ if(idx>=0 && idx<a.length-1){ next.style.display=''; next.textContent='Next: '+a[idx+1].label+' →'; } else next.style.display='none'; }
 }
 addEventListener('resize', ()=>{ clearTimeout(window._rs); window._rs=setTimeout(redrawCharts, 150); });
 
