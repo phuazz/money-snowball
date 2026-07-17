@@ -208,6 +208,28 @@ Note: relative asset paths assume the page is served from a directory URL with a
 slash (as GitHub Pages does). Serving `docs` without the trailing slash locally will 404
 the icon — harmless, and not how it is deployed.
 
+## Support tile (Stripe)
+
+A Stripe **Buy Button** in Step 8 (For the grown-ups). Two deliberate decisions:
+
+**It is not above the fold.** It used to be, which put a "Support · $5" button in front of a
+7-year-old before they had started. Children cannot consent to payments, and the blurb is
+addressed to parents anyway ("if it helped a kid in *your* life"), so it belongs where the
+parents already are — beside the share button. Same ask, right room.
+
+**`js.stripe.com` loads lazily, on first open of Step 8 — never on the kid-facing path.**
+`buy-button.js` fingerprints on load, and a child learning about compounding has no business
+being fingerprinted by a payment processor. It also keeps the script off the ~99% of visits
+that never reach that step. `mountStripe()` is idempotent (verified: one script, one element,
+even after re-entering the tab).
+
+**On keys:** `buy-button-id` and `publishable-key` (`pk_live_…`) are **public by design** —
+Stripe intends them to sit in client-side HTML, so committing them to this public repo is
+correct. The **secret key (`sk_…`) plays no part and must never appear in this repo**; the Buy
+Button needs no secret and no backend. Card details are entered on Stripe's own hosted
+checkout, so **no payment data ever touches this page** — which is exactly why the Buy Button
+is the right pattern for a static public site.
+
 ## On the material
 
 Everything taught here is long-standing, universal finance pedagogy, independently

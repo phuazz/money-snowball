@@ -186,15 +186,13 @@ body.older .younger-only{display:none}
 /* ---------- support tile (Stripe test) ---------- */
 .support{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;
   background:var(--g-bg); border:1px solid var(--g-bg2); border-radius:var(--radius-kid);
-  padding:14px 18px; margin:10px 0 4px}
+  padding:14px 18px; margin:16px 0 4px}
 .support .blurb{font-size:15px; color:var(--t2); text-align:left; max-width:340px}
 .support .blurb b{color:var(--t1)}
 .btn-pay{background:var(--g); color:#fff; font-size:16px; min-height:46px; padding:12px 20px;
   display:inline-flex; align-items:center; gap:8px; white-space:nowrap}
 .btn-pay:hover{filter:brightness(1.06)}
-.mocktag{display:block; text-align:center; font-family:var(--mono); font-size:11px;
-  letter-spacing:.4px; color:var(--a-text); background:var(--sun-bg);
-  border:1px dashed rgba(180,83,9,.4); border-radius:8px; padding:4px 8px; margin:0 auto 10px; max-width:420px}
+#stripeMount{min-height:46px}
 .nav{display:flex; justify-content:space-between; gap:10px; margin-top:18px}
 .foot{text-align:center; color:var(--t3-text); font-size:13px; margin-top:34px; line-height:1.7}
 .foot a{color:var(--b-text); text-decoration:none}
@@ -313,28 +311,10 @@ body.older .younger-only{display:none}
     <div class="sub">watch small money grow into BIG money</div>
   </div>
 
-  <!-- ============ STRIPE TEST — MOCK, NOT LIVE ============
-       Local experiment only. Do not ship without a decision.
-
-       The real integration is two lines and no backend. In the <head>:
-           <script async src="https://js.stripe.com/v3/buy-button.js"></script>
-       and here, in place of the .support div below:
-           <stripe-buy-button
-             buy-button-id="buy_btn_XXXXXXXXXXXX"
-             publishable-key="pk_test_XXXXXXXXXXXX">
-           </stripe-buy-button>
-       Both values come from dashboard.stripe.com → Payment Links → Buy Button.
-       The publishable key is public by design; it is safe in client-side HTML.
-       The secret key (sk_...) is NOT and must never appear in this file.
-
-       Everything below is a stand-in so the tile can be seen and sized. It
-       deliberately collects nothing and reaches no payment processor. -->
-  <div class="mocktag">MOCK — no real Stripe, no card, no money</div>
-  <div class="support">
-    <div class="blurb">Money Snowball is <b>free, forever</b>. If it helped a kid in your
-      life get it, you can chip in for the next lesson. ☕</div>
-    <button class="btn btn-pay" onclick="mockCheckout()">Support · $5</button>
-  </div>
+  <!-- The support tile deliberately does NOT live here. It used to sit above the fold, which
+       put a "Support · $5" button in front of a 7-year-old before they had even started.
+       Children cannot consent to payments, and the blurb is addressed to parents anyway,
+       so it now lives in Step 8 (For the grown-ups) — same ask, right room. -->
 
   <div class="agebar">
     <div class="seg" role="tablist" aria-label="Choose age level">
@@ -779,6 +759,18 @@ body.older .younger-only{display:none}
         </div>
         <div class="tiny mono muted" style="margin-top:10px" id="shareUrl">phuazz.github.io/money-snowball</div>
       </div>
+
+      <!-- Stripe Buy Button. Both values are PUBLIC by design and belong in client-side HTML;
+           the secret key (sk_...) plays no part here and must never appear in this file.
+           Card details are entered on Stripe's own hosted checkout, so no payment data ever
+           touches this page. js.stripe.com is loaded lazily by mountStripe() when this step is
+           first opened — see the note there: children should not be fingerprinted by a payment
+           processor just for learning about compounding. -->
+      <div class="support">
+        <div class="blurb">Money Snowball is <b>free, forever</b>. If it helped a kid in your
+          life get it, you can chip in for the next lesson. ☕</div>
+        <div id="stripeMount"></div>
+      </div>
     </div>
     <div class="nav"><button class="btn btn-ghost" onclick="go(6)">← Back</button><button class="btn btn-sun" onclick="finish()">I am a Compounding Champion! 🏆</button></div>
   </section>
@@ -939,6 +931,7 @@ function go(n){
   redrawCharts();   // this step's charts now have a real width, so their text can be sized properly
   shutUp(); say(SAY[n]);
   if([2,5,6].includes(n)) showTake(n);   // no reveal on these, so the takeaway cannot spoil anything
+  if(n===7) mountStripe();               // third-party payment script loads here and nowhere else
 }
 addEventListener('resize', ()=>{ clearTimeout(window._rs); window._rs=setTimeout(redrawCharts, 150); });
 
@@ -1504,10 +1497,27 @@ function toast(msg){
   const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
   clearTimeout(window._toast); window._toast=setTimeout(()=>el.classList.remove('show'), 2400);
 }
-// STRIPE TEST — stand-in for the Buy Button. A real <stripe-buy-button> would hand off to
-// Stripe's own hosted checkout page here; this reaches nothing and takes nothing.
-function mockCheckout(){
-  toast('🧪 Mock only — real Stripe would open checkout here');
+/* ---------- Stripe support tile (grown-ups step only) ----------
+   Loaded LAZILY, on first open of Step 8, rather than from <head>. buy-button.js does fraud
+   fingerprinting on load, and a child learning about compounding has no business being
+   fingerprinted by a payment processor — nor should the 99% of visits that never reach this
+   step pay for a third-party script. This keeps the entire kid-facing path free of it.
+   Both attribute values are public by design; no secret key is involved anywhere. */
+const STRIPE_BUY_BUTTON_ID='buy_btn_1Tu3E4Hukz9ebSJYQhFQzYIW';
+const STRIPE_PUBLISHABLE_KEY='pk_live_51N8kfaHukz9ebSJYcn6MNGFSOqlKvTmVLOWyzKVT7f9lReOhaqkN4b9im6XKdWpR9hyx23lM2O4KX31fpDMfo5S400C81HJOoN';
+let stripeMounted=false;
+function mountStripe(){
+  if(stripeMounted) return; stripeMounted=true;
+  const mount=document.getElementById('stripeMount'); if(!mount) return;
+  const s=document.createElement('script');
+  s.async=true; s.src='https://js.stripe.com/v3/buy-button.js';
+  s.onerror=()=>{ mount.innerHTML='<a class="btn btn-pay" href="https://phuazz.github.io/money-snowball/" onclick="return false" style="opacity:.6">Support unavailable</a>'; };
+  document.head.appendChild(s);
+  // The custom element can sit in the DOM before the script defines it; it upgrades on load.
+  const el=document.createElement('stripe-buy-button');
+  el.setAttribute('buy-button-id', STRIPE_BUY_BUTTON_ID);
+  el.setAttribute('publishable-key', STRIPE_PUBLISHABLE_KEY);
+  mount.appendChild(el);
 }
 async function shareIt(){
   // Native share sheet on phones (where this actually gets passed between parents); fall back to copy.
