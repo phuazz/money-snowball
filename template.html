@@ -186,7 +186,7 @@ body.older .younger-only{display:none}
 /* ---------- support tile (Stripe Payment Link) ---------- */
 .support{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap;
   background:var(--g-bg); border:1px solid var(--g-bg2); border-radius:var(--radius-kid);
-  padding:14px 18px; margin:16px 0 4px}
+  padding:14px 18px; margin:28px 0 4px}   /* 28px top: it now follows a step's nav row, not the masthead */
 .support .blurb{font-size:15px; color:var(--t2); text-align:left; max-width:340px}
 .support .blurb b{color:var(--t1)}
 .btn-pay{background:var(--g); color:#fff; font-size:16px; min-height:46px; padding:12px 20px;
@@ -312,22 +312,9 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
     <div class="sub">watch small money grow into BIG money</div>
   </div>
 
-  <!-- Stripe Payment Link. A plain anchor by design: no script, no custom element, nothing
-       from js.stripe.com on this page at all. The previous Buy Button needed buy-button.js on
-       every visit (a child's included) to render, and its buy_btn_ id 404'd at Stripe, so the
-       page shipped "Something went wrong" for hours while an iframe-size check called it
-       verified. An <a href> cannot fail that way: it works or the link is dead.
-       Card details are entered on Stripe's hosted checkout; nothing sensitive touches this
-       page and no key of any kind is needed here.
-       LABEL MUST MATCH STRIPE: the link charges SGD 5.00 ("Donate Now"). Re-check the live
-       link before editing this label — a price that drifts from the checkout is a lie to a
-       parent, not a typo. Checkout shows the merchant as P2 Managed Services Pte Ltd. -->
-  <div class="support">
-    <div class="blurb">Money Snowball is <b>free, forever</b>. If it helped a kid in your
-      life get it, you can chip in for the next lesson. ☕</div>
-    <a class="btn btn-pay" href="https://buy.stripe.com/fZu7sL3090nhgWk3K52go01"
-       target="_blank" rel="noopener noreferrer">Support · S$5</a>
-  </div>
+  <!-- The support tile lives at the END of the page, just above .foot — not here. Owner's
+       call, 2026-07-17. It used to sit at 154px, so "Support · S$5" was the first thing a
+       7-year-old met, before the lesson. -->
 
   <div class="agebar">
     <div class="seg" role="tablist" aria-label="Choose age level">
@@ -776,6 +763,22 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
     </div>
     <div class="nav"><button class="btn btn-ghost" onclick="go(6)">← Back</button><button class="btn btn-sun" onclick="finish()">I am a Compounding Champion! 🏆</button></div>
   </section>
+
+  <!-- Stripe Payment Link, at the end of the page. A plain anchor by design: no key, no
+       buy-button.js, no custom element — nothing from js.stripe.com on the page at all. The
+       Buy Button this replaced needed a script on every visit and its buy_btn_ id 404'd at
+       Stripe, so the page served "Something went wrong" for hours while an iframe-size check
+       called it verified. An <a href> cannot fail that way: it works or the link is dead.
+       Card details are entered on Stripe's hosted checkout; nothing sensitive touches here.
+       LABEL MUST MATCH STRIPE: the link charges SGD 5.00 ("Donate Now"). Re-check the live
+       link before editing this label — a price that drifts from the checkout is a false claim
+       to a parent, not a typo. Checkout shows the merchant as P2 Managed Services Pte Ltd. -->
+  <div class="support">
+    <div class="blurb">Money Snowball is <b>free, forever</b>. If it helped a kid in your
+      life get it, you can chip in for the next lesson. ☕</div>
+    <a class="btn btn-pay" href="https://buy.stripe.com/fZu7sL3090nhgWk3K52go01"
+       target="_blank" rel="noopener noreferrer">Support · S$5</a>
+  </div>
 
   <div class="foot">
     Made with ❤️ to teach kids about money. Free to use and to pass on.
