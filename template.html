@@ -293,13 +293,6 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
 .mtable .never{color:var(--t3-text)}  /* --t4 is 2.09:1 — decorative only, never text */
 .qbox{border-left:3px solid var(--joy); background:var(--p-bg); border-radius:0 12px 12px 0; padding:12px 14px; margin-top:10px; font-size:15px}
 .qbox b{color:var(--joy)}
-/* ---------- ice-cream counter (step 6) ---------- */
-.cones{font-size:18px; line-height:1.45; letter-spacing:2px; word-break:break-word; margin-top:8px; min-height:28px}
-.cones .gone{filter:grayscale(1); opacity:.2}
-.cone-card{margin:14px 0; padding:14px; border:1px solid var(--bd); border-radius:var(--radius-kid); background:var(--bg2)}
-.cone-card.good{border-color:var(--g-bg2); background:var(--g-bg)}
-.cone-n{font-family:var(--mono); font-weight:700; font-size:clamp(22px,6.5vw,32px); letter-spacing:-.5px}
-.thief{font-size:44px; text-align:center; margin:2px 0 -4px}
 
 /* ---------- takeaway ("what we just learned") ---------- */
 .takeaway{display:none; margin-top:18px; padding:16px 18px; border-radius:var(--radius-kid);
@@ -650,8 +643,6 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         years your money <b>goes down</b>, and it can feel horrible. In 2008 it fell by about half. People who
         panicked and sold locked in the loss. People who stayed calm kept their snowball rolling. That is why you
         only invest money you will not need for a long, long time.
-        <br><br>Which makes the obvious answer “fine, I will just keep it safe under my bed instead” — and that is
-        exactly the trap. <b>Turn the page.</b> 🥷
       </div>
 
       <div class="takeaway" id="tk5"><div class="lbl">💡 What we just learned</div><p>Owning tiny pieces of great companies has grown money faster than a piggy bank or a bank — but the ride is <b>bumpy</b>, and that bumpiness is the <b>price</b> you pay for the growth. It is not free.</p></div>
@@ -663,73 +654,18 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         <b>sitting still</b> through all of it. Nobody promises the future copies the past — this is history, not a forecast.
       </div>
     </div>
-    <div class="nav"><button class="btn btn-ghost" onclick="go(4)">← Back</button><button class="btn btn-ghost" onclick="go(6)">Next: the sneaky thief →</button></div>
+    <div class="nav"><button class="btn btn-ghost" onclick="go(4)">← Back</button><button class="btn btn-ghost" onclick="go(6)">Next: for grown-ups →</button></div>
   </section>
 
-  <!-- ============ STEP 6 — INFLATION: THE COST OF DOING NOTHING ============ -->
+  <!-- ============ STEP 6 — GROWN-UP MODE & PARENT GUIDE ============ -->
+  <!-- The "Sneaky thief" inflation step was cut 2026-07-17 (owner's call). Two reasons: the
+       decline-in-value idea does not land for a 7-year-old from a static widget, and — worse —
+       measuring wealth in "ice creams you could buy" frames money as CONSUMPTION, which fights
+       the whole page's spine (Step 1: never eat the profit). Inflation now lives only where it
+       actually works: the grandparent question in the parent guide below. -->
   <section class="step" data-step="6">
     <div class="card">
-      <div class="eyebrow">Step 7 · The sneaky bit</div>
-      <div class="thief">🥷</div>
-      <h2 class="center">The sneaky thief</h2>
-      <p class="lead center">“I will just keep my $100 under my bed. Then nobody can ever take it.”<br>
-        Good plan? Let us check. 🕵️</p>
-
-      <div class="ctrl">
-        <label>Wait <b class="mono" id="infYearsV" style="color:var(--joy)">20</b> years…</label>
-        <input class="slider" id="infYears" type="range" min="0" max="30" value="20" step="1" oninput="infUpdate()">
-      </div>
-
-      <div class="splitrow">
-        <div class="splitcell"><div class="eyebrow">🐷 Under your bed</div>
-          <div class="cone-n" id="infCash" style="color:var(--t2)">$100</div>
-          <div class="tiny muted">still exactly $100. Nobody touched it.</div></div>
-        <div class="splitcell"><div class="eyebrow">🍦 One ice cream costs</div>
-          <div class="cone-n" id="infPrice" style="color:var(--r)">$5.42</div>
-          <div class="tiny muted">it was $3.00 when you started</div></div>
-      </div>
-
-      <div class="cone-card">
-        <div class="eyebrow">🐷 What your $100 under the bed can buy</div>
-        <div class="cone-n" id="infPiggyN" style="color:var(--r)">18 ice creams</div>
-        <div class="cones" id="conesPiggy"></div>
-        <div class="tiny muted" id="infLost" style="margin-top:6px"></div>
-      </div>
-
-      <div class="cone-card good">
-        <div class="eyebrow">🌳 What the same $100 could have bought, invested</div>
-        <div class="cone-n" id="infInvN" style="color:var(--g)">124 ice creams</div>
-        <div class="cones" id="conesInv"></div>
-        <div class="tiny muted" id="infInvNote" style="margin-top:6px"></div>
-      </div>
-
-      <div class="factbox">
-        🥷 <b>Your money did not shrink. The price grew.</b> That is what makes the thief sneaky: the number on your
-        note never changes, so it always <em>looks</em> like nothing is happening. Nobody ever sends you a bill.
-      </div>
-
-      <div class="warn">
-        ⚠️ <b>So there is no “do nothing” button.</b> Keeping your money still <em>feels</em> like the safe choice —
-        but it is a choice too, and it has a price. The real question is not “should I wait?”
-        It is <b>“what is waiting costing me?”</b>
-      </div>
-
-      <div class="takeaway" id="tk6"><div class="lbl">💡 What we just learned</div><p>Doing nothing is <b>not safe</b>. Your money sits still while prices walk away from it — so the piggy bank quietly loses almost half its power. There is no "do nothing" button.</p></div>
-
-      <div class="factbox older-only">
-        Prices have usually crept up somewhere around <b>2–4% a year</b>; this uses <b>3%</b>. Now remember the Rule
-        of 72 from Step 3 — but pointed the wrong way: 72 ÷ 3 = <b class="mono">24</b>, so <b>prices double roughly
-        every 24 years</b>. Money left doing nothing loses about <em>half</em> its power in a working lifetime, quietly,
-        without one dramatic day. The same maths that builds your snowball also melts it if you sit still.
-      </div>
-    </div>
-    <div class="nav"><button class="btn btn-ghost" onclick="go(5)">← Back</button><button class="btn btn-ghost" onclick="go(7)">Next: for grown-ups →</button></div>
-  </section>
-
-  <!-- ============ STEP 7 — GROWN-UP MODE & PARENT GUIDE ============ -->
-  <section class="step" data-step="7">
-    <div class="card">
-      <div class="eyebrow">Step 8 · For the grown-ups</div>
+      <div class="eyebrow">Step 7 · For the grown-ups</div>
       <h2>Grown-up mode</h2>
       <p class="lead">The same maths, on a grown-up salary: your income, the slice you invest, and what it becomes.</p>
 
@@ -794,7 +730,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       </div>
 
     </div>
-    <div class="nav"><button class="btn btn-ghost" onclick="go(6)">← Back</button><button class="btn btn-sun" onclick="finish()">I am a Compounding Champion! 🏆</button></div>
+    <div class="nav"><button class="btn btn-ghost" onclick="go(5)">← Back</button><button class="btn btn-sun" onclick="finish()">I am a Compounding Champion! 🏆</button></div>
   </section>
 
   <!-- Stripe Payment Link, at the end of the page. A plain anchor by design: no key, no
@@ -858,7 +794,7 @@ function fmt2(n){ // 2dp
 
 /* ---------- self-checks (dev; logged to console) ----------
    MUST be called from init at the bottom, never as an IIFE here: it references consts
-   (conePrice, conesFor, grownUpSeries) declared further down, and touching a const before
+   (grownUpSeries, kcBucketOf, KC_BUCKETS) declared further down, and touching a const before
    its initialiser runs throws a TDZ ReferenceError that aborts the ENTIRE script and leaves
    a blank page. Function declarations hoist; const initialisers do not. */
 function selfTest(){
@@ -896,11 +832,6 @@ function selfTest(){
   t.push(['35@20% $100m -> 72', mile(35,84000,20,1e8)===72]);
   // Inflation step: $3 cone at 3%/yr. After 20 yrs a cone is $5.42, so $100 buys 18 cones (from 33),
   // while $100 invested at 10% buys 124. Prices double every 72/3 = 24 yrs (rule-of-72 callback).
-  t.push(['cone @20y = 5.42', approx(conePrice(20),5.4183,0.001)]);
-  t.push(['piggy 20y = 18 cones', conesFor(100,20)===18]);
-  t.push(['start = 33 cones', conesFor(100,0)===33]);
-  t.push(['invested 20y = 124 cones', conesFor(100*Math.pow(1.1,20),20)===124]);
-  t.push(['prices ~2x in 24y @3%', approx(Math.pow(1.03,24),2.0328,0.001)]);
   // Step 3 rate comparison: "how many times more than a piggy bank" must be honest, and the
   // correct bucket must MOVE with the horizon (so "pick the biggest" is not a strategy).
   const idxMult=(age,wk,tgt)=>futureValue(0,wk*52,10,tgt-age)/futureValue(0,wk*52,0,tgt-age);
@@ -927,7 +858,7 @@ function selfTest(){
   // The percent gloss must be arithmetically true, or we are teaching a lie in plain words.
   t.push(['gloss: 20% of $5 = $1', Math.abs(5*0.20-1)<1e-9]);
   t.push(['gloss: 10% of $10 = $1', Math.abs(10*0.10-1)<1e-9]);
-  t.push(['every step has a takeaway', [0,1,2,3,4,5,6].every(n=>!!document.getElementById('tk'+n))]);
+  t.push(['every teaching step has a takeaway', [0,1,2,3,4,5].every(n=>!!document.getElementById('tk'+n))]);
   const fails=t.filter(x=>!x[1]);
   if(fails.length) console.error('Money Snowball self-test FAILED:', fails);
   else console.log('Money Snowball self-test passed ('+t.length+' checks).');
@@ -955,8 +886,7 @@ const STEPS = [
   {n:3, icon:'🐷', label:'Grow it'},
   {n:4, icon:'🐦', label:'Early bird'},
   {n:5, icon:'🌳', label:'Investing'},
-  {n:6, icon:'🥷', label:'Sneaky thief'},
-  {n:7, icon:'👪', label:'Grown-ups'},
+  {n:6, icon:'👪', label:'Grown-ups'},
 ];
 let current = 0;
 const visited = new Set([0]);
@@ -982,7 +912,7 @@ function go(n){
   if(n>0) document.body.classList.add('started');  // shrink the masthead; set once, never unset
   clearInterval(window._bird); clearInterval(window._kc);  // do not leave an animation running off-screen
   shutUp(); say(SAY[n]);
-  if([2,5,6].includes(n)) showTake(n);   // no reveal on these, so the takeaway cannot spoil anything
+  if([2,5].includes(n)) showTake(n);   // no reveal on these, so the takeaway cannot spoil anything
 }
 addEventListener('resize', ()=>{ clearTimeout(window._rs); window._rs=setTimeout(redrawCharts, 150); });
 
@@ -1234,8 +1164,7 @@ const SAY={
   3:"Now it is your turn. Set it up like it is really you. How old are you, and how much can you save each week? Then guess this: if you invest your money instead of leaving it in a piggy bank, how many times more do you think you would end up with?",
   4:"Meet Amy and Ben. They each get one thousand dollars of ang pow money, and they both grow it at ten percent a year. Amy puts hers in when she is eight. Ben keeps his in a drawer, and only puts it in when he is twenty five. Exactly the same money. So who do you think has more at sixty?",
   5:"A snowball needs a hill to roll down. Some hills are much steeper than others. A piggy bank does not grow at all. A bank grows a little. And owning tiny pieces of great companies has grown the most.",
-  6:"Imagine you keep one hundred dollars under your bed, where nobody can ever take it. It stays exactly one hundred dollars. So it is safe. Or is it? Drag the slider, and watch the ice creams.",
-  7:"This part is for the grown-ups."
+  6:"This part is for the grown-ups."
 };
 const SAY_TAKE={
   0:"Doubling starts slow, and then it explodes. The magic coin looked like a total loser for two whole weeks, and it still won by nearly eighteen thousand times. Slow is not the same as losing.",
@@ -1582,41 +1511,6 @@ function guUpdate(){
   document.getElementById('guLegend').innerHTML=GU_RATES.map(g=>`<span><i style="background:${g.c}"></i>${g.r}%</span>`).join('');
 }
 
-/* ---------- Step 6: inflation, priced in ice cream ----------
-   A child cannot feel "$100 loses value" — the note still says $100, which is exactly why
-   inflation is invisible. They CAN feel ice creams vanishing. So price the piggy bank in cones. */
-const ICE0=3, INFL=3, INV_R=10;               // $3 cone, prices +3%/yr, investing at 10% (same rate as Step 6's rung)
-const conePrice=y=>ICE0*Math.pow(1+INFL/100, y);
-const conesFor=(dollars,y)=>Math.floor(dollars/conePrice(y));
-function renderCones(id, bright, total){
-  let s='';
-  const cap=Math.min(total,150);            // keep the DOM sane; 124 cones is the point, 1000 is not
-  for(let i=0;i<cap;i++) s += (i<bright) ? '🍦' : '<span class="gone">🍦</span>';
-  document.getElementById(id).innerHTML = s + (total>cap ? ` <b>+${total-cap} more</b>` : '');
-}
-function infUpdate(){
-  const y=+document.getElementById('infYears').value;
-  const price=conePrice(y);
-  const start=conesFor(100,0);                       // 33 cones on day one
-  const piggy=conesFor(100,y);
-  const inv=conesFor(100*Math.pow(1+INV_R/100,y), y);
-  document.getElementById('infYearsV').textContent=y;
-  document.getElementById('infCash').textContent='$100';
-  document.getElementById('infPrice').textContent=fmt2(price);
-  document.getElementById('infPiggyN').textContent=piggy+(piggy===1?' ice cream':' ice creams');
-  document.getElementById('infInvN').textContent=inv+(inv===1?' ice cream':' ice creams');
-  // The piggy row always shows the ORIGINAL 33 cones — the lost ones grey out where they stood.
-  renderCones('conesPiggy', piggy, start);
-  renderCones('conesInv', inv, inv);
-  const lost=start-piggy;
-  document.getElementById('infLost').innerHTML = y===0
-    ? 'Right now they are the same. Drag the slider and watch what happens. 👆'
-    : `😱 <b>${lost} ice creams have quietly vanished</b> — that is <b>${Math.round(lost/start*100)}%</b> of your money's power, and you never saw it go.`;
-  document.getElementById('infInvNote').innerHTML = y===0
-    ? 'Same $100, same day. The difference is what you do next.'
-    : `🌳 That is <b>${(inv/Math.max(piggy,1)).toFixed(0)}×</b> more ice cream than the money under the bed — from the very same $100.`;
-}
-
 /* ---------- sharing ---------- */
 const SHARE_URL='https://phuazz.github.io/money-snowball/';
 const SHARE_TEXT='Would you rather get a $10 ang pow every day for a month, or one magic 1-cent coin that doubles? A free, playful way to teach kids how money grows.';
@@ -1651,12 +1545,12 @@ async function copyLink(){
 function finish(){
   confettiBurst(); sfx.fanfare();
   setTimeout(()=>{ confettiBurst(); sfx.fanfare(); }, 400);
-  alert('🏆 Compounding Champion!\n\nYou now know the four secrets:\n\n1. Money can make money — and that money makes money too.\n2. The sooner you start, the more times it doubles.\n3. Never spend the profit. Let the snowball roll.\n4. Doing nothing is not safe. The sneaky thief eats it anyway.\n\nNow go and explain it to a grown-up.');
+  alert('🏆 Compounding Champion!\n\nYou now know the three secrets:\n\n1. Money can make money — and that money makes money too.\n2. The sooner you start, the more times it doubles.\n3. Never spend the profit. Let the snowball roll.\n\nNow go and explain it to a grown-up.');
 }
 
 /* ---------- init ---------- */
 buildTabs(); buildBars(); rateUpdate(); snowRender(null);
-buildKc(); kcInputs(); drawMarket(); infUpdate(); guUpdate(); initRead(); go(0);
+buildKc(); kcInputs(); drawMarket(); guUpdate(); initRead(); go(0);
 selfTest();   // last: every const it checks is initialised by now
 </script>
 </body>
