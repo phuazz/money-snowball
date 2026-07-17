@@ -311,10 +311,19 @@ body.older .younger-only{display:none}
     <div class="sub">watch small money grow into BIG money</div>
   </div>
 
-  <!-- The support tile deliberately does NOT live here. It used to sit above the fold, which
-       put a "Support · $5" button in front of a 7-year-old before they had even started.
-       Children cannot consent to payments, and the blurb is addressed to parents anyway,
-       so it now lives in Step 8 (For the grown-ups) — same ask, right room. -->
+  <!-- Stripe Buy Button, at the masthead by owner's decision (2026-07-17). Both attribute
+       values are PUBLIC by design and belong in client-side HTML; the secret key (sk_...)
+       plays no part here and must never appear in this file. Card details are entered on
+       Stripe's own hosted checkout, so no payment data touches this page.
+       NOTE: sitting above the fold means buy-button.js can no longer be lazy — it loads on
+       every visit, including every child's. That is the cost of this placement; see
+       mountStripe(). A Stripe Payment Link (a plain <a href>, no script) would buy back
+       both properties if this ever gets revisited. -->
+  <div class="support">
+    <div class="blurb">Money Snowball is <b>free, forever</b>. If it helped a kid in your
+      life get it, you can chip in for the next lesson. ☕</div>
+    <div id="stripeMount"></div>
+  </div>
 
   <div class="agebar">
     <div class="seg" role="tablist" aria-label="Choose age level">
@@ -760,17 +769,6 @@ body.older .younger-only{display:none}
         <div class="tiny mono muted" style="margin-top:10px" id="shareUrl">phuazz.github.io/money-snowball</div>
       </div>
 
-      <!-- Stripe Buy Button. Both values are PUBLIC by design and belong in client-side HTML;
-           the secret key (sk_...) plays no part here and must never appear in this file.
-           Card details are entered on Stripe's own hosted checkout, so no payment data ever
-           touches this page. js.stripe.com is loaded lazily by mountStripe() when this step is
-           first opened — see the note there: children should not be fingerprinted by a payment
-           processor just for learning about compounding. -->
-      <div class="support">
-        <div class="blurb">Money Snowball is <b>free, forever</b>. If it helped a kid in your
-          life get it, you can chip in for the next lesson. ☕</div>
-        <div id="stripeMount"></div>
-      </div>
     </div>
     <div class="nav"><button class="btn btn-ghost" onclick="go(6)">← Back</button><button class="btn btn-sun" onclick="finish()">I am a Compounding Champion! 🏆</button></div>
   </section>
@@ -931,7 +929,6 @@ function go(n){
   redrawCharts();   // this step's charts now have a real width, so their text can be sized properly
   shutUp(); say(SAY[n]);
   if([2,5,6].includes(n)) showTake(n);   // no reveal on these, so the takeaway cannot spoil anything
-  if(n===7) mountStripe();               // third-party payment script loads here and nowhere else
 }
 addEventListener('resize', ()=>{ clearTimeout(window._rs); window._rs=setTimeout(redrawCharts, 150); });
 
@@ -1497,11 +1494,12 @@ function toast(msg){
   const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
   clearTimeout(window._toast); window._toast=setTimeout(()=>el.classList.remove('show'), 2400);
 }
-/* ---------- Stripe support tile (grown-ups step only) ----------
-   Loaded LAZILY, on first open of Step 8, rather than from <head>. buy-button.js does fraud
-   fingerprinting on load, and a child learning about compounding has no business being
-   fingerprinted by a payment processor — nor should the 99% of visits that never reach this
-   step pay for a third-party script. This keeps the entire kid-facing path free of it.
+/* ---------- Stripe support tile (masthead) ----------
+   Mounts on DOM ready. The tile is above the fold, so it cannot be deferred the way the
+   Step 8 version was: buy-button.js now loads on every visit, including every child's, and
+   it fingerprints on load. That is a known and accepted cost of the masthead placement, not
+   an oversight — a Stripe Payment Link (plain <a href>, no script at all) would restore the
+   no-third-party-script property while keeping the button right here.
    Both attribute values are public by design; no secret key is involved anywhere. */
 const STRIPE_BUY_BUTTON_ID='buy_btn_1Tu3E4Hukz9ebSJYQhFQzYIW';
 const STRIPE_PUBLISHABLE_KEY='pk_live_51N8kfaHukz9ebSJYcn6MNGFSOqlKvTmVLOWyzKVT7f9lReOhaqkN4b9im6XKdWpR9hyx23lM2O4KX31fpDMfo5S400C81HJOoN';
@@ -1519,6 +1517,8 @@ function mountStripe(){
   el.setAttribute('publishable-key', STRIPE_PUBLISHABLE_KEY);
   mount.appendChild(el);
 }
+if(document.readyState==='loading') addEventListener('DOMContentLoaded', mountStripe);
+else mountStripe();
 async function shareIt(){
   // Native share sheet on phones (where this actually gets passed between parents); fall back to copy.
   if(navigator.share){
