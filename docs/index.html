@@ -1691,7 +1691,11 @@ function guUpdate(){
   const rows=[], series=[];
   GU_RATES.forEach(g=>{
     const pts=grownUpSeries(age, inc, grow, pct, lump, g.r, 90);
-    series.push({name:g.r+'%', color:g.c, pts, w:g.r>=20?3.5:2.5, fill:false});
+    // Label each line with its rate at the end (its own colour), matching the legend. Scale-aware
+    // so labels never collide: on the linear scale only the 20% line is visibly separated, so only
+    // it gets a label; on log the lines fan apart, so the 10/15/20% investing lines get theirs.
+    const tag = guLog ? (g.r>=10 ? g.r+'%' : '') : (g.r===20 ? '20%' : '');
+    series.push({name:g.r+'%', color:g.c, pts, w:g.r>=20?3.5:2.5, fill:false, tag});
     const at65=pts.find(p=>p.a===65);
     const cell=t=>{const a=milestoneAge(pts,t); return a!==null?`<td class="hit">${a}</td>`:'<td class="never">—</td>';};
     rows.push(`<tr><td><b style="color:${g.c}">${g.r}%</b></td>${cell(1e5)}${cell(1e6)}${cell(1e7)}${cell(1e8)}<td>${at65?fmt(at65.v):'—'}</td></tr>`);
