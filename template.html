@@ -164,6 +164,9 @@ body.older .younger-only.inline{display:none}
 .snow-stage{position:relative; height:220px; margin:6px 0 2px; border-radius:var(--radius-kid); overflow:hidden;
   background:linear-gradient(180deg, var(--sky) 0%, #ffffff 100%)}
 .snow-stage svg{position:absolute; inset:0; width:100%; height:100%}
+/* Smooth grow when the child keeps the profit (SVG geometry transitions in modern browsers;
+   degrades to an instant resize where unsupported — harmless). */
+#snowBall{transition:r .35s cubic-bezier(.2,.8,.2,1), cy .35s cubic-bezier(.2,.8,.2,1)}
 .snow-readout{display:flex; justify-content:center; align-items:baseline; gap:10px; margin-top:6px}
 .yeartag{font-family:var(--mono); font-size:14px; color:var(--t3-text)}
 .gain-line{display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:8px; font-size:15px}
@@ -421,50 +424,54 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
   <section class="step" data-step="1">
     <div class="card">
       <div class="eyebrow">What is compounding?</div>
-      <h2>The money snowball</h2>
-      <p class="lead">Start with <b>$100</b>. Every year it grows <b>20%</b>. Tap <b>Grow!</b> and watch. ❄️</p>
-
-      <p class="lead" style="margin-top:-4px">Two kids. Both start with <b>$100</b>. Both earn <b>20%</b> a year.
-        <span class="gloss younger-only inline">(20% means: every year, for every <b>$5</b> you have, you get <b>$1</b> more.)</span>
-        One <b>keeps</b> the profit. One <b>spends</b> it on ice cream. Tap <b>Grow!</b> 🌱</p>
+      <h2>The ice cream choice</h2>
+      <p class="lead">You have <b>$100</b>. Every year it earns <b>20%</b> — that is your <b>profit</b>.
+        <span class="gloss younger-only inline">(20% means: for every <b>$5</b> you have, you get <b>$1</b> more.)</span></p>
+      <p class="lead" style="margin-top:-4px"><b>You</b> choose each year: <b>🐿️ keep</b> the profit so your snowball grows,
+        or <b>🍦 eat</b> it as ice cream. Yum now — or bigger later?</p>
 
       <div class="snow-stage" id="snowStage">
         <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
           <line x1="10" y1="200" x2="390" y2="200" stroke="var(--bd2)" stroke-width="3" stroke-linecap="round"/>
-          <circle id="ballKeep" cx="110" cy="176" r="24" fill="#fff" stroke="#1a8754" stroke-width="3"/>
-          <circle id="ballSpend" cx="300" cy="176" r="24" fill="#fff" stroke="#3b82f6" stroke-width="3"/>
-          <text x="110" y="216" text-anchor="middle" font-size="12" font-family="DM Sans" fill="#5c5c56">keeps it 🐿️</text>
-          <text x="300" y="216" text-anchor="middle" font-size="12" font-family="DM Sans" fill="#5c5c56">spends it 🍦</text>
+          <circle id="snowBall" cx="200" cy="176" r="24" fill="#fff" stroke="#1a8754" stroke-width="3"/>
+          <circle cx="192" cy="168" r="4" fill="var(--sky2)"/>
+          <circle cx="209" cy="183" r="3" fill="var(--sky2)"/>
         </svg>
       </div>
 
-      <div class="center"><span class="yeartag">after <b id="snowYear">0</b> years</span></div>
+      <div class="center"><span class="yeartag">Year <b id="snowYear">1</b> of 8</span></div>
       <div class="splitrow">
-        <div class="splitcell grow"><div class="eyebrow">🐿️ Keeps the profit</div>
-          <div class="big mono" id="snowKeepV">$100</div></div>
-        <div class="splitcell"><div class="eyebrow">🍦 Eats the profit</div>
-          <div class="big mono" id="snowSpendV" style="color:var(--t2)">$100</div>
-          <div class="tiny muted">…and <b class="mono" id="snowEaten">$0</b> of ice cream, all gone</div></div>
+        <div class="splitcell grow"><div class="eyebrow">🐿️ Your snowball</div>
+          <div class="big mono" id="snowPotV">$100</div></div>
+        <div class="splitcell"><div class="eyebrow">🍦 Ice creams eaten</div>
+          <div class="big mono" id="snowConesV" style="color:var(--t2)">0</div>
+          <div class="tiny" id="snowShelf" style="letter-spacing:3px; min-height:22px; margin-top:2px"></div></div>
       </div>
 
-      <div class="gain-line" id="snowGains" style="display:none">
-        <span>🐿️ grew by <b style="color:var(--g-text)" id="snowGain">$0</b> this year</span>
-        <span class="older-only inline">…of which <b style="color:var(--p-text)" id="snowOnGain">$0</b> was earned on past <em>profit</em> 🤯</span>
-      </div>
-
-      <div class="btnrow center" style="justify-content:center">
-        <button class="btn btn-sun" id="snowGrow" onclick="snowGrow()">Grow! 🌱</button>
-        <button class="btn btn-ghost" onclick="snowReset()">Start again</button>
+      <div id="snowChoose">
+        <div class="note" id="snowProfitMsg" style="text-align:center">🎉 <b>Year 1:</b> your snowball earned <b class="mono">$20</b> profit! Keep it, or eat it?</div>
+        <div class="btnrow center" style="justify-content:center">
+          <button class="btn btn-sun" onclick="snowKeep()">🐿️ Keep it</button>
+          <button class="btn btn-ghost" onclick="snowEat()">🍦 Eat it 😋</button>
+        </div>
       </div>
 
       <div id="snowMsg" class="note" style="display:none"></div>
-      <div class="takeaway" id="tk1"><div class="lbl">💡 What we just learned</div><p>Money can make money — and that new money makes money too. But only if you <b>never spend the profit</b>. Same $100, same 20%: one kid ends with $891, the other with $100.</p></div>
+
+      <div id="snowResult" style="display:none">
+        <div class="note" id="snowResultMsg"></div>
+        <div class="btnrow center" style="justify-content:center">
+          <button class="btn btn-ghost" onclick="snowReset()">🔁 Play again</button>
+        </div>
+      </div>
+      <div class="takeaway" id="tk1"><div class="lbl">💡 What we just learned</div><p>Money makes money — and that money makes <b>more</b> money. Every year you <b>keep</b> the profit, next year's profit is bigger. Eat it, and your snowball stops. Yum is fun, but keeping is how small money grows big.</p></div>
 
       <div class="factbox older-only" style="margin-top:16px">
-        <b>Why one speeds up and one never does:</b> in year 1 both earn 20% of $100 = $20. In year 2 the squirrel
-        earns 20% of <b>$120</b> = $24 — more than last year, because the profit is now earning too. The ice-cream
-        kid is always back at $100, so they earn $20 for ever. Same money, same 20%, completely different lives.
-        Warren Buffett calls his whole fortune a snowball.
+        <b>Why keeping speeds up and eating never does:</b> in year 1 you earn 20% of $100 = $20. <b>Keep</b> it and
+        year 2 you earn 20% of <b>$120</b> = $24 — more than last year, because the profit is now earning too, and
+        the profit itself keeps growing: $20 → $24 → $28.80 → … <b>Eat</b> it and you are always back at $100, so the
+        profit is stuck at $20 for ever. Same money, same 20% — the only difference is whether you keep it. Warren
+        Buffett calls his whole fortune a snowball.
       </div>
     </div>
     <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button><button class="btn btn-ghost nav-next" onclick="goNext()">Next →</button></div>
@@ -814,6 +821,10 @@ function selfTest(){
   t.push(['penny d30', approx(0.01*Math.pow(2,29),5368709.12,0.01)]);
   // The finale's "aha": the last day's jump equals the entire prior total (that IS doubling).
   t.push(['day-30 jump = prior total', approx(coinOn(30)-coinOn(29), coinOn(29), 0.01)]);
+  // Step 1 ice-cream game: keeping every year for 8 years grows $100 to ~$430; keeping makes the
+  // profit itself grow ($20 -> $24 after one keep). Eating leaves the pot (and the profit) flat.
+  t.push(['snow keep-all 8y ~ 430', approx(SNOW_START*Math.pow(1.2,SNOW_YEARS), 429.98, 0.5)]);
+  t.push(['snow profit grows when kept', approx((SNOW_START*1.2)*0.2, 24, 1e-9)]);
   // Pacing must decelerate into the explosion, not blur it: late days slower than early days.
   t.push(['race decelerates', wyrDelay(30)>wyrDelay(24) && wyrDelay(24)>wyrDelay(10)]);
   // Rule of 72 sample values
@@ -1037,46 +1048,67 @@ function wyrReveal(){
 /* ---------- Step 1: the two snowballs ----------
    Racing keeper against spender side by side beats a toggle: the child WATCHES the gap open,
    rather than reading that it would. The spender's pot never leaves $100 — that is the lesson. */
-const SNOW_RATE=20, SNOW_START=100;
-let snowYear=0;
-function snowRender(gain, onGain){
-  const keep=SNOW_START*Math.pow(1+SNOW_RATE/100, snowYear);
-  const eaten=SNOW_START*(SNOW_RATE/100)*snowYear;
-  document.getElementById('snowYear').textContent=snowYear;
-  document.getElementById('snowKeepV').textContent=fmt2(keep).replace('.00','');
-  document.getElementById('snowSpendV').textContent='$100';
-  document.getElementById('snowEaten').textContent=fmt(eaten);
-  // radius by sqrt(value) so area reads as the amount; both balls sit on the line at y=200
-  const rk=Math.min(86, 24*Math.sqrt(keep/SNOW_START));
-  const bk=document.getElementById('ballKeep'); bk.setAttribute('r', rk.toFixed(1)); bk.setAttribute('cy', (200-rk).toFixed(1));
-  const bs=document.getElementById('ballSpend'); bs.setAttribute('r','24'); bs.setAttribute('cy','176');
-  const gl=document.getElementById('snowGains');
-  if(gain!=null){ gl.style.display='flex';
-    document.getElementById('snowGain').textContent=fmt2(gain).replace('.00','');
-    document.getElementById('snowOnGain').textContent=fmt2(onGain).replace('.00','');
-  } else gl.style.display='none';
+// REBUILT 2026-07-18. The old "press Grow 12×" was a chore and one-sided (the spender just sat
+// there). Now the child plays the marshmallow test: each year, KEEP the profit (the snowball
+// grows, and next year's profit is visibly bigger — compounding, felt) or EAT it as ice cream
+// (yum, but the snowball stalls). Agency + real temptation + an honest reveal beats watching.
+const SNOW_RATE=20, SNOW_START=100, SNOW_YEARS=8;
+let snowPot=SNOW_START, snowYear=1, snowCones=0;
+const money2=v=>fmt2(v).replace('.00','');
+function snowDrawBall(){
+  const r=Math.min(92, 24*Math.sqrt(snowPot/SNOW_START));
+  const b=document.getElementById('snowBall'); b.setAttribute('r', r.toFixed(1)); b.setAttribute('cy',(200-r).toFixed(1));
 }
-function snowGrow(){
-  const before=SNOW_START*Math.pow(1+SNOW_RATE/100, snowYear);
-  const gain=before*(SNOW_RATE/100);
-  const onGain=Math.max(0, gain - SNOW_START*(SNOW_RATE/100)); // the bit earned on past profit
+function snowRenderTiles(){
+  document.getElementById('snowPotV').textContent=money2(snowPot);
+  document.getElementById('snowConesV').textContent=snowCones;
+  document.getElementById('snowShelf').textContent='🍦'.repeat(snowCones);
+  snowDrawBall();
+}
+function snowRenderChoose(){
+  const profit=snowPot*SNOW_RATE/100;
+  document.getElementById('snowYear').textContent=snowYear;
+  snowRenderTiles();
+  document.getElementById('snowProfitMsg').innerHTML =
+    `🎉 <b>Year ${snowYear}:</b> your snowball earned <b class="mono">${money2(profit)}</b> profit! Keep it and grow — or eat <b>${money2(profit)}</b> of ice cream?`;
+}
+function snowKeep(){
+  const oldP=snowPot*SNOW_RATE/100;
+  snowPot+=oldP;
+  const newP=snowPot*SNOW_RATE/100;
+  sfx.grow(snowYear+3);
+  snowAdvance(`🐿️ <b>Kept!</b> Your snowball is now <b>${money2(snowPot)}</b>. Next year it earns <b>${money2(newP)}</b> — more than this year's ${money2(oldP)}. <b>Your money is making money!</b> 🤯`);
+}
+function snowEat(){
+  snowCones++;
+  sfx.pick();   // eating feels fine (it IS a treat) — the cost shows in the reveal, not a punishing sound
+  snowAdvance(`🍦 <b>Yum!</b> But your snowball did not grow — still <b>${money2(snowPot)}</b>. Next year's profit stays exactly the same.`);
+}
+function snowAdvance(msg){
+  const m=document.getElementById('snowMsg'); m.style.display='block'; m.innerHTML=msg;
+  snowRenderTiles();   // reflect the choice just made — including the final year, before the reveal
   snowYear++;
-  snowRender(gain, onGain);
-  sfx.grow(snowYear);
-  if(snowYear>=4) showTake(1);
-  const m=document.getElementById('snowMsg');
-  const keep=SNOW_START*Math.pow(1+SNOW_RATE/100, snowYear);
-  if(snowYear===4){ m.style.display='block';
-    m.innerHTML='❄️ The squirrel has already <b>doubled</b> — and grows by more every year. The ice-cream kid is still on $100, and always will be.'; }
-  else if(snowYear===12){ m.style.display='block';
-    m.innerHTML=`🐿️ After 12 years the squirrel has <b>${fmt(keep)}</b> — nearly <b>9×</b> the start — while the ice-cream kid still has $100. Neither of them saved another cent.`; }
-  if(snowYear>=12) document.getElementById('snowGrow').disabled=true;
+  if(snowYear>SNOW_YEARS){ snowReveal(); return; }
+  snowRenderChoose();
+}
+function snowReveal(){
+  document.getElementById('snowChoose').style.display='none';
+  document.getElementById('snowMsg').style.display='none';
+  const maxKeep=SNOW_START*Math.pow(1+SNOW_RATE/100, SNOW_YEARS), kept=SNOW_YEARS-snowCones;
+  document.getElementById('snowResultMsg').innerHTML = snowCones===0
+    ? `🏆 <b>You kept it every single year!</b> Your snowball grew to <b>${fmt(maxKeep)}</b> — the biggest it could be, from the very same $100. That is compounding: money making money, that makes even more money.`
+    : `You ate the profit <b>${snowCones}×</b> 🍦 and kept it <b>${kept}×</b> 🐿️, ending on <b>${fmt(snowPot)}</b>. Keep it <em>every</em> year and you would have <b>${fmt(maxKeep)}</b> — so those ice creams cost your snowball <b>${fmt(maxKeep-snowPot)}</b>. Yum is fun, but <b>keeping</b> is how small money grows big.`;
+  const res=document.getElementById('snowResult'); res.style.display='block';
+  res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
+  bringIntoView(res); snowDrawBall();
+  confettiBurst(); sfx.fanfare(); showTake(1);
 }
 function snowReset(){
-  snowYear=0;
-  document.getElementById('snowGrow').disabled=false;
+  snowPot=SNOW_START; snowYear=1; snowCones=0;
+  document.getElementById('snowResult').style.display='none';
+  document.getElementById('snowChoose').style.display='block';
   document.getElementById('snowMsg').style.display='none';
-  snowRender(null);
+  snowRenderChoose();
 }
 
 /* ---------- Step 2: doubling machine ---------- */
@@ -1220,7 +1252,7 @@ function initRead(){
 // Set-up lines. Deliberately STOP before the question — the grown-up asks it.
 const SAY={
   0:"Would you rather get a ten dollar ang pow, every single day for a whole month? Or just one magic coin, that starts at one cent, and doubles every day? Have a think, and pick the one you want.",
-  1:"Here are two kids. They both start with one hundred dollars, and both of them grow it by twenty percent every year. But one of them keeps the profit, and the other one spends it on ice cream. Tap the grow button, and watch what happens to each of them.",
+  1:"You have one hundred dollars, and every year it earns twenty percent profit. Each year, you choose: keep the profit so your snowball grows, or eat it as ice cream. Yum now, or bigger later? You decide.",
   2:"Here is a machine that tells you how fast money doubles. Drag the slider to change how fast it grows, and see how many years it takes to double.",
   3:"Now it is your turn. Set it up like it is really you. How old are you, and how much can you save each week? Then guess this: if you invest your money instead of leaving it in a piggy bank, how many times more do you think you would end up with?",
   4:"Meet Amy and Ben. They each get one thousand dollars of ang pow money, and they both grow it at ten percent a year. Amy puts hers in when she is eight. Ben keeps his in a drawer, and only puts it in when he is twenty five. Exactly the same money. So who do you think has more at sixty?",
@@ -1610,7 +1642,7 @@ function finish(){
 }
 
 /* ---------- init ---------- */
-buildTabs(); buildBars(); rateUpdate(); snowRender(null);
+buildTabs(); buildBars(); rateUpdate(); snowReset();
 buildKc(); kcInputs(); drawMarket(); guUpdate(); initRead(); go(0);
 selfTest();   // last: every const it checks is initialised by now
 </script>
