@@ -735,11 +735,11 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       </div>
 
       <div class="btnrow" style="justify-content:center; margin-top:16px">
-        <button class="btn btn-ghost" id="guScaleBtn" onclick="guToggleScale()">📈 Switch to log scale</button>
+        <button class="btn btn-ghost" id="guScaleBtn" onclick="guToggleScale()">📉 Switch to straight scale</button>
       </div>
       <div class="chart" id="guChart"></div>
       <div class="legend" id="guLegend"></div>
-      <div class="tiny muted center" id="guScaleNote">Straight scale: only the fastest line is visible — that <em>is</em> the lesson. Switch to log to see them all.</div>
+      <div class="tiny muted center" id="guScaleNote">Log scale: each line up is <b>10× bigger</b>, so all six fit — and every curve crosses the milestone lines at the exact ages in the table above.</div>
 
       <div class="note">
         Contributions are invested at the <b>end</b> of each year, and the income grows every year. Returns are
@@ -1410,7 +1410,16 @@ function paintChart(hostId, series, o){
   const X=a=>P.l+((a-a0)/((a1-a0)||1))*(W-P.l-P.r);
   const Y=v=>{const lo=tf(vmin),hi=tf(vmax); const t=(tf(v)-lo)/((hi-lo)||1); return H-P.b-t*(H-P.t-P.b);};
   let g='';
-  for(let i=0;i<=4;i++){ const yy=P.t+i*(H-P.t-P.b)/4; g+=`<line class="gl" x1="${P.l}" y1="${yy}" x2="${W-P.r}" y2="${yy}"/>`; }
+  // Even gridlines — unless milestone reference lines are supplied, in which case THEY are the grid.
+  if(!o.hlines) for(let i=0;i<=4;i++){ const yy=P.t+i*(H-P.t-P.b)/4; g+=`<line class="gl" x1="${P.l}" y1="${yy}" x2="${W-P.r}" y2="${yy}"/>`; }
+  // Reference lines that LINK a chart to a table: horizontal at $100k/$1m/… and a vertical age
+  // marker, each labelled and drawn behind the curves so the crossings (= the table's ages) read.
+  (o.hlines||[]).forEach(h=>{ const yy=Y(h.v); if(yy>=P.t-1 && yy<=H-P.b+1){
+    g+=`<line x1="${P.l}" y1="${yy.toFixed(1)}" x2="${W-P.r}" y2="${yy.toFixed(1)}" stroke="var(--bd2)" stroke-width="1" stroke-dasharray="3 4"/>`
+      +`<text class="ax" font-size="${axFS}" x="${P.l+2}" y="${(yy-3).toFixed(1)}" text-anchor="start">${h.label}</text>`; }});
+  (o.vlines||[]).forEach(vl=>{ const xx=X(vl.a);
+    g+=`<line x1="${xx.toFixed(1)}" y1="${P.t}" x2="${xx.toFixed(1)}" y2="${H-P.b}" stroke="var(--bd2)" stroke-width="1" stroke-dasharray="3 4"/>`
+      +`<text class="ax" font-size="${axFS}" x="${(xx+3).toFixed(1)}" y="${(P.t+axFS).toFixed(1)}" text-anchor="start">${vl.label}</text>`; });
   series.forEach(s=>{
     const line=s.pts.map(p=>`${X(p.a).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ');
     if(s.fill){
@@ -1427,7 +1436,7 @@ function paintChart(hostId, series, o){
   [a0, Math.round((a0+a1)/2), a1].forEach(a=>{
     g+=`<text class="ax" font-size="${axFS}" x="${X(a).toFixed(1)}" y="${H-6}" text-anchor="middle">${o.xPrefix||''}${a}</text>`;
   });
-  g+=`<text class="ax" font-size="${axFS}" x="${P.l}" y="${P.t-5}">${o.topLabel!=null?o.topLabel:fmt(vmax)}</text>`;
+  if(!o.hlines) g+=`<text class="ax" font-size="${axFS}" x="${P.l}" y="${P.t-5}">${o.topLabel!=null?o.topLabel:fmt(vmax)}</text>`;
   host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img">${g}</svg>`;
 }
 // Big numbers mean nothing to a child until they are priced in something they want.
@@ -1667,15 +1676,14 @@ function milestoneAge(pts, target){ const h=pts.find(p=>p.v>=target); return h?h
 // 14px bold table text, so it must clear 4.5:1. The old #b0b0a8 row measured
 // 2.18:1 — unreadable, on a number the table exists to show.
 const GU_RATES=[{r:0,c:'#66665e'},{r:2,c:'#a93226'},{r:4,c:'#92400e'},{r:10,c:'#1d4ed8'},{r:15,c:'#146c43'},{r:20,c:'#7c3aed'}];
-let guLog=false;
-function guToggleScale(){
-  guLog=!guLog;
+let guLog=true;   // grown-up mode defaults to log: it lines the curves up with the milestone table
+function guScaleUI(){
   document.getElementById('guScaleBtn').textContent = guLog?'📉 Switch to straight scale':'📈 Switch to log scale';
   document.getElementById('guScaleNote').innerHTML = guLog
-    ? 'Log scale: each gridline is <b>10× the one below</b>. Now every line is visible — and a straight line means steady compounding.'
-    : 'Straight scale: only the fastest line is visible — that <em>is</em> the lesson. Switch to log to see them all.';
-  guUpdate();
+    ? 'Log scale: each line up is <b>10× bigger</b>, so all six fit — and every curve crosses the milestone lines at the exact ages in the table above.'
+    : 'Straight scale: only the fastest line is visible — that <em>is</em> the raw drama. Switch to log to line it up with the table.';
 }
+function guToggleScale(){ guLog=!guLog; guScaleUI(); guUpdate(); }
 function guUpdate(){
   const age=+document.getElementById('guAge').value;
   const inc=+document.getElementById('guInc').value;
@@ -1701,7 +1709,12 @@ function guUpdate(){
     rows.push(`<tr><td><b style="color:${g.c}">${g.r}%</b></td>${cell(1e5)}${cell(1e6)}${cell(1e7)}${cell(1e8)}<td>${at65?fmt(at65.v):'—'}</td></tr>`);
   });
   document.getElementById('guBody').innerHTML=rows.join('');
-  drawChart('guChart', series, {log:guLog, h:250, xPrefix:'age '});
+  // Link the chart to the table: draw the milestone thresholds ($100k…$100m) and an age-65 marker,
+  // so each curve crosses them at exactly the ages listed above. Milestones only read on log (even
+  // spacing, all lines visible), so they are shown there; the age marker helps on both scales.
+  drawChart('guChart', series, {log:guLog, h:250, xPrefix:'age ',
+    hlines: guLog ? [{v:1e5,label:'$100k'},{v:1e6,label:'$1m'},{v:1e7,label:'$10m'},{v:1e8,label:'$100m'}] : null,
+    vlines: [{a:65,label:'age 65'}]});
   document.getElementById('guLegend').innerHTML=GU_RATES.map(g=>`<span><i style="background:${g.c}"></i>${g.r}%</span>`).join('');
 }
 
@@ -1745,7 +1758,7 @@ function finish(){
 
 /* ---------- init ---------- */
 buildTabs(); buildBars(); rateUpdate(); snowReset();
-buildKc(); kcInputs(); drawMarket(); guUpdate(); initRead(); go(0);
+buildKc(); kcInputs(); drawMarket(); guScaleUI(); guUpdate(); initRead(); go(0);
 selfTest();   // last: every const it checks is initialised by now
 </script>
 </body>
