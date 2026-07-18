@@ -739,7 +739,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       </div>
       <div class="chart" id="guChart"></div>
       <div class="legend" id="guLegend"></div>
-      <div class="tiny muted center" id="guScaleNote">Log scale: each line up is <b>10× bigger</b>, so all six fit — and every curve crosses the milestone lines at the exact ages in the table above.</div>
+      <div class="tiny muted center" id="guScaleNote">Log scale, running to <b>age 65</b>: each step up is 10× bigger, so all six fit. Every line <b>ends on its age-65 pot</b> — the last column of the table — and crosses the $1m / $10m markers at the ages listed there.</div>
 
       <div class="note">
         Contributions are invested at the <b>end</b> of each year, and the income grows every year. Returns are
@@ -832,6 +832,12 @@ function rule72(ratePct){ return 72/ratePct; }
 
 function fmt(n){ // whole-dollar, grouped
   return '$' + Math.round(n).toLocaleString('en-US');
+}
+// Compact money for chart labels, where a full grouped figure would not fit: $204m, $11m, $1.3m.
+function fmtShort(v){
+  if(v>=1e6){ const m=v/1e6; return '$'+(m>=10?Math.round(m):Math.round(m*10)/10)+'m'; }
+  if(v>=1e3) return '$'+Math.round(v/1e3)+'k';
+  return '$'+Math.round(v);
 }
 // Reveals happen below the fold on a phone. Bring the payoff to the child rather than making
 // them scroll to find it — the kid test said the scrolling broke their attention.
@@ -1680,8 +1686,8 @@ let guLog=true;   // grown-up mode defaults to log: it lines the curves up with 
 function guScaleUI(){
   document.getElementById('guScaleBtn').textContent = guLog?'📉 Switch to straight scale':'📈 Switch to log scale';
   document.getElementById('guScaleNote').innerHTML = guLog
-    ? 'Log scale: each line up is <b>10× bigger</b>, so all six fit — and every curve crosses the milestone lines at the exact ages in the table above.'
-    : 'Straight scale: only the fastest line is visible — that <em>is</em> the raw drama. Switch to log to line it up with the table.';
+    ? 'Log scale, running to <b>age 65</b>: each step up is 10× bigger, so all six fit. Every line <b>ends on its age-65 pot</b> — the last column of the table — and crosses the $1m / $10m markers at the ages listed there.'
+    : 'Straight scale to <b>age 65</b>: only the fastest line is visible — that <em>is</em> the raw drama. Switch to log to line it up with the table.';
 }
 function guToggleScale(){ guLog=!guLog; guScaleUI(); guUpdate(); }
 function guUpdate(){
@@ -1698,23 +1704,25 @@ function guUpdate(){
   document.getElementById('guFirst').textContent=fmt(inc*pct/100)+' in year one';
   const rows=[], series=[];
   GU_RATES.forEach(g=>{
+    // Full series to 90 for the TABLE — some milestones are reached after 65 (e.g. 10% hits $100m
+    // at 88), so the milestone columns need the long run.
     const pts=grownUpSeries(age, inc, grow, pct, lump, g.r, 90);
-    // Label each line with its rate at the end (its own colour), matching the legend. Scale-aware
-    // so labels never collide: on the linear scale only the 20% line is visibly separated, so only
-    // it gets a label; on log the lines fan apart, so the 10/15/20% investing lines get theirs.
-    const tag = guLog ? (g.r>=10 ? g.r+'%' : '') : (g.r===20 ? '20%' : '');
-    series.push({name:g.r+'%', color:g.c, pts, w:g.r>=20?3.5:2.5, fill:false, tag});
     const at65=pts.find(p=>p.a===65);
+    // The CHART stops at 65, so every line ends on its retirement pot — the table's last column —
+    // and that number is the label. Only the top three are labelled: 0/2/4% finish within a
+    // whisker of each other around the $1m marker, so their labels would collide (exact figures
+    // are in the table). Age 90 endpoints were meaningless; age 65 is the number people care about.
+    series.push({name:g.r+'%', color:g.c, pts:pts.filter(p=>p.a<=65), w:g.r>=20?3.5:2.5, fill:false,
+      tag: g.r>=10 ? fmtShort(at65.v) : ''});
     const cell=t=>{const a=milestoneAge(pts,t); return a!==null?`<td class="hit">${a}</td>`:'<td class="never">—</td>';};
     rows.push(`<tr><td><b style="color:${g.c}">${g.r}%</b></td>${cell(1e5)}${cell(1e6)}${cell(1e7)}${cell(1e8)}<td>${at65?fmt(at65.v):'—'}</td></tr>`);
   });
   document.getElementById('guBody').innerHTML=rows.join('');
-  // Link the chart to the table: draw the milestone thresholds ($100k…$100m) and an age-65 marker,
-  // so each curve crosses them at exactly the ages listed above. Milestones only read on log (even
-  // spacing, all lines visible), so they are shown there; the age marker helps on both scales.
+  // Link the chart to the table: milestone thresholds ($100k…$100m) as reference lines, and the
+  // x-axis now ends at 65 so the final tick IS the age-65 column (no separate marker needed).
+  // Milestones only read on log (even spacing, all six lines visible), so they show there.
   drawChart('guChart', series, {log:guLog, h:250, xPrefix:'age ',
-    hlines: guLog ? [{v:1e5,label:'$100k'},{v:1e6,label:'$1m'},{v:1e7,label:'$10m'},{v:1e8,label:'$100m'}] : null,
-    vlines: [{a:65,label:'age 65'}]});
+    hlines: guLog ? [{v:1e5,label:'$100k'},{v:1e6,label:'$1m'},{v:1e7,label:'$10m'},{v:1e8,label:'$100m'}] : null});
   document.getElementById('guLegend').innerHTML=GU_RATES.map(g=>`<span><i style="background:${g.c}"></i>${g.r}%</span>`).join('');
 }
 
