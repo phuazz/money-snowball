@@ -167,6 +167,9 @@ body.older .younger-only.inline{display:none}
 /* Smooth grow when the child keeps the profit (SVG geometry transitions in modern browsers;
    degrades to an instant resize where unsupported — harmless). */
 #snowBall{transition:r .35s cubic-bezier(.2,.8,.2,1), cy .35s cubic-bezier(.2,.8,.2,1)}
+/* Step 1 "stuff you bought" shelf — real things a kid wants, each popping in as they buy it. */
+.stuff-shelf{display:flex; flex-wrap:wrap; gap:5px; justify-content:center; min-height:32px; margin:6px 0 2px; font-size:26px; line-height:1}
+.stuff-shelf span{animation:coinpop .4s ease}
 .snow-readout{display:flex; justify-content:center; align-items:baseline; gap:10px; margin-top:6px}
 .yeartag{font-family:var(--mono); font-size:14px; color:var(--t3-text)}
 .gain-line{display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:8px; font-size:15px}
@@ -424,11 +427,11 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
   <section class="step" data-step="1">
     <div class="card">
       <div class="eyebrow">What is compounding?</div>
-      <h2>The ice cream choice</h2>
-      <p class="lead">You have <b>$100</b>. Every year it earns <b>20%</b> — that is your <b>profit</b>.
+      <h2>Keep it, or spend it?</h2>
+      <p class="lead">You have <b>$100</b>. Every year it earns <b>20%</b> — that is your <b>profit</b>, money to keep or to spend.
         <span class="gloss younger-only inline">(20% means: for every <b>$5</b> you have, you get <b>$1</b> more.)</span></p>
-      <p class="lead" style="margin-top:-4px"><b>You</b> choose each year: <b>🐿️ keep</b> the profit so your snowball grows,
-        or <b>🍦 eat</b> it as ice cream. Yum now — or bigger later?</p>
+      <p class="lead" style="margin-top:-4px">Each year <b>you</b> decide: <b>🐿️ keep</b> the profit so your snowball keeps growing —
+        or <b>🛍️ spend</b> it on something you want <em>right now</em>. Fun today, or something bigger later?</p>
 
       <div class="snow-stage" id="snowStage">
         <svg viewBox="0 0 400 220" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
@@ -441,18 +444,18 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
 
       <div class="center"><span class="yeartag">Year <b id="snowYear">1</b> of 8</span></div>
       <div class="splitrow">
-        <div class="splitcell grow"><div class="eyebrow">🐿️ Your snowball</div>
+        <div class="splitcell grow"><div class="eyebrow">🐿️ Your snowball — it grows!</div>
           <div class="big mono" id="snowPotV">$100</div></div>
-        <div class="splitcell"><div class="eyebrow">🍦 Ice creams eaten</div>
-          <div class="big mono" id="snowConesV" style="color:var(--t2)">0</div>
-          <div class="tiny" id="snowShelf" style="letter-spacing:3px; min-height:22px; margin-top:2px"></div></div>
+        <div class="splitcell"><div class="eyebrow">🛍️ Stuff you bought (<span id="snowStuffN">0</span>)</div>
+          <div class="stuff-shelf" id="snowStuff"></div>
+          <div class="tiny muted">fun to own — but it never makes more money</div></div>
       </div>
 
       <div id="snowChoose">
-        <div class="note" id="snowProfitMsg" style="text-align:center">🎉 <b>Year 1:</b> your snowball earned <b class="mono">$20</b> profit! Keep it, or eat it?</div>
+        <div class="note" id="snowProfitMsg" style="text-align:center"></div>
         <div class="btnrow center" style="justify-content:center">
           <button class="btn btn-sun" onclick="snowKeep()">🐿️ Keep it</button>
-          <button class="btn btn-ghost" onclick="snowEat()">🍦 Eat it 😋</button>
+          <button class="btn btn-ghost" id="snowBuyBtn" onclick="snowBuy()">🛍️ Buy it</button>
         </div>
       </div>
 
@@ -464,14 +467,14 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
           <button class="btn btn-ghost" onclick="snowReset()">🔁 Play again</button>
         </div>
       </div>
-      <div class="takeaway" id="tk1"><div class="lbl">💡 What we just learned</div><p>Money makes money — and that money makes <b>more</b> money. Every year you <b>keep</b> the profit, next year's profit is bigger. Eat it, and your snowball stops. Yum is fun, but keeping is how small money grows big.</p></div>
+      <div class="takeaway" id="tk1"><div class="lbl">💡 What we just learned</div><p>A snowball <b>makes more money</b> every year — the stuff you buy just sits there. Spend the profit and your snowball stops; keep it and the profit itself grows, so you can afford even <b>bigger</b> things later. That is how small money becomes big money.</p></div>
 
       <div class="factbox older-only" style="margin-top:16px">
-        <b>Why keeping speeds up and eating never does:</b> in year 1 you earn 20% of $100 = $20. <b>Keep</b> it and
-        year 2 you earn 20% of <b>$120</b> = $24 — more than last year, because the profit is now earning too, and
-        the profit itself keeps growing: $20 → $24 → $28.80 → … <b>Eat</b> it and you are always back at $100, so the
-        profit is stuck at $20 for ever. Same money, same 20% — the only difference is whether you keep it. Warren
-        Buffett calls his whole fortune a snowball.
+        <b>Why keeping speeds up and spending never does:</b> in year 1 you earn 20% of $100 = $20. <b>Keep</b> it and
+        year 2 you earn 20% of <b>$120</b> = $24 — more than last year, because the profit is now earning too, and the
+        profit itself keeps growing: $20 → $24 → $28.80 → … so each year you could afford something cooler. <b>Spend</b>
+        it and you are always back at $100, so the profit is stuck at $20 for ever. A toy is <em>consumption</em> — it
+        does not grow. A snowball is an <em>asset</em> — it makes more money. Warren Buffett calls his fortune a snowball.
       </div>
     </div>
     <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button><button class="btn btn-ghost nav-next" onclick="goNext()">Next →</button></div>
@@ -825,6 +828,9 @@ function selfTest(){
   // profit itself grow ($20 -> $24 after one keep). Eating leaves the pot (and the profit) flat.
   t.push(['snow keep-all 8y ~ 430', approx(SNOW_START*Math.pow(1.2,SNOW_YEARS), 429.98, 0.5)]);
   t.push(['snow profit grows when kept', approx((SNOW_START*1.2)*0.2, 24, 1e-9)]);
+  // Wishlist escalates: a $20 profit buys cards, a kept-all $430 snowball could buy a console.
+  t.push(['wish $20 = cards', wishFor(20).e==='🎴']);
+  t.push(['wish $430 = console', wishFor(430).e==='🕹️']);
   // Pacing must decelerate into the explosion, not blur it: late days slower than early days.
   t.push(['race decelerates', wyrDelay(30)>wyrDelay(24) && wyrDelay(24)>wyrDelay(10)]);
   // Rule of 72 sample values
@@ -1046,43 +1052,64 @@ function wyrReveal(){
 }
 
 /* ---------- Step 1: the two snowballs ----------
-   Racing keeper against spender side by side beats a toggle: the child WATCHES the gap open,
-   rather than reading that it would. The spender's pot never leaves $100 — that is the lesson. */
-// REBUILT 2026-07-18. The old "press Grow 12×" was a chore and one-sided (the spender just sat
-// there). Now the child plays the marshmallow test: each year, KEEP the profit (the snowball
-// grows, and next year's profit is visibly bigger — compounding, felt) or EAT it as ice cream
-// (yum, but the snowball stalls). Agency + real temptation + an honest reveal beats watching.
+/* ---------- Step 1: keep it or spend it? ----------
+   The marshmallow test as a game. Each year the child KEEPS the profit (snowball grows; next
+   year's profit is visibly bigger — compounding, felt — and unlocks cooler things to want) or
+   SPENDS it on a REAL, escalating wishlist item (a video game, a scooter, a party — concrete
+   temptations a kid actually has, sized to the growing profit so resisting gets harder). Agency
+   + real temptation + an honest reveal beats pressing "Grow" twelve times and watching. */
 const SNOW_RATE=20, SNOW_START=100, SNOW_YEARS=8;
-let snowPot=SNOW_START, snowYear=1, snowCones=0;
+// Real things a kid actually wants, sized so the choice is concrete: as the snowball grows the
+// profit could buy cooler and cooler stuff, so resisting gets harder — which is the whole point.
+const WISH=[
+  {c:6,   e:'🍭', n:'a big bag of sweets'},
+  {c:14,  e:'📚', n:'a stack of comics'},
+  {c:20,  e:'🎴', n:'a pack of trading cards'},
+  {c:26,  e:'🎮', n:'a video game'},
+  {c:36,  e:'🧩', n:'a giant Lego set'},
+  {c:50,  e:'🛴', n:'a cool scooter'},
+  {c:65,  e:'🎉', n:'a party for your friends'},
+  {c:95,  e:'🎧', n:'awesome headphones'},
+  {c:160, e:'🚲', n:'a brand-new bike'},
+  {c:300, e:'🕹️', n:'a games console'},
+];
+function wishFor(v){ let p=WISH[0]; for(const w of WISH) if(w.c<=v) p=w; return p; }
 const money2=v=>fmt2(v).replace('.00','');
+let snowPot=SNOW_START, snowYear=1, snowBought=[], snowStreak=0;
 function snowDrawBall(){
   const r=Math.min(92, 24*Math.sqrt(snowPot/SNOW_START));
   const b=document.getElementById('snowBall'); b.setAttribute('r', r.toFixed(1)); b.setAttribute('cy',(200-r).toFixed(1));
 }
 function snowRenderTiles(){
   document.getElementById('snowPotV').textContent=money2(snowPot);
-  document.getElementById('snowConesV').textContent=snowCones;
-  document.getElementById('snowShelf').textContent='🍦'.repeat(snowCones);
+  document.getElementById('snowStuffN').textContent=snowBought.length;
+  // append only new items (they pop) and rebuild on reset — do not re-animate the whole shelf
+  const shelf=document.getElementById('snowStuff'), have=shelf.childElementCount;
+  if(have>snowBought.length){ shelf.innerHTML=snowBought.map(e=>`<span>${e}</span>`).join(''); }
+  else for(let i=have;i<snowBought.length;i++){ const s=document.createElement('span'); s.textContent=snowBought[i]; shelf.appendChild(s); }
   snowDrawBall();
 }
 function snowRenderChoose(){
-  const profit=snowPot*SNOW_RATE/100;
+  const profit=snowPot*SNOW_RATE/100, w=wishFor(profit);
   document.getElementById('snowYear').textContent=snowYear;
   snowRenderTiles();
+  document.getElementById('snowBuyBtn').innerHTML=`${w.e} Buy it`;
+  const streak = snowStreak>=2 ? ` <b style="color:var(--joy)">🔥 kept ${snowStreak} in a row!</b>` : '';
   document.getElementById('snowProfitMsg').innerHTML =
-    `🎉 <b>Year ${snowYear}:</b> your snowball earned <b class="mono">${money2(profit)}</b> profit! Keep it and grow — or eat <b>${money2(profit)}</b> of ice cream?`;
+    `🎉 <b>Year ${snowYear}:</b> your snowball earned <b class="mono">${money2(profit)}</b>! Keep it and grow — or spend it on ${w.e} <b>${w.n}</b>?${streak}`;
 }
 function snowKeep(){
   const oldP=snowPot*SNOW_RATE/100;
-  snowPot+=oldP;
-  const newP=snowPot*SNOW_RATE/100;
+  snowPot+=oldP; snowStreak++;
+  const newP=snowPot*SNOW_RATE/100, next=wishFor(newP);
   sfx.grow(snowYear+3);
-  snowAdvance(`🐿️ <b>Kept!</b> Your snowball is now <b>${money2(snowPot)}</b>. Next year it earns <b>${money2(newP)}</b> — more than this year's ${money2(oldP)}. <b>Your money is making money!</b> 🤯`);
+  snowAdvance(`🐿️ <b>Kept!</b> Your snowball is now <b>${money2(snowPot)}</b>. Next year it earns <b>${money2(newP)}</b> — enough for ${next.e} <b>${next.n}</b>, if you can resist! <b>Your money is making money.</b> 🤯`);
 }
-function snowEat(){
-  snowCones++;
-  sfx.pick();   // eating feels fine (it IS a treat) — the cost shows in the reveal, not a punishing sound
-  snowAdvance(`🍦 <b>Yum!</b> But your snowball did not grow — still <b>${money2(snowPot)}</b>. Next year's profit stays exactly the same.`);
+function snowBuy(){
+  const w=wishFor(snowPot*SNOW_RATE/100);
+  snowBought.push(w.e); snowStreak=0;
+  sfx.pick();   // buying feels fine (it IS something they want) — the cost shows in the reveal
+  snowAdvance(`${w.e} <b>You bought ${w.n} — fun!</b> But your snowball did <b>not</b> grow — still <b>${money2(snowPot)}</b>, and next year's profit is the same. Toys just sit there; a snowball makes more money.`);
 }
 function snowAdvance(msg){
   const m=document.getElementById('snowMsg'); m.style.display='block'; m.innerHTML=msg;
@@ -1094,17 +1121,18 @@ function snowAdvance(msg){
 function snowReveal(){
   document.getElementById('snowChoose').style.display='none';
   document.getElementById('snowMsg').style.display='none';
-  const maxKeep=SNOW_START*Math.pow(1+SNOW_RATE/100, SNOW_YEARS), kept=SNOW_YEARS-snowCones;
-  document.getElementById('snowResultMsg').innerHTML = snowCones===0
-    ? `🏆 <b>You kept it every single year!</b> Your snowball grew to <b>${fmt(maxKeep)}</b> — the biggest it could be, from the very same $100. That is compounding: money making money, that makes even more money.`
-    : `You ate the profit <b>${snowCones}×</b> 🍦 and kept it <b>${kept}×</b> 🐿️, ending on <b>${fmt(snowPot)}</b>. Keep it <em>every</em> year and you would have <b>${fmt(maxKeep)}</b> — so those ice creams cost your snowball <b>${fmt(maxKeep-snowPot)}</b>. Yum is fun, but <b>keeping</b> is how small money grows big.`;
+  const maxKeep=SNOW_START*Math.pow(1+SNOW_RATE/100, SNOW_YEARS), kept=SNOW_YEARS-snowBought.length, top=wishFor(maxKeep);
+  document.getElementById('snowResultMsg').innerHTML = snowBought.length===0
+    ? `🏆 <b>You kept it every single year!</b> Your snowball grew to <b>${fmt(maxKeep)}</b> from the same $100 — now you could buy ${top.e} <b>${top.n}</b> and <em>still</em> have <b>${fmt(maxKeep-top.c)}</b> left. Growing your money let you afford <em>more</em> than spending ever could.`
+    : `You bought <b>${snowBought.length}</b> things ${snowBought.join(' ')} and kept it <b>${kept}×</b> 🐿️, ending on <b>${fmt(snowPot)}</b>. Keep it <em>every</em> year and you would have <b>${fmt(maxKeep)}</b> — so that stuff cost your snowball <b>${fmt(maxKeep-snowPot)}</b>. Fun now, or a fortune later — you are learning to choose.`;
   const res=document.getElementById('snowResult'); res.style.display='block';
   res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
-  bringIntoView(res); snowDrawBall();
+  bringIntoView(res); snowRenderTiles();
   confettiBurst(); sfx.fanfare(); showTake(1);
 }
 function snowReset(){
-  snowPot=SNOW_START; snowYear=1; snowCones=0;
+  snowPot=SNOW_START; snowYear=1; snowBought=[]; snowStreak=0;
+  document.getElementById('snowStuff').innerHTML='';
   document.getElementById('snowResult').style.display='none';
   document.getElementById('snowChoose').style.display='block';
   document.getElementById('snowMsg').style.display='none';
@@ -1252,7 +1280,7 @@ function initRead(){
 // Set-up lines. Deliberately STOP before the question — the grown-up asks it.
 const SAY={
   0:"Would you rather get a ten dollar ang pow, every single day for a whole month? Or just one magic coin, that starts at one cent, and doubles every day? Have a think, and pick the one you want.",
-  1:"You have one hundred dollars, and every year it earns twenty percent profit. Each year, you choose: keep the profit so your snowball grows, or eat it as ice cream. Yum now, or bigger later? You decide.",
+  1:"You have one hundred dollars, and every year it earns twenty percent profit. Each year, you choose: keep the profit so your snowball keeps growing, or spend it on something you really want right now. Fun today, or something bigger later? You decide.",
   2:"Here is a machine that tells you how fast money doubles. Drag the slider to change how fast it grows, and see how many years it takes to double.",
   3:"Now it is your turn. Set it up like it is really you. How old are you, and how much can you save each week? Then guess this: if you invest your money instead of leaving it in a piggy bank, how many times more do you think you would end up with?",
   4:"Meet Amy and Ben. They each get one thousand dollars of ang pow money, and they both grow it at ten percent a year. Amy puts hers in when she is eight. Ben keeps his in a drawer, and only puts it in when he is twenty five. Exactly the same money. So who do you think has more at sixty?",
