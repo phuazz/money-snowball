@@ -303,6 +303,19 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
 .homerow.super .v, .homerow.super .v .x{color:var(--p-text)}
 .legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:5px; vertical-align:-1px}
 
+/* ---------- Step 4 race lanes: two snowballs on ONE shared scale ----------
+   Radius tracks sqrt(value) so the ball's AREA is the money — Amy ends ~5x Ben's area, honestly.
+   Ben's ball is frozen (and labelled asleep) until 25, which is the whole lesson, visible. */
+.lanes{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0 4px}
+.lane{border:1px solid var(--bd); border-radius:var(--radius-kid); background:var(--bg2); padding:10px 8px; text-align:center}
+.lane-top{font-size:15px}
+.lane-top .muted{color:var(--t3-text); font-size:13px}
+.lane-stage{position:relative; height:132px}
+.lane-stage svg{width:100%; height:100%; display:block}
+.lane-stage circle{transition:r .3s cubic-bezier(.2,.8,.2,1), cy .3s cubic-bezier(.2,.8,.2,1)}
+.lane-sleep{position:absolute; left:0; right:0; bottom:2px; font-size:12px; color:var(--t3-text)}
+.lane-val{font-weight:700; font-size:clamp(17px,4.8vw,21px); letter-spacing:-.5px; margin-top:2px}
+.lane-dbl{min-height:22px; font-size:15px; letter-spacing:1px; line-height:1.3}
 /* ---------- bird race (step 4) ---------- */
 .birds{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px}
 @media(max-width:520px){.birds{grid-template-columns:1fr} .splitrow{grid-template-columns:1fr}}
@@ -651,9 +664,39 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       </div>
 
       <div id="birdResult" style="display:none">
+        <!-- The race is two SNOWBALLS, not a line chart. On a linear chart to $150k both lines sit
+             flat on the floor until ~45, so the whole point — that Ben has not started — is
+             invisible. Two balls on one shared scale make it obvious: Amy's grows every year while
+             Ben's sits frozen in a drawer until 25. Same visual language as Step 1. -->
+        <div class="center"><span class="yeartag">Age <b id="birdAge" class="mono">8</b></span></div>
+        <div class="lanes">
+          <div class="lane">
+            <div class="lane-top">🐦 <b>Amy</b> <span class="muted">— in at 8</span></div>
+            <div class="lane-stage">
+              <svg viewBox="0 0 160 130" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+                <line x1="8" y1="122" x2="152" y2="122" stroke="var(--bd2)" stroke-width="3" stroke-linecap="round"/>
+                <circle id="ballA" cx="80" cy="118" r="4.4" fill="#fff" stroke="#1a8754" stroke-width="3"/>
+              </svg>
+            </div>
+            <div class="lane-val mono" id="valA" style="color:var(--g-text)">$1,000</div>
+            <div class="lane-dbl" id="dblA"></div>
+          </div>
+          <div class="lane">
+            <div class="lane-top">🦉 <b>Ben</b> <span class="muted">— in at 25</span></div>
+            <div class="lane-stage">
+              <svg viewBox="0 0 160 130" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+                <line x1="8" y1="122" x2="152" y2="122" stroke="var(--bd2)" stroke-width="3" stroke-linecap="round"/>
+                <circle id="ballB" cx="80" cy="118" r="4.4" fill="#fff" stroke="#2563eb" stroke-width="3"/>
+              </svg>
+              <div class="lane-sleep" id="benSleep">😴 still in the drawer</div>
+            </div>
+            <div class="lane-val mono" id="valB" style="color:var(--b-text)">$1,000</div>
+            <div class="lane-dbl" id="dblB"></div>
+          </div>
+        </div>
+        <div class="note" id="birdLive" style="display:none"></div>
         <div class="chart" id="birdChart"></div>
         <div class="legend"><span><i style="background:var(--g)"></i>Amy (starts at 8)</span><span><i style="background:var(--b)"></i>Ben (starts at 25)</span></div>
-        <div class="note" id="birdLive" style="display:none"></div>
         <div class="note" id="birdMsg"></div>
         <div class="takeaway" id="tk4"><div class="lbl">💡 What we just learned</div><p><b>Starting early beats starting rich.</b> Amy and Ben put in exactly the same <b>$1,000</b>. Amy just started <b>17 years sooner</b> — and ended with about <b>5× more</b>. The years you wait are the ones that cost the most.</p></div>
         <div class="factbox older-only">
@@ -944,7 +987,10 @@ function selfTest(){
   t.push(['bird Amy@60 = 142,043', approx(birdEnd(BIRD_START), 1000*Math.pow(1.1,52), 0.5)]);
   t.push(['bird Ben@60 = 28,102',  approx(birdEnd(BEN_STARTS), 1000*Math.pow(1.1,35), 0.5)]);
   t.push(['bird ratio ~5.05x',     approx(birdEnd(BIRD_START)/birdEnd(BEN_STARTS), 5.05, 0.02)]);
-  t.push(['bird Ben flat until 25', birdPath(BEN_STARTS).filter(p=>p.a<BEN_STARTS).every(p=>p.v===0)]);
+  t.push(['bird Ben idle at $1,000 until 25', birdPath(BEN_STARTS).filter(p=>p.a<BEN_STARTS).every(p=>p.v===BIRD_LUMP)]);
+  // Countable compounding: Amy's $1,000 doubles 7 times by 60, Ben's only 4. Stated as counts, never
+  // as 2^(difference) — that would claim 8x when the honest ratio is 5.05x.
+  t.push(['bird doublings 7 vs 4', birdDoubles(birdEnd(BIRD_START))===7 && birdDoubles(birdEnd(BEN_STARTS))===4]);
   t.push(['bird same money in',    birdPath(BIRD_START).find(p=>p.a===BIRD_START).v === birdPath(BEN_STARTS).find(p=>p.a===BEN_STARTS).v]);
   // The percent gloss must be arithmetically true, or we are teaching a lie in plain words.
   t.push(['gloss: 20% of $5 = $1', Math.abs(5*0.20-1)<1e-9]);
@@ -1021,7 +1067,7 @@ function go(n){
   window.scrollTo({top:0, behavior:'smooth'});
   redrawCharts();   // this step's charts now have a real width, so their text can be sized properly
   if(n>0) document.body.classList.add('started');  // shrink the masthead; set once, never unset
-  clearInterval(window._bird); clearInterval(window._kc); clearTimeout(window._wyr);  // do not leave an animation running off-screen
+  clearTimeout(window._bird); clearInterval(window._kc); clearTimeout(window._wyr);  // do not leave an animation running off-screen
   shutUp(); say(SAY[n]);
   if([2,5].includes(n)) showTake(n);   // no reveal on these, so the takeaway cannot spoil anything
   updateNav();
@@ -1626,16 +1672,32 @@ function kcAgain(){
    say "well she just saved more" — the money in is identical. And Ben's line sits flat on zero
    until 25, so "he has not even started" is something you WATCH rather than something we claim. */
 const BIRD_LUMP=1000, BIRD_R=10, BIRD_START=8, BEN_STARTS=25, BIRD_END=60;
+// Before investing, the money is NOT zero — it is $1,000 sitting in a drawer, not growing. Showing
+// it flat at $1,000 (rather than absent) is both truer to the story and the thing that makes Ben's
+// wasted years legible: same money as Amy, just doing nothing.
 function birdPath(investAt){
-  let v=0; const pts=[];
+  const pts=[];
   for(let a=BIRD_START; a<=BIRD_END; a++){
-    if(a===investAt) v=BIRD_LUMP;            // the ang pow goes in
-    else if(a>investAt) v=v*(1+BIRD_R/100);  // and is then left completely alone
-    pts.push({a, v});
+    pts.push({a, v: a<investAt ? BIRD_LUMP : BIRD_LUMP*Math.pow(1+BIRD_R/100, a-investAt)});
   }
   return pts;
 }
 const birdEnd=at=>birdPath(at)[birdPath(at).length-1].v;
+const birdValAt=(investAt,a)=> a<investAt ? BIRD_LUMP : BIRD_LUMP*Math.pow(1+BIRD_R/100, a-investAt);
+// Ball AREA is the money, so radius tracks sqrt — and both lanes share Amy's final as the scale,
+// which is what makes "Amy's is ~5x bigger" honest rather than decorative.
+function birdBall(id, v){
+  const r=52*Math.sqrt(v/birdEnd(BIRD_START));
+  const el=document.getElementById(id);
+  el.setAttribute('r', r.toFixed(1)); el.setAttribute('cy', (122-r).toFixed(1));
+}
+// Countable compounding: each ✨ is one doubling of the original $1,000.
+const birdDoubles=v=>Math.max(0, Math.floor(Math.log2(v/BIRD_LUMP)));
+function birdDelay(a){
+  if(a===BEN_STARTS) return 950;   // hold the beat where Ben finally wakes up
+  if(a>=55) return 170;            // slow into the finish, where the gap really opens
+  return 75;
+}
 function birdDraw(upto, done){
   const amy=birdPath(BIRD_START).filter(p=>p.a<=upto);
   const ben=birdPath(BEN_STARTS).filter(p=>p.a<=upto);
@@ -1655,27 +1717,47 @@ function birdGuess(pick){
   bringIntoView(res);                     // the chart is the point; do not make them hunt for it
   document.getElementById('birdMsg').innerHTML='';
   const live=document.getElementById('birdLive'); live.style.display='block';
-  live.innerHTML='🐦 Amy puts her $1,000 in at <b>8</b>. Now watch Ben — he has not even started…';
-  // Play it out a year at a time. The kids asked for slower and followable: ~5s for 52 years.
-  let a=BIRD_START; birdDraw(a, false);
-  clearInterval(window._bird);
-  window._bird=setInterval(()=>{
+  live.innerHTML='🐦 Amy puts her $1,000 in at <b>8</b>. 🦉 Ben keeps his in a drawer — watch his snowball do <b>nothing</b>…';
+  const chart=document.getElementById('birdChart'); chart.style.display='none';   // chart is the epilogue
+  const sleep=document.getElementById('benSleep'); sleep.style.display='block';
+  let a=BIRD_START, lastDA=0, lastDB=0;
+  const render=()=>{
+    const va=birdValAt(BIRD_START,a), vb=birdValAt(BEN_STARTS,a);
+    document.getElementById('birdAge').textContent=a;
+    document.getElementById('valA').textContent=fmt(va);
+    document.getElementById('valB').textContent=fmt(vb);
+    birdBall('ballA', va); birdBall('ballB', vb);
+    const da=birdDoubles(va), db=birdDoubles(vb);
+    document.getElementById('dblA').textContent='✨'.repeat(da);
+    document.getElementById('dblB').textContent='✨'.repeat(db);
+    if(da>lastDA){ sfx.grow(da+4); lastDA=da; }   // a beat every time her money doubles
+    if(db>lastDB){ sfx.grow(db+4); lastDB=db; }
+  };
+  render();
+  clearTimeout(window._bird);
+  const step=()=>{
     a++;
-    birdDraw(a, a>=BIRD_END);
     if(a===BEN_STARTS){
-      live.innerHTML='🦉 <b>Ben finally starts at 25</b> — with the very same $1,000. But look how far ahead Amy already is.';
+      sleep.style.display='none';
+      live.innerHTML='🦉 <b>Ben finally starts at 25</b> — same $1,000. But look how much bigger Amy\'s snowball already is.';
       sfx.whoosh();
     }
+    render();
     if(a>=BIRD_END){
-      clearInterval(window._bird);
+      clearTimeout(window._bird);
       const times=(amyT/benT).toFixed(1);
-      live.innerHTML=`🤯 <b>Same $1,000. Same 10%.</b> Amy ends with <b>${fmt(amyT)}</b>, Ben with <b>${fmt(benT)}</b> — <b>${times}×</b> more, purely for starting earlier.`;
+      live.innerHTML=`🤯 <b>Same $1,000. Same 10%.</b> Amy's money doubled <b>${birdDoubles(amyT)}</b> times; Ben's only <b>${birdDoubles(benT)}</b> — so she ends with <b>${times}×</b> more, purely for starting earlier.`;
       document.getElementById('birdMsg').innerHTML = (pick==='amy')
         ? `🎉 <b>Correct — Amy wins, and it is not close.</b> Waiting 17 years cost Ben <b>${fmt(amyT-benT)}</b>. He did not put in a single cent less. He just started later.`
         : `😮 <b>Amy wins — by a mile.</b> Both put in exactly <b>$1,000</b>, so this is not about saving harder. Waiting 17 years cost Ben <b>${fmt(amyT-benT)}</b>.`;
+      chart.style.display='';                    // now the whole journey, as the epilogue
+      birdDraw(BIRD_END, true);
       confettiBurst(); sfx.fanfare(); showTake(4);
+      return;
     }
-  }, 95);
+    window._bird=setTimeout(step, birdDelay(a+1));
+  };
+  window._bird=setTimeout(step, birdDelay(BIRD_START+1));
 }
 
 /* ---------- Step 5: market illustration ---------- */
