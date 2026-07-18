@@ -211,6 +211,12 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
 .confetti{position:fixed; inset:0; pointer-events:none; z-index:50}
 .reveal{animation:reveal .5s ease}
 @keyframes reveal{from{opacity:0; transform:scale(.9)}to{opacity:1; transform:none}}
+/* Step 0 race: the coin number pops on each doubling in the explosion phase, so the doubling is
+   felt, not just plotted. The "×2 every day" badge names what is happening as it happens. */
+#wyrCoin.coinpop{animation:coinpop .38s ease}
+@keyframes coinpop{35%{transform:scale(1.15)}}
+.doubletag{display:none; margin-top:6px; font-size:13px; font-weight:700; color:var(--p-text);
+  background:var(--p-bg); border:1px solid rgba(124,58,237,.28); border-radius:999px; padding:3px 12px}
 
 /* ---------- controls (steps 3 & 6) ---------- */
 .ctrl{margin:16px 0}
@@ -393,7 +399,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         <div class="center"><div class="eyebrow">Day <span id="wyrDay" class="mono">1</span> of 30</div></div>
         <div class="splitrow">
           <div class="splitcell"><div class="eyebrow">🧧 $10 ang pow a day</div><div class="big mono" id="wyrCash" style="color:var(--b)">$10</div></div>
-          <div class="splitcell"><div class="eyebrow">🪙 Magic coin</div><div class="big mono" id="wyrCoin" style="color:var(--joy)">$0.01</div></div>
+          <div class="splitcell"><div class="eyebrow">🪙 Magic coin</div><div class="big mono" id="wyrCoin" style="color:var(--joy)">$0.01</div><div class="doubletag" id="wyrCoinX">×2 every day! 🤯</div></div>
         </div>
         <div class="chart" id="wyrChart"></div>
         <div class="legend"><span><i style="background:var(--b)"></i>the ang pow</span><span><i style="background:var(--joy)"></i>the magic coin</span></div>
@@ -806,6 +812,10 @@ function selfTest(){
   t.push(['snow y4', approx(futureValue(100,0,20,4),207.36,1e-6)]);
   // Penny doubling day 30 = 0.01 * 2^29
   t.push(['penny d30', approx(0.01*Math.pow(2,29),5368709.12,0.01)]);
+  // The finale's "aha": the last day's jump equals the entire prior total (that IS doubling).
+  t.push(['day-30 jump = prior total', approx(coinOn(30)-coinOn(29), coinOn(29), 0.01)]);
+  // Pacing must decelerate into the explosion, not blur it: late days slower than early days.
+  t.push(['race decelerates', wyrDelay(30)>wyrDelay(24) && wyrDelay(24)>wyrDelay(10)]);
   // Rule of 72 sample values
   t.push(['r72 @2', approx(rule72(2),36,1e-9)]);
   t.push(['r72 @20', approx(rule72(20),3.6,1e-9)]);
@@ -930,7 +940,7 @@ function go(n){
   window.scrollTo({top:0, behavior:'smooth'});
   redrawCharts();   // this step's charts now have a real width, so their text can be sized properly
   if(n>0) document.body.classList.add('started');  // shrink the masthead; set once, never unset
-  clearInterval(window._bird); clearInterval(window._kc);  // do not leave an animation running off-screen
+  clearInterval(window._bird); clearInterval(window._kc); clearTimeout(window._wyr);  // do not leave an animation running off-screen
   shutUp(); say(SAY[n]);
   if([2,5].includes(n)) showTake(n);   // no reveal on these, so the takeaway cannot spoil anything
   updateNav();
@@ -969,6 +979,14 @@ function wyrRaceDraw(n){
     {name:'coin', color:'#7c3aed', pts:coin, fill:true, w:3.5}
   ], {xPrefix:'day ', h:210, noFade:true});
 }
+// Pacing is the whole point of the rethink. Constant speed blurs the one thing worth watching —
+// the acceleration. So: brisk through the boring losing stretch, then DECELERATE into the
+// explosion so a child can watch each doubling land, one huge jump at a time. ~9s, drama rising.
+function wyrDelay(d){
+  if(d<=14) return 140;           // days 2–14: the coin is losing. Keep it moving, but visible.
+  if(d<=24) return 300;           // it takes the lead and starts to matter.
+  return 450 + (d-25)*130;        // the explosion: d25=450ms … d30=1100ms — savour each doubling.
+}
 function wyrReveal(){
   const res=document.getElementById('wyrResult'); res.style.display='block';
   res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
@@ -976,32 +994,44 @@ function wyrReveal(){
   document.querySelectorAll('#wyrChoices .choice').forEach(c=>c.classList.remove('win','lose'));
   const btn=document.getElementById('wyrReveal'); btn.disabled=true;
   const live=document.getElementById('wyrLive'); live.style.display='block';
-  live.innerHTML='😴 Watch the coin. It is <b>losing badly</b>. Boring, right? Keep watching…';
+  live.innerHTML='😴 The coin is <b>tiny</b> — just one cent — and it will <b>lose for two whole weeks</b>. Keep watching, it gets wild…';
   document.getElementById('wyrVerdict').innerHTML='';
+  const coinEl=document.getElementById('wyrCoin'), coinX=document.getElementById('wyrCoinX');
+  coinX.style.display='none'; coinEl.classList.remove('coinpop');
   let n=1; wyrRaceDraw(1);
-  clearInterval(window._wyr);
-  window._wyr=setInterval(()=>{
+  clearTimeout(window._wyr);
+  const step=()=>{
     n++;
     document.getElementById('wyrDay').textContent=n;
-    document.getElementById('wyrCoin').textContent=money(coinOn(n));
+    coinEl.textContent=money(coinOn(n));
     document.getElementById('wyrCash').textContent=money(cashOn(n));
     wyrRaceDraw(n);
-    if(n<15 && n%3===0) sfx.tick();
-    if(n===15){ live.innerHTML='🏁 <b>Day 15 — the coin just took the lead!</b> It needed half the month just to catch up. Now watch…'; sfx.whoosh(); }
-    else if(n===23) live.innerHTML='🚀 <b>Wheeee!</b> The ang pow line looks flat now — but it is still climbing $10 every day. It simply cannot keep up.';
+    if(n<15){ if(n%3===0) sfx.tick(); }
+    else {
+      // felt doubling: pop the coin number and climb the pitch, every day, once it matters.
+      coinEl.classList.remove('coinpop'); void coinEl.offsetWidth; coinEl.classList.add('coinpop');
+      sfx.grow(n);
+    }
+    if(n>=24) coinX.style.display='inline-block';
+    if(n===15){ live.innerHTML='🏁 <b>Day 15 — the coin finally overtakes the ang pow!</b> It needed half the whole month just to catch up.'; sfx.whoosh(); }
+    else if(n===24) live.innerHTML='🚀 <b>Now it gets wild.</b> From here the coin <b>doubles every single day</b> — watch each jump get bigger than everything before it.';
     if(n>=30){
-      clearInterval(window._wyr);
-      const ratio=Math.round(coinOn(30)/cashOn(30));
-      live.innerHTML=`🤯 <b>The coin wins by ${ratio.toLocaleString('en-US')} times.</b> Same month, same start. One of them just <b>doubled</b>.`;
+      clearTimeout(window._wyr);
+      const ratio=Math.round(coinOn(30)/cashOn(30)), lastJump=coinOn(30)-coinOn(29);
+      live.innerHTML=`🤯 <b>The coin wins by ${ratio.toLocaleString('en-US')} times.</b> And look — on the <b>last day alone</b> it grew by <b>${fmt(lastJump)}</b>, as much as the whole month before it, all over again. <b>That</b> is compounding.`;
       document.querySelector('.choice[data-pick="coin"]').classList.add('win');
       document.querySelector('.choice[data-pick="cash"]').classList.add('lose');
       document.getElementById('wyrVerdict').innerHTML = (wyrChoice==='coin')
         ? `🎉 <b>You picked the magic coin — brilliant!</b> <b>${fmt(coinOn(30))}</b> against $300.`
         : `😮 $300 felt like the safe pick… but the coin finishes on <b>${fmt(coinOn(30))}</b>. Doubling is magic.`;
+      coinEl.classList.remove('coinpop');
       confettiBurst(); sfx.fanfare(); showTake(0);
       btn.disabled=false; btn.textContent='Race again 🔁';
+      return;
     }
-  }, 115);
+    window._wyr=setTimeout(step, wyrDelay(n));
+  };
+  window._wyr=setTimeout(step, wyrDelay(1));
 }
 
 /* ---------- Step 1: the two snowballs ----------
