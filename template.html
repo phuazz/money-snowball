@@ -170,6 +170,14 @@ body.older .younger-only.inline{display:none}
 /* Step 1 "stuff you bought" shelf — real things a kid wants, each popping in as they buy it. */
 .stuff-shelf{display:flex; flex-wrap:wrap; gap:5px; justify-content:center; min-height:32px; margin:6px 0 2px; font-size:26px; line-height:1}
 .stuff-shelf span{animation:coinpop .4s ease}
+/* Step 1 reveal: a projection ladder showing the snowball keeps rolling for life (the numbers
+   balloon) while the "stuff" stays flat — the driving-home that 8 years alone cannot deliver. */
+.snow-proj{display:flex; flex-direction:column; gap:6px; margin:14px 0 4px}
+.snow-proj .r{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 14px; border:1px solid var(--bd); border-radius:12px; background:var(--bg2); font-size:15px}
+.snow-proj .r b{font-family:var(--mono); font-weight:700; white-space:nowrap}
+.snow-proj .r.hot{border-color:var(--g-bg2); background:var(--g-bg)}
+.snow-proj .r.hot b{color:var(--g-text)}
+.snow-proj .r.flat b{font-family:var(--sans); font-weight:600; color:var(--t3-text)}
 .snow-readout{display:flex; justify-content:center; align-items:baseline; gap:10px; margin-top:6px}
 .yeartag{font-family:var(--mono); font-size:14px; color:var(--t3-text)}
 .gain-line{display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:8px; font-size:15px}
@@ -463,6 +471,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
 
       <div id="snowResult" style="display:none">
         <div class="note" id="snowResultMsg"></div>
+        <div class="snow-proj" id="snowProj"></div>
         <div class="btnrow center" style="justify-content:center">
           <button class="btn btn-ghost" onclick="snowReset()">🔁 Play again</button>
         </div>
@@ -831,6 +840,9 @@ function selfTest(){
   // Wishlist escalates: a $20 profit buys cards, a kept-all $430 snowball could buy a console.
   t.push(['wish $20 = cards', wishFor(20).e==='🎴']);
   t.push(['wish $430 = console', wishFor(430).e==='🕹️']);
+  // Reveal projection: a snowball left to roll 20 more years at 20% multiplies by ~38× (the
+  // driving-home — and why a small amount spent costs a lot later).
+  t.push(['snow proj 20y = 38x', approx(Math.pow(1.2,20), 38.34, 0.01)]);
   // Pacing must decelerate into the explosion, not blur it: late days slower than early days.
   t.push(['race decelerates', wyrDelay(30)>wyrDelay(24) && wyrDelay(24)>wyrDelay(10)]);
   // Rule of 72 sample values
@@ -1121,10 +1133,23 @@ function snowAdvance(msg){
 function snowReveal(){
   document.getElementById('snowChoose').style.display='none';
   document.getElementById('snowMsg').style.display='none';
-  const maxKeep=SNOW_START*Math.pow(1+SNOW_RATE/100, SNOW_YEARS), kept=SNOW_YEARS-snowBought.length, top=wishFor(maxKeep);
+  const maxKeep=SNOW_START*Math.pow(1.2,SNOW_YEARS), kept=SNOW_YEARS-snowBought.length, pot=snowPot, gap=maxKeep-pot;
+  // Short summary; the DRIVING-HOME is the projection ladder below.
   document.getElementById('snowResultMsg').innerHTML = snowBought.length===0
-    ? `🏆 <b>You kept it every single year!</b> Your snowball grew to <b>${fmt(maxKeep)}</b> from the same $100 — now you could buy ${top.e} <b>${top.n}</b> and <em>still</em> have <b>${fmt(maxKeep-top.c)}</b> left. Growing your money let you afford <em>more</em> than spending ever could.`
-    : `You bought <b>${snowBought.length}</b> things ${snowBought.join(' ')} and kept it <b>${kept}×</b> 🐿️, ending on <b>${fmt(snowPot)}</b>. Keep it <em>every</em> year and you would have <b>${fmt(maxKeep)}</b> — so that stuff cost your snowball <b>${fmt(maxKeep-snowPot)}</b>. Fun now, or a fortune later — you are learning to choose.`;
+    ? `🏆 <b>You kept it every single year!</b> Your snowball is <b>${fmt(maxKeep)}</b> — the biggest it could be, from the very same $100.`
+    : `You bought <b>${snowBought.length}</b> ${snowBought.join(' ')} and kept it <b>${kept}×</b> 🐿️, ending on <b>${fmt(pot)}</b>. Keep it <em>every</em> year and you would have <b>${fmt(maxKeep)}</b>.`;
+  // The point 8 years alone can't make: a snowball keeps rolling for LIFE, the stuff does not.
+  const row=(l,v,cls,tag)=>`<div class="r ${cls||''}"><span>${l}</span><b>${v}${tag?' '+tag:''}</b></div>`;
+  let proj = `<div class="lead center" style="margin-bottom:4px">But a snowball <b>never stops rolling</b> — leave your <b class="mono">${money2(pot)}</b> alone and it keeps growing all by itself:</div>`
+    + row('🐿️ Today', fmt(pot))
+    + row('…in 10 years', fmt(pot*Math.pow(1.2,10)), 'hot', '🔥')
+    + row('…when you are grown up', fmt(pot*Math.pow(1.2,20)), 'hot', '🚀')
+    + (snowBought.length ? row('🛍️ Your stuff', `still ${snowBought.length} thing${snowBought.length===1?'':'s'} ${snowBought.join('')}`, 'flat') : '');
+  if(snowBought.length){
+    proj += `<div class="note" style="margin-top:8px">💸 And the <b>${fmt(gap)}</b> you gave up by spending is worse than it looks: left to grow, it would have become <b>${fmt(gap*Math.pow(1.2,20))}</b> by the time you are grown up. <b>Spending a little costs a LOT later</b> — because money you spend can never grow.</div>`;
+  }
+  proj += `<div class="tiny muted center older-only" style="margin-top:6px">(This assumes 20% a year, which is very high — real investing is nearer 10%. The idea holds either way: money you keep keeps working for ever; money you spend is gone.)</div>`;
+  document.getElementById('snowProj').innerHTML=proj;
   const res=document.getElementById('snowResult'); res.style.display='block';
   res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
   bringIntoView(res); snowRenderTiles();
