@@ -192,6 +192,12 @@ body.older .younger-only.inline{display:none}
 /* Grown-up mode slider read-outs */
 .gu-val{font-family:var(--mono); color:var(--joy); font-weight:700}
 .gu-first{font-family:var(--mono); font-weight:700; font-size:18px; color:var(--t2); padding:6px 0 2px}
+/* Scrub read-out: every rate's value at the hovered age. min-height stops the layout jumping. */
+.gu-scrub{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:4px 12px;
+  min-height:24px; margin:6px 0 2px; font-size:13px; font-family:var(--mono)}
+.gu-scrub b{font-weight:700}
+.gu-scrub .muted{color:var(--t3-text); font-family:var(--sans)}
+.chart{cursor:crosshair}
 .snow-readout{display:flex; justify-content:center; align-items:baseline; gap:10px; margin-top:6px}
 .yeartag{font-family:var(--mono); font-size:14px; color:var(--t3-text)}
 .gain-line{display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:8px; font-size:15px}
@@ -735,11 +741,12 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       </div>
 
       <div class="btnrow" style="justify-content:center; margin-top:16px">
-        <button class="btn btn-ghost" id="guScaleBtn" onclick="guToggleScale()">📉 Switch to straight scale</button>
+        <button class="btn btn-ghost" id="guScaleBtn" onclick="guToggleScale()">📈 Switch to log scale</button>
       </div>
       <div class="chart" id="guChart"></div>
+      <div class="gu-scrub" id="guScrub"></div>
       <div class="legend" id="guLegend"></div>
-      <div class="tiny muted center" id="guScaleNote">Log scale, running to <b>age 65</b>: each step up is 10× bigger, so all six fit. Every line <b>ends on its age-65 pot</b> — the last column of the table — and crosses the $1m / $10m markers at the ages listed there.</div>
+      <div class="tiny muted center" id="guScaleNote">Straight scale to <b>age 65</b> — the honest shape: only the fastest line really lifts off. Each line still <b>ends on its age-65 pot</b>, the table's last column. Switch to log to separate them all.</div>
 
       <div class="note">
         Contributions are invested at the <b>end</b> of each year, and the income grows every year. Returns are
@@ -1443,6 +1450,8 @@ function paintChart(hostId, series, o){
     g+=`<text class="ax" font-size="${axFS}" x="${X(a).toFixed(1)}" y="${H-6}" text-anchor="middle">${o.xPrefix||''}${a}</text>`;
   });
   if(!o.hlines) g+=`<text class="ax" font-size="${axFS}" x="${P.l}" y="${P.t-5}">${o.topLabel!=null?o.topLabel:fmt(vmax)}</text>`;
+  // Expose the age<->pixel mapping so callers can add pointer scrubbing without duplicating geometry.
+  host._chart={a0, a1, W, P};
   host.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img">${g}</svg>`;
 }
 // Big numbers mean nothing to a child until they are priced in something they want.
@@ -1682,14 +1691,59 @@ function milestoneAge(pts, target){ const h=pts.find(p=>p.v>=target); return h?h
 // 14px bold table text, so it must clear 4.5:1. The old #b0b0a8 row measured
 // 2.18:1 — unreadable, on a number the table exists to show.
 const GU_RATES=[{r:0,c:'#66665e'},{r:2,c:'#a93226'},{r:4,c:'#92400e'},{r:10,c:'#1d4ed8'},{r:15,c:'#146c43'},{r:20,c:'#7c3aed'}];
-let guLog=true;   // grown-up mode defaults to log: it lines the curves up with the milestone table
+// Linear by DEFAULT. A log scale flatters exponential growth into a tame straight line, which
+// misleads a non-technical reader — and the honest shock of the shape is this page's whole job.
+// The table link survives on linear anyway: each line ends on its age-65 pot, labelled. Log is one
+// tap away for separating the six lines and reading the milestone crossings.
+let guLog=false;
 function guScaleUI(){
   document.getElementById('guScaleBtn').textContent = guLog?'📉 Switch to straight scale':'📈 Switch to log scale';
   document.getElementById('guScaleNote').innerHTML = guLog
-    ? 'Log scale, running to <b>age 65</b>: each step up is 10× bigger, so all six fit. Every line <b>ends on its age-65 pot</b> — the last column of the table — and crosses the $1m / $10m markers at the ages listed there.'
-    : 'Straight scale to <b>age 65</b>: only the fastest line is visible — that <em>is</em> the raw drama. Switch to log to line it up with the table.';
+    ? 'Log scale to <b>age 65</b>: each step up is 10× bigger, so all six separate. Every line <b>ends on its age-65 pot</b> — the table\'s last column — and crosses the $1m / $10m markers at the ages listed there.'
+    : 'Straight scale to <b>age 65</b> — the honest shape: only the fastest line really lifts off. Each line still <b>ends on its age-65 pot</b>, the table\'s last column. Switch to log to separate them all.';
 }
 function guToggleScale(){ guLog=!guLog; guScaleUI(); guUpdate(); }
+
+/* Scrubbing: hover or drag across the chart to read every rate's value at that age, with a
+   crosshair. This is the one thing a Plotly hover would have given us — delivered in ~40 lines
+   instead of a ~1MB CDN library, which would be this page's only external dependency and would
+   cost the instant phone load and offline capability the whole build is designed around. */
+let guSeriesCache=[], guScrubWired=false;
+function guDrawChart(scrubAge){
+  // Link the chart to the table: milestone thresholds as reference lines, and the x-axis ends at
+  // 65 so the final tick IS the age-65 column. Milestones only read on log (even spacing).
+  drawChart('guChart', guSeriesCache, {log:guLog, h:250, xPrefix:'age ', noFade:true,
+    hlines: guLog ? [{v:1e5,label:'$100k'},{v:1e6,label:'$1m'},{v:1e7,label:'$10m'},{v:1e8,label:'$100m'}] : null,
+    vlines: scrubAge!=null ? [{a:scrubAge, label:'age '+scrubAge}] : null});
+}
+function guShowAt(a){
+  const el=document.getElementById('guScrub');
+  if(a==null){
+    el.innerHTML='<span class="muted">Hover or drag across the chart to read every rate at any age.</span>';
+    guDrawChart(null); return;
+  }
+  const chips=guSeriesCache.map(s=>{
+    const p=s.pts.find(x=>x.a===a);
+    return p?`<span style="color:${s.color}"><b>${s.name}</b> ${fmtShort(p.v)}</span>`:'';
+  }).filter(Boolean).join('');
+  el.innerHTML=`<b class="mono">Age ${a}</b>${chips}`;
+  guDrawChart(a);
+}
+function guWireScrub(){
+  if(guScrubWired) return; guScrubWired=true;
+  const host=document.getElementById('guChart');
+  const read=e=>{
+    const c=host._chart, svg=host.querySelector('svg');
+    if(!c||!svg) return;
+    const rect=svg.getBoundingClientRect();
+    if(!rect.width) return;
+    const t=Math.max(0, Math.min(1, ((e.clientX-rect.left)/rect.width*c.W - c.P.l) / (c.W-c.P.l-c.P.r)));
+    guShowAt(Math.round(c.a0 + t*(c.a1-c.a0)));
+  };
+  host.addEventListener('pointermove', read);
+  host.addEventListener('pointerdown', read);
+  host.addEventListener('pointerleave', ()=>guShowAt(null));
+}
 function guUpdate(){
   const age=+document.getElementById('guAge').value;
   const inc=+document.getElementById('guInc').value;
@@ -1718,11 +1772,10 @@ function guUpdate(){
     rows.push(`<tr><td><b style="color:${g.c}">${g.r}%</b></td>${cell(1e5)}${cell(1e6)}${cell(1e7)}${cell(1e8)}<td>${at65?fmt(at65.v):'—'}</td></tr>`);
   });
   document.getElementById('guBody').innerHTML=rows.join('');
-  // Link the chart to the table: milestone thresholds ($100k…$100m) as reference lines, and the
-  // x-axis now ends at 65 so the final tick IS the age-65 column (no separate marker needed).
-  // Milestones only read on log (even spacing, all six lines visible), so they show there.
-  drawChart('guChart', series, {log:guLog, h:250, xPrefix:'age ',
-    hlines: guLog ? [{v:1e5,label:'$100k'},{v:1e6,label:'$1m'},{v:1e7,label:'$10m'},{v:1e8,label:'$100m'}] : null});
+  guSeriesCache=series;
+  guDrawChart(null);
+  guWireScrub();
+  guShowAt(null);
   document.getElementById('guLegend').innerHTML=GU_RATES.map(g=>`<span><i style="background:${g.c}"></i>${g.r}%</span>`).join('');
 }
 
