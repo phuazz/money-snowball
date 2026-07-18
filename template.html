@@ -178,6 +178,17 @@ body.older .younger-only.inline{display:none}
 .snow-proj .r.hot{border-color:var(--g-bg2); background:var(--g-bg)}
 .snow-proj .r.hot b{color:var(--g-text)}
 .snow-proj .r.flat b{font-family:var(--sans); font-weight:600; color:var(--t3-text)}
+/* Step 1 "cost bomb" — the emotional climax: a small amount spent becomes a big amount given up.
+   Hero numbers, the scary one dominant, so it reads as a headline not a footnote. */
+.costbomb{margin-top:12px; padding:16px 14px; border-radius:var(--radius-kid); text-align:center;
+  background:linear-gradient(160deg, var(--r-bg2), var(--sun-bg)); border:2px solid rgba(192,57,43,.3)}
+.costbomb .cb-lbl{font-size:12px; text-transform:uppercase; letter-spacing:.9px; font-weight:700; color:var(--t3-text)}
+.costbomb .cb-num{font-family:var(--mono); font-weight:700; letter-spacing:-1px; line-height:1.05}
+.costbomb .cb-num.spent{font-size:clamp(26px,7vw,36px); color:var(--t2)}
+.costbomb .cb-num.cost{font-size:clamp(40px,13vw,64px); color:var(--r-text); animation:coinpop .5s ease .3s both}
+.costbomb .cb-arrow{font-size:12px; font-weight:700; color:var(--r-text); margin:7px 0; text-transform:uppercase; letter-spacing:.5px}
+.costbomb .cb-punch{margin-top:12px; font-size:16px; color:var(--t1)}
+.costbomb .cb-punch b{color:var(--r-text)}
 .snow-readout{display:flex; justify-content:center; align-items:baseline; gap:10px; margin-top:6px}
 .yeartag{font-family:var(--mono); font-size:14px; color:var(--t3-text)}
 .gain-line{display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:8px; font-size:15px}
@@ -1146,7 +1157,14 @@ function snowReveal(){
     + row('…when you are grown up', fmt(pot*Math.pow(1.2,20)), 'hot', '🚀')
     + (snowBought.length ? row('🛍️ Your stuff', `still ${snowBought.length} thing${snowBought.length===1?'':'s'} ${snowBought.join('')}`, 'flat') : '');
   if(snowBought.length){
-    proj += `<div class="note" style="margin-top:8px">💸 And the <b>${fmt(gap)}</b> you gave up by spending is worse than it looks: left to grow, it would have become <b>${fmt(gap*Math.pow(1.2,20))}</b> by the time you are grown up. <b>Spending a little costs a LOT later</b> — because money you spend can never grow.</div>`;
+    proj += `<div class="costbomb">
+      <div class="cb-lbl">💸 You gave up</div>
+      <div class="cb-num spent">${fmt(gap)}</div>
+      <div class="cb-arrow">↓ left to grow, by the time you are grown up ↓</div>
+      <div class="cb-lbl">that would have become</div>
+      <div class="cb-num cost">${fmt(gap*Math.pow(1.2,20))} 😱</div>
+      <div class="cb-punch">Spending a little costs a <b>LOT</b> later — money you spend can never grow.</div>
+    </div>`;
   }
   proj += `<div class="tiny muted center older-only" style="margin-top:6px">(This assumes 20% a year, which is very high — real investing is nearer 10%. The idea holds either way: money you keep keeps working for ever; money you spend is gone.)</div>`;
   document.getElementById('snowProj').innerHTML=proj;
