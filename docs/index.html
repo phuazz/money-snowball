@@ -189,6 +189,9 @@ body.older .younger-only.inline{display:none}
 .costbomb .cb-arrow{font-size:12px; font-weight:700; color:var(--r-text); margin:7px 0; text-transform:uppercase; letter-spacing:.5px}
 .costbomb .cb-punch{margin-top:12px; font-size:16px; color:var(--t1)}
 .costbomb .cb-punch b{color:var(--r-text)}
+/* Grown-up mode slider read-outs */
+.gu-val{font-family:var(--mono); color:var(--joy); font-weight:700}
+.gu-first{font-family:var(--mono); font-weight:700; font-size:18px; color:var(--t2); padding:6px 0 2px}
 .snow-readout{display:flex; justify-content:center; align-items:baseline; gap:10px; margin-top:6px}
 .yeartag{font-family:var(--mono); font-size:14px; color:var(--t3-text)}
 .gain-line{display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-top:8px; font-size:15px}
@@ -705,16 +708,22 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       <h2>Grown-up mode</h2>
       <p class="lead">The same maths, on a grown-up salary: your income, the slice you invest, and what it becomes.</p>
 
-      <!-- Money fields are type="text" + inputmode="numeric", NOT type="number": the HTML spec
-           requires type="number" to hold a valid floating-point number, so a comma makes the
-           value invalid and the browser discards it. Grouping is worth more than the spinners. -->
+      <!-- Sliders, not text boxes: grown-up mode is for exploring what-ifs, so dragging beats
+           typing (and no keyboard on a phone). Dollar sliders step in round amounts, which is
+           plenty for a projection. Each slider shows its value in the label. -->
       <div class="gu-grid">
-        <div><label class="gu-lab">Starting age</label><input class="gu-in" id="guAge" type="number" value="21" min="10" max="70" oninput="guUpdate()"></div>
-        <div><label class="gu-lab">Starting annual income ($)</label><input class="gu-in money" id="guInc" type="text" inputmode="numeric" value="42,000" oninput="guUpdate()" onblur="groupMoney(this); guUpdate()"></div>
-        <div><label class="gu-lab">Annual income increase (%)</label><input class="gu-in" id="guGrow" type="number" value="5" min="0" max="20" step="0.5" oninput="guUpdate()"></div>
-        <div><label class="gu-lab">% of income invested</label><input class="gu-in" id="guPct" type="number" value="20" min="0" max="100" step="1" oninput="guUpdate()"></div>
-        <div><label class="gu-lab">Lump sum at the start ($)</label><input class="gu-in money" id="guLump" type="text" inputmode="numeric" value="0" oninput="guUpdate()" onblur="groupMoney(this); guUpdate()"></div>
-        <div><label class="gu-lab">First-year investment</label><input class="gu-in" id="guFirst" type="text" value="" disabled></div>
+        <div><label class="gu-lab">Starting age: <b class="gu-val" id="guAgeV">21</b></label>
+          <input class="slider" id="guAge" type="range" min="15" max="45" value="21" step="1" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">Starting income: <b class="gu-val" id="guIncV">$42,000</b></label>
+          <input class="slider" id="guInc" type="range" min="0" max="200000" value="42000" step="2000" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">Income rise a year: <b class="gu-val" id="guGrowV">5%</b></label>
+          <input class="slider" id="guGrow" type="range" min="0" max="15" value="5" step="0.5" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">Slice invested: <b class="gu-val" id="guPctV">20%</b></label>
+          <input class="slider" id="guPct" type="range" min="0" max="50" value="20" step="1" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">Lump sum at the start: <b class="gu-val" id="guLumpV">$0</b></label>
+          <input class="slider" id="guLump" type="range" min="0" max="100000" value="0" step="2000" oninput="guUpdate()"></div>
+        <div><label class="gu-lab">First-year investment</label>
+          <div class="gu-first mono" id="guFirst">$8,400 in year one</div></div>
       </div>
 
       <div class="eyebrow" style="margin-top:20px">Age you reach each milestone</div>
@@ -736,6 +745,7 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
         Contributions are invested at the <b>end</b> of each year, and the income grows every year. Returns are
         assumed steady; real markets are not. This is arithmetic, not a forecast, and nothing here is financial advice.
       </div>
+      <div class="tiny muted center" style="margin-top:14px">👇 Below: how to teach all this to your kids.</div>
     </div>
 
     <div class="card">
@@ -745,10 +755,10 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       <div class="qbox"><b>Ask, do not tell.</b> At every reveal, make them commit to a guess <em>out loud</em> first. A wrong guess is the whole point; surprise is what sticks. A child who is told a fact forgets it. A child who is <em>wrong</em> remembers.</div>
       <div class="qbox"><b>Do it with sweets, at the table — no screen.</b> Put out 1 sweet. Then 2, then 4, 8, 16 — five days, in front of them. Then ask: “how many by day 21?” It is <b>1,048,576</b>. The physical start and the absurd finish is the entire lesson, and it works on a five-year-old.</div>
       <div class="qbox"><b>The two-cookie test.</b> “One cookie now, or two next week?” Then: “What if waiting turned one cookie into ten?” That is compounding, in cookies.</div>
-      <div class="qbox"><b>Ask a grandparent — this one is the best of the lot.</b> “What did a bowl of noodles cost when you were my age?” Their answer teaches inflation better than any chart, because it is <em>true, specific and from someone they love</em>. It turns a dry word into a family story, and it is the perfect way into Step 7.</div>
+      <div class="qbox"><b>Ask a grandparent — this one is the best of the lot.</b> “What did a bowl of noodles cost when you were my age?” Their answer teaches inflation better than any chart, because it is <em>true, specific and from someone they love</em>. It turns a dry word into a family story — the one honest way to teach inflation, and the page leaves it to you on purpose.</div>
       <div class="qbox"><b>Make it real — be the market.</b> Match their savings: for every $1 they put in, add 20% at the end of the month. Let them <em>feel</em> a return arrive without working for it. Nothing else lands like that.</div>
       <div class="qbox"><b>Let them pick the company.</b> A share in something they love and can see — a toy maker, a burger chain — beats any lecture about an index fund.</div>
-      <div class="qbox"><b>Never let them spend the profit.</b> Step 2 is the whole point: the squirrel and the ice-cream kid start identical. Eat the profit and the magic switches off, permanently.</div>
+      <div class="qbox"><b>Never let them spend the profit.</b> That is the heart of Step 1's game — keep the profit and the snowball rolls; spend it and the magic switches off, permanently. Real money works exactly the same way.</div>
       <div class="factbox">
         <b>Expect the boring bit.</b> In Step 1 the magic coin loses for 14 straight days, and in real life the
         boring stretch lasts years. That is not a flaw in the plan — it <em>is</em> the plan. Almost everyone who
@@ -766,7 +776,18 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       </div>
 
     </div>
-    <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button><button class="btn btn-sun" onclick="finish()">I am a Compounding Champion! 🏆</button></div>
+
+    <div class="card" style="text-align:center; background:linear-gradient(160deg, var(--g-bg), var(--sun-bg)); border-color:var(--g-bg2)">
+      <div style="font-size:48px; line-height:1">🏆</div>
+      <h2>That's the whole journey!</h2>
+      <p class="lead">You know the secrets now: money makes money, start early, and never spend the profit.</p>
+      <div class="btnrow center" style="justify-content:center; margin-top:6px">
+        <button class="btn btn-sun" onclick="finish()">🎉 Celebrate!</button>
+        <button class="btn btn-ghost" onclick="go(0)">🔁 Start over</button>
+        <button class="btn btn-ghost" onclick="shareIt()">📤 Share it</button>
+      </div>
+    </div>
+    <div class="nav"><button class="btn btn-ghost nav-prev" onclick="goPrev()">← Back</button></div>
   </section>
 
   <!-- Stripe Payment Link, at the end of the page. A plain anchor by design: no key, no
@@ -1656,12 +1677,17 @@ function guToggleScale(){
   guUpdate();
 }
 function guUpdate(){
-  const age=+document.getElementById('guAge').value||21;
-  const inc=numOf(document.getElementById('guInc'));      // "42,000" -> 42000
-  const grow=+document.getElementById('guGrow').value||0;
-  const pct=+document.getElementById('guPct').value||0;
-  const lump=numOf(document.getElementById('guLump'));
-  document.getElementById('guFirst').value=fmt(inc*pct/100)+' in year one';
+  const age=+document.getElementById('guAge').value;
+  const inc=+document.getElementById('guInc').value;
+  const grow=+document.getElementById('guGrow').value;
+  const pct=+document.getElementById('guPct').value;
+  const lump=+document.getElementById('guLump').value;
+  document.getElementById('guAgeV').textContent=age;
+  document.getElementById('guIncV').textContent=fmt(inc);
+  document.getElementById('guGrowV').textContent=grow+'%';
+  document.getElementById('guPctV').textContent=pct+'%';
+  document.getElementById('guLumpV').textContent=fmt(lump);
+  document.getElementById('guFirst').textContent=fmt(inc*pct/100)+' in year one';
   const rows=[], series=[];
   GU_RATES.forEach(g=>{
     const pts=grownUpSeries(age, inc, grow, pct, lump, g.r, 90);
@@ -1707,9 +1733,10 @@ async function copyLink(){
 
 /* ---------- finish ---------- */
 function finish(){
+  // The completion card already recaps the secrets, so no blocking alert — just celebrate.
   confettiBurst(); sfx.fanfare();
-  setTimeout(()=>{ confettiBurst(); sfx.fanfare(); }, 400);
-  alert('🏆 Compounding Champion!\n\nYou now know the three secrets:\n\n1. Money can make money — and that money makes money too.\n2. The sooner you start, the more times it doubles.\n3. Never spend the profit. Let the snowball roll.\n\nNow go and explain it to a grown-up.');
+  setTimeout(()=>{ confettiBurst(); sfx.fanfare(); }, 450);
+  toast('🏆 You are a Compounding Champion!');
 }
 
 /* ---------- init ---------- */
