@@ -56,9 +56,13 @@ doubling coin rather than a million dollars.
    each week. **The guess adapts to age**: Younger taps one of four options (no keyboard,
    nothing to freeze at — a blank box gets skipped, and a skipped guess kills the reveal);
    Older types a number, which is a firmer commitment than picking from a list.
-4. **Early Bird vs Late Bird** — Amy saves from 8 to 18 then stops; Ben saves from 25 to
-   60. Amy ends with **$249,619** against Ben's **$77,513**, having put in 3.5× less.
-   Starting early beats saving more.
+4. **Early Bird vs Late Bird** — run as an **actual race**: one shared track, two cars, a
+   finish line at 60. Amy invests her $1,000 at 8, Ben leaves an identical $1,000 in a drawer
+   and only invests at 25. Amy ends on **$142,043** against Ben's **$28,102** — **5.05×**, on
+   exactly the same money in. Ben is **visibly parked** at the start line, engine off, from 8
+   to 24, which is the entire lesson; once he starts, both cars move at the *same speed* and
+   he never closes the gap. The child must **predict first**, and all three answers (Amy /
+   Ben / about the same) land a different screen.
 5. **Where does ~10% come from?** — a gentle, honest intro to owning pieces of great
    companies, including the part where markets fall by half and it feels horrible.
 6. **The Sneaky Thief 🥷 (inflation)** — the answer to the obvious rebuttal Step 5 invites
@@ -99,6 +103,13 @@ child ends with exactly what they put in, so it is withheld at 0%.
 
 ## Status
 
+- **2026-07-18** — Step 4 rebuilt as a real race, and the guess is finally read. Two growing
+  circles in separate boxes were not a race: nothing moved along a shared track, so there was no
+  positional lead to feel. Now one track, two cars, a finish line at 60, and Ben visibly parked
+  with his engine off until 25. Separately, `birdGuess(pick)` never read `pick` — every answer lit
+  Amy up and printed both totals *before* the race ran, so tapping "Ben" showed a child their
+  prediction being silently overwritten *and* spoiled the result. All three answers now hold the
+  prediction on screen and settle it differently. 67 self-checks pass.
 - **2026-07-17** — Sound effects, opt-in narration, per-step takeaways; contrast corrected to
   the `design.md` `-text` tokens (`--t3` fails at label size). 32 self-checks pass.
 - **2026-07-17** — Readability pass: chart text was rendering at ~4px on a phone (viewBox
@@ -129,6 +140,14 @@ child ends with exactly what they put in, so it is withheld at 0%.
 - Step 0 race: the coin passes $10/day on **day 15** and finishes 17,896× ahead
   ($5,368,709 vs $300). The chart's y-axis deliberately rescales itself each frame — the
   rescaling is what conveys the explosion.
+- **Step 4 race track: position is DOUBLINGS, not dollars — and the page says so.** A linear
+  track to $142k pins *both* racers on the start line until ~45 (Amy is 0.7% along at 8 and 3.6%
+  at 24), which is exactly why the earlier line-chart version failed the kid test. sqrt was
+  rejected because it compresses to no readable unit. Doublings give labelled money flags
+  ($1k→$128k) and a constant speed once invested, so the race reads as "same car, Ben left 17
+  years late". The cost is that the track **flatters Ben** — he finishes 67% along holding 20% of
+  the money — so that debt is paid at the finish by a linear `.truthbar` naming both figures, plus
+  the linear epilogue chart. Never ship the compression without the correction. Pinned by checks.
 - Step 6 inflation: $3 cone at 3%/yr, invested at 10% (kept consistent with the ~10% rung
   in Step 5, so nominal is compared with nominal). After 20 years a cone is $5.42, so $100
   buys 18 cones against 33 at the start, while $100 invested buys 124. All pinned by

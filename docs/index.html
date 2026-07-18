@@ -303,19 +303,58 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
 .homerow.super .v, .homerow.super .v .x{color:var(--p-text)}
 .legend i{display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:5px; vertical-align:-1px}
 
-/* ---------- Step 4 race lanes: two snowballs on ONE shared scale ----------
-   Radius tracks sqrt(value) so the ball's AREA is the money — Amy ends ~5x Ben's area, honestly.
-   Ben's ball is frozen (and labelled asleep) until 25, which is the whole lesson, visible. */
-.lanes{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:10px 0 4px}
-.lane{border:1px solid var(--bd); border-radius:var(--radius-kid); background:var(--bg2); padding:10px 8px; text-align:center}
-.lane-top{font-size:15px}
-.lane-top .muted{color:var(--t3-text); font-size:13px}
-.lane-stage{position:relative; height:132px}
-.lane-stage svg{width:100%; height:100%; display:block}
-.lane-stage circle{transition:r .3s cubic-bezier(.2,.8,.2,1), cy .3s cubic-bezier(.2,.8,.2,1)}
-.lane-sleep{position:absolute; left:0; right:0; bottom:2px; font-size:12px; color:var(--t3-text)}
-.lane-val{font-weight:700; font-size:clamp(17px,4.8vw,21px); letter-spacing:-.5px; margin-top:2px}
-.lane-dbl{min-height:22px; font-size:15px; letter-spacing:1px; line-height:1.3}
+/* ---------- Step 4: the race track ----------
+   ONE shared track, both racers on it, position encodes money. The axis choice IS the design
+   problem here, so it is declared on the page rather than buried in this comment.
+
+   THE DISTORTION, NAMED: track position is DOUBLINGS COMPLETED, log2(v/$1,000) — not dollars.
+   A linear-to-$142k track is unwatchable: Amy stands at 0.7% of the way at age 8 and 3.6% at 24,
+   and Ben never leaves the paint until ~45. That is exactly why the earlier line-chart version
+   failed the kid test. sqrt was the other candidate and was rejected because it compresses to no
+   readable unit — Ben would end at 44.5% of the track, a number that decodes to nothing.
+   Doublings buy three things a child can actually use:
+     - every flag is a LABELLED money marker ($1k, $2k, $4k … $128k), so the compression is
+       visible on the page instead of smuggled into a scale;
+     - once invested, both cars move at exactly the SAME SPEED (10%/yr is a constant 0.1375
+       doublings per year), so the race reads as "same car, same speed, Ben left 17 years late" —
+       the lesson drawn rather than asserted;
+     - the finishing gap is 2.34 flags, the same ~2.3 doublings the older-mode factbox explains.
+   THE COST, PAID EXPLICITLY: Ben finishes 67% down a track while holding 20% of the money, so the
+   track FLATTERS him. That debt is settled at the finish by .truthbar — a plain LINEAR money bar
+   showing the real 5.05x — and again by the linear epilogue chart. The compression is a teaching
+   beat that gets corrected out loud, never a silent axis trick.
+
+   Text size: the viewBox is 340 units and the svg is capped at 460px, so the scale stays inside
+   ~0.73–1.35 and label text never collapses the way a 620-unit chart box does (see paintChart).
+   Measured on a 320px phone, not assumed. */
+.trackwrap{margin:12px 0 2px}
+.trackwrap svg{width:100%; max-width:460px; height:auto; display:block; margin:0 auto}
+.racer{transition:transform .34s cubic-bezier(.25,.9,.3,1)}
+.racer.parked{transition:none}          /* a parked car must not glide; it is switched off */
+@media(prefers-reduced-motion:reduce){.racer{transition:none}}
+.trackcap{font-size:14px; color:var(--t3-text); text-align:center; margin-top:4px}
+/* The child's prediction, held on screen from the tap until the outcome settles it. */
+.yousaid{display:inline-block; padding:9px 18px; border-radius:999px; background:var(--p-bg);
+  border:1px solid rgba(124,58,237,.28); color:var(--p-text); font-size:15.5px; font-weight:700}
+.btn.picked{background:var(--p-bg); border-color:var(--joy); color:var(--p-text);
+  box-shadow:0 0 0 3px rgba(124,58,237,.18)}
+/* Three outcomes, three different screens. Being wrong is a colour and a joke, never a failure. */
+.verdict{display:none; margin-top:16px; padding:15px 17px; border-radius:var(--radius-kid);
+  border:2px solid; font-size:15.5px}
+.verdict.show{display:block}
+.verdict .vh{display:block; font-size:18.5px; margin-bottom:5px}
+.verdict.right{border-color:var(--g); background:var(--g-bg); color:var(--g-text)}
+.verdict.oops{border-color:var(--sun); background:var(--sun-bg); color:var(--a-text)}
+.verdict.half{border-color:var(--b); background:var(--b-bg); color:var(--b-text)}
+/* The un-compression: linear bars, so the track's flattery of Ben is corrected in plain sight. */
+.truthbar{display:none; margin-top:14px; border:1px solid var(--bd); border-radius:var(--radius-kid);
+  background:var(--bg2); padding:14px 15px}
+.truthbar.show{display:block}
+.tb-grid{display:grid; grid-template-columns:auto 1fr auto; gap:9px 10px; align-items:center}
+.tb-name{font-size:15px; white-space:nowrap}
+.tb-track{height:18px; background:var(--bg4); border-radius:9px; overflow:hidden}
+.tb-track i{display:block; height:100%; width:0; border-radius:9px; transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.tb-val{font-family:var(--mono); font-weight:700; font-size:14.5px; white-space:nowrap}
 /* ---------- bird race (step 4) ---------- */
 .birds{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px}
 @media(max-width:520px){.birds{grid-template-columns:1fr} .splitrow{grid-template-columns:1fr}}
@@ -657,44 +696,34 @@ a.btn-pay{text-decoration:none; line-height:1; justify-content:center}
       </div>
 
       <p class="lead center" style="margin-top:18px"><b>Who has more money at age 60?</b></p>
-      <div class="btnrow" style="justify-content:center">
-        <button class="btn btn-ghost" onclick="birdGuess('amy')">🐦 Amy</button>
-        <button class="btn btn-ghost" onclick="birdGuess('ben')">🦉 Ben</button>
-        <button class="btn btn-ghost" onclick="birdGuess('same')">🤝 About the same</button>
+      <div class="btnrow" style="justify-content:center" id="birdChoices">
+        <button class="btn btn-ghost" id="pickAmy"  onclick="birdGuess('amy')">🐦 Amy</button>
+        <button class="btn btn-ghost" id="pickBen"  onclick="birdGuess('ben')">🦉 Ben</button>
+        <button class="btn btn-ghost" id="pickSame" onclick="birdGuess('same')">🤝 About the same</button>
       </div>
 
       <div id="birdResult" style="display:none">
-        <!-- The race is two SNOWBALLS, not a line chart. On a linear chart to $150k both lines sit
-             flat on the floor until ~45, so the whole point — that Ben has not started — is
-             invisible. Two balls on one shared scale make it obvious: Amy's grows every year while
-             Ben's sits frozen in a drawer until 25. Same visual language as Step 1. -->
-        <div class="center"><span class="yeartag">Age <b id="birdAge" class="mono">8</b></span></div>
-        <div class="lanes">
-          <div class="lane">
-            <div class="lane-top">🐦 <b>Amy</b> <span class="muted">— in at 8</span></div>
-            <div class="lane-stage">
-              <svg viewBox="0 0 160 130" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-                <line x1="8" y1="122" x2="152" y2="122" stroke="var(--bd2)" stroke-width="3" stroke-linecap="round"/>
-                <circle id="ballA" cx="80" cy="118" r="4.4" fill="#fff" stroke="#1a8754" stroke-width="3"/>
-              </svg>
-            </div>
-            <div class="lane-val mono" id="valA" style="color:var(--g-text)">$1,000</div>
-            <div class="lane-dbl" id="dblA"></div>
-          </div>
-          <div class="lane">
-            <div class="lane-top">🦉 <b>Ben</b> <span class="muted">— in at 25</span></div>
-            <div class="lane-stage">
-              <svg viewBox="0 0 160 130" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-                <line x1="8" y1="122" x2="152" y2="122" stroke="var(--bd2)" stroke-width="3" stroke-linecap="round"/>
-                <circle id="ballB" cx="80" cy="118" r="4.4" fill="#fff" stroke="#2563eb" stroke-width="3"/>
-              </svg>
-              <div class="lane-sleep" id="benSleep">😴 still in the drawer</div>
-            </div>
-            <div class="lane-val mono" id="valB" style="color:var(--b-text)">$1,000</div>
-            <div class="lane-dbl" id="dblB"></div>
-          </div>
-        </div>
+        <!-- A RACE, not two boxes getting bigger. One shared track, two cars, a finish line at 60.
+             The track is marked in doublings and says so on its face — see the .trackwrap comment
+             in the stylesheet for why, and .truthbar below for how that compression is paid back. -->
+        <div class="center"><span class="yousaid" id="birdYouSaid"></span></div>
+        <div class="center" style="margin-top:8px"><span class="yeartag">Age <b id="birdAge" class="mono">8</b></span></div>
+        <div class="trackwrap" id="birdTrack"></div>
+        <div class="trackcap">🏁 Every flag is <b>double</b> the flag before it. The finish line is age <b>60</b>.</div>
         <div class="note" id="birdLive" style="display:none"></div>
+        <div class="verdict" id="birdVerdict"></div>
+        <div class="truthbar" id="birdTruth">
+          <div class="tiny" style="margin-bottom:9px"><b>And here is the plain money</b> — no flags, no doublings, just dollars side by side:</div>
+          <!-- ONE grid for both rows, not a grid per row: sibling grids size their 1fr column
+               independently, so Ben's shorter "$28,102" bought him a wider bar and drew him at
+               20.3% of Amy when the true figure is 19.8%. On the element whose entire job is the
+               honest linear comparison, that is the one error we cannot ship. -->
+          <div class="tb-grid">
+            <span class="tb-name">🐦 Amy</span><div class="tb-track"><i id="tbA" style="background:var(--g)"></i></div><b class="tb-val" id="tbAv" style="color:var(--g-text)">—</b>
+            <span class="tb-name">🦉 Ben</span><div class="tb-track"><i id="tbB" style="background:var(--b)"></i></div><b class="tb-val" id="tbBv" style="color:var(--b-text)">—</b>
+          </div>
+          <p class="tiny" style="margin:2px 0 0; color:var(--t3-text)" id="tbNote"></p>
+        </div>
         <div class="chart" id="birdChart"></div>
         <div class="legend"><span><i style="background:var(--g)"></i>Amy (starts at 8)</span><span><i style="background:var(--b)"></i>Ben (starts at 25)</span></div>
         <div class="note" id="birdMsg"></div>
@@ -992,6 +1021,49 @@ function selfTest(){
   // as 2^(difference) — that would claim 8x when the honest ratio is 5.05x.
   t.push(['bird doublings 7 vs 4', birdDoubles(birdEnd(BIRD_START))===7 && birdDoubles(birdEnd(BEN_STARTS))===4]);
   t.push(['bird same money in',    birdPath(BIRD_START).find(p=>p.a===BIRD_START).v === birdPath(BEN_STARTS).find(p=>p.a===BEN_STARTS).v]);
+  // --- the race track ---
+  // Ben PARKED is the whole lesson: his position must not drift by a pixel from 8 to 24, and he
+  // must be sitting exactly on the start line while he does it.
+  const benParked=[]; for(let a=BIRD_START;a<BEN_STARTS;a++) benParked.push(birdX(birdDbl(BEN_STARTS,a)));
+  t.push(['track Ben unmoved 8..24', benParked.every(x=>x===benParked[0])]);
+  t.push(['track Ben parked on the start line', benParked[0]===TRK.x0]);
+  t.push(['track Amy moves every year 8..24',
+    Array.from({length:BEN_STARTS-BIRD_START-1},(_,i)=>BIRD_START+i)
+      .every(a=>birdX(birdDbl(BIRD_START,a+1)) > birdX(birdDbl(BIRD_START,a)))]);
+  // Constant rate => constant doublings/yr => identical speed once invested. That equality is the
+  // picture the race makes ("same car, Ben just left late"), so it is pinned.
+  const spdA=birdX(birdDbl(BIRD_START,40))-birdX(birdDbl(BIRD_START,39));
+  const spdB=birdX(birdDbl(BEN_STARTS,40))-birdX(birdDbl(BEN_STARTS,39));
+  t.push(['track both cars same speed once invested', approx(spdA,spdB,1e-9)]);
+  t.push(['track Amy finishes on the line', approx(birdX(birdDbl(BIRD_START,BIRD_END)), TRK.x1, 1e-9)]);
+  // The declared distortion: the track flatters Ben (67% of the way on 20% of the money). If this
+  // ever silently drifts we want to know, because .truthbar's copy quotes both figures.
+  const trackFrac=(birdX(birdDbl(BEN_STARTS,BIRD_END))-TRK.x0)/(TRK.x1-TRK.x0);
+  const moneyFrac=birdEnd(BEN_STARTS)/birdEnd(BIRD_START);
+  t.push(['track flatters Ben ~67% on ~20% of the money', approx(trackFrac,0.673,0.01) && approx(moneyFrac,0.198,0.005)]);
+  t.push(['truthbar bar uses MONEY not track position', moneyFrac < trackFrac]);
+  // Both bars must hang off ONE grid, or the 1fr column resolves per row and the comparison lies.
+  // (A width check cannot catch this: the bars are display:none at init, so both measure 0.)
+  const tbTracks=[...document.querySelectorAll('.tb-track')];
+  t.push(['truthbar bars share one grid', tbTracks.length===2 && tbTracks[0].parentElement===tbTracks[1].parentElement]);
+  // Flags are the doublings, labelled in dollars: 8 flags from $1k to $128k.
+  t.push(['track 8 flags $1k..$128k', TRK.flags===8 && fmtShort(BIRD_LUMP*Math.pow(2,7))==='$128k']);
+  // Pacing: brisk while Ben is parked, a long HOLD when he starts, decelerating into the finish.
+  t.push(['bird race decelerates', birdDelay(60)>birdDelay(50) && birdDelay(50)>birdDelay(30) && birdDelay(30)>birdDelay(15)]);
+  t.push(['bird holds the beat at 25', birdDelay(BEN_STARTS)>birdDelay(BEN_STARTS-1)*4]);
+  // The guess must be READ. Three answers, three genuinely different screens — the old version
+  // ignored `pick` at tap time and collapsed "Ben" and "same" into one message.
+  const vA=birdVerdictFor('amy',142043,28102), vB=birdVerdictFor('ben',142043,28102), vS=birdVerdictFor('same',142043,28102);
+  t.push(['guess: 3 distinct verdict styles', new Set([vA.cls,vB.cls,vS.cls]).size===3]);
+  t.push(['guess: 3 distinct verdict texts',  new Set([vA.html,vB.html,vS.html]).size===3]);
+  t.push(['guess: only Amy is marked correct', vA.cls==='right' && vB.cls!=='right' && vS.cls!=='right']);
+  t.push(['guess: each verdict names the choice back',
+    /You said Amy/.test(vA.html) && /You said Ben/.test(vB.html) && /about the same/i.test(vS.html)]);
+  t.push(['guess: a wrong answer is never scolded', ![vB.html,vS.html].some(h=>/wrong|fail|no!|bad/i.test(h))]);
+  t.push(['guess: wrong answers sound different from right', typeof sfx.boing==='function' && sfx.boing!==sfx.fanfare]);
+  // Totals are the answer: they must start hidden, or the race is spoiled before it runs.
+  t.push(['bird totals start hidden', document.getElementById('amyTot').textContent.trim()==='?'
+                                   && document.getElementById('benTot').textContent.trim()==='?']);
   // The percent gloss must be arithmetically true, or we are teaching a lie in plain words.
   t.push(['gloss: 20% of $5 = $1', Math.abs(5*0.20-1)<1e-9]);
   t.push(['gloss: 10% of $10 = $1', Math.abs(10*0.10-1)<1e-9]);
@@ -1345,6 +1417,10 @@ const sfx={
   grow:  (n)=>tone(300*Math.pow(1.09, n), 0.16, {type:'triangle', vol:0.15}),
   whoosh:()=>tone(220, 0.42, {type:'sawtooth', vol:0.09, slideTo:1400}),
   sad:   ()=>tone(300, 0.3, {type:'sine', vol:0.12, slideTo:150}),
+  // A wrong guess is a "whoops-a-daisy", NOT the sad tone (that one is reserved for the piggy
+  // bank, where flat really is the bad news). Down-then-up reads as cartoon, not as failure.
+  boing: ()=>{ tone(520, 0.13, {type:'triangle', vol:0.13, slideTo:250});
+               tone(300, 0.20, {type:'triangle', vol:0.13, delay:0.12, slideTo:660}); },
   fanfare:()=>{ [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f, 0.34, {type:'triangle', vol:0.17, delay:i*0.085})); }
 };
 function toggleSfx(){
@@ -1457,6 +1533,12 @@ function redrawCharts(){
     const h=document.getElementById(id);
     if(h && h.clientWidth) paintChart(id, CHART_STATE[id].series, CHART_STATE[id].o);
   });
+  // The race track is hand-built SVG rather than a drawChart series, so it needs the same
+  // rebuild-on-resize treatment. Rebuild wipes the cars' positions, so re-place them after.
+  const trk=document.getElementById('birdTrack');
+  // (window._birdAge, not a top-level `let`: redrawCharts can run before a const further down the
+  // file has initialised, and touching one in its TDZ throws and blanks the page. See selfTest.)
+  if(trk && trk.clientWidth && trk.firstChild){ birdTrackBuild(); birdTrackMove(window._birdAge||BIRD_START); }
 }
 function paintChart(hostId, series, o){
   const host=document.getElementById(hostId); if(!host) return;
@@ -1684,19 +1766,97 @@ function birdPath(investAt){
 }
 const birdEnd=at=>birdPath(at)[birdPath(at).length-1].v;
 const birdValAt=(investAt,a)=> a<investAt ? BIRD_LUMP : BIRD_LUMP*Math.pow(1+BIRD_R/100, a-investAt);
-// Ball AREA is the money, so radius tracks sqrt — and both lanes share Amy's final as the scale,
-// which is what makes "Amy's is ~5x bigger" honest rather than decorative.
-function birdBall(id, v){
-  const r=52*Math.sqrt(v/birdEnd(BIRD_START));
-  const el=document.getElementById(id);
-  el.setAttribute('r', r.toFixed(1)); el.setAttribute('cy', (122-r).toFixed(1));
-}
 // Countable compounding: each ✨ is one doubling of the original $1,000.
 const birdDoubles=v=>Math.max(0, Math.floor(Math.log2(v/BIRD_LUMP)));
+
+/* --- the track ---------------------------------------------------------------------------
+   Position along the track is DOUBLINGS COMPLETED, not dollars. The full argument for that
+   choice, and the honesty debt it creates, are written out in the .trackwrap comment in the
+   stylesheet; the short version is that a linear-to-$142k track pins BOTH racers on the start
+   line until ~45, and the debt is repaid by the linear .truthbar at the finish.
+   Because the rate is constant, doublings-per-year is constant too: an invested racer moves at
+   a FIXED speed, so the picture is "same car, same speed, Ben set off 17 years late". */
+// x0 leaves room for the money pill that rides above each car at its LEFTMOST position, and
+// (W - x1) for the widest pill, "$142,043", at the finish. Without that margin the number the
+// whole step exists to show gets clipped by the viewBox at exactly the two moments it matters.
+const TRK={W:360, H:182, x0:48, x1:310, laneA:82, laneB:162, flags:8};
+const birdDbl=(investAt,a)=> a<investAt ? 0 : (a-investAt)*Math.log2(1+BIRD_R/100);
+const BIRD_FULL=birdDbl(BIRD_START, BIRD_END);                 // 7.150 doublings = Amy's finish
+const birdX=d=> TRK.x0 + (TRK.x1-TRK.x0)*Math.min(d/BIRD_FULL, 1);
+function birdCar(id, colour, driver, fsMoney, pillW){
+  const hp=(pillW/2).toFixed(1);
+  return `<g id="${id}" class="racer" transform="translate(${TRK.x0},${TRK.laneA})">`
+    + `<rect x="-${hp}" y="${(-33-fsMoney).toFixed(1)}" width="${pillW.toFixed(1)}" height="${(fsMoney+5).toFixed(1)}" rx="${((fsMoney+5)/2).toFixed(1)}" fill="var(--bg2)" stroke="${colour}" stroke-width="1.2"/>`
+    + `<text id="money${id.slice(-1)}" x="0" y="-31" font-size="${fsMoney}" font-weight="700" text-anchor="middle" fill="${colour}">$1,000</text>`
+    + `<ellipse cx="0" cy="5" rx="20" ry="3.2" fill="rgba(0,0,0,.10)"/>`
+    + `<path d="M-9,-13 L-5,-23 L7,-23 L11,-13 Z" fill="${colour}" opacity=".5"/>`
+    + `<rect x="-19" y="-13" width="38" height="11" rx="5" fill="${colour}"/>`
+    + `<rect x="14" y="-11.5" width="5.5" height="4" rx="2" fill="#fff" opacity=".75"/>`
+    + `<circle cx="-11" cy="0" r="5" fill="#2a2a28"/><circle cx="-11" cy="0" r="1.9" fill="#8a8a82"/>`
+    + `<circle cx="11" cy="0" r="5" fill="#2a2a28"/><circle cx="11" cy="0" r="1.9" fill="#8a8a82"/>`
+    + `<text x="1" y="-14.5" font-size="11" text-anchor="middle">${driver}</text></g>`;
+}
+function birdTrackBuild(){
+  const host=document.getElementById('birdTrack'); if(!host) return;
+  // SVG text is measured in viewBox user units, so the container scales it — the same trap
+  // paintChart documents. Measured, not assumed: at a fixed 11 units these labels rendered at
+  // 8.5px on a 375px phone, under this page's own floor for kid-facing text.
+  const scale=Math.min((host.clientWidth||TRK.W), 460)/TRK.W || 1;
+  const upx=n=>+(n/Math.max(scale,0.05)).toFixed(1);           // wanted on-screen px -> user units
+  const fsFlag=upx(10.5), fsMoney=upx(11), fsHdr=upx(11);
+  const pillW=fsMoney*5.6;                                     // fits the widest figure, "$142,043"
+  const gap=(birdX(TRK.flags-1)-TRK.x0)/(TRK.flags-1);
+  // When the labels would collide at a legible size, label every OTHER flag and let the tick
+  // lines carry the rest. Shrinking them to fit was the wrong trade on a page read by a 7-year-old.
+  const every = (fsFlag*2.9) > gap*0.92 ? 2 : 1;
+  let g='';
+  [22,102].forEach(y=>{ g+=`<rect x="8" y="${y}" width="344" height="72" rx="12" fill="var(--bg3)"/>`; });
+  // doubling flags, labelled with the money each one stands for — this is what makes the
+  // compression legible on the page rather than a hidden axis
+  for(let k=0;k<TRK.flags;k++){
+    const x=birdX(k);
+    g+=`<line x1="${x.toFixed(1)}" y1="20" x2="${x.toFixed(1)}" y2="176" stroke="var(--bd2)" stroke-width="1" stroke-dasharray="3 5"/>`;
+    if(k%every===0) g+=`<text x="${x.toFixed(1)}" y="14" font-size="${fsFlag}" text-anchor="middle" fill="var(--t3-text)">${fmtShort(BIRD_LUMP*Math.pow(2,k))}</text>`;
+  }
+  // finish line at age 60: a chequered band centred on the line itself
+  for(let row=0;row<8;row++) for(let col=0;col<2;col++){
+    g+=`<rect x="${TRK.x1-5+col*5}" y="${(20+row*19.5).toFixed(1)}" width="5" height="19.5" `
+     + `fill="${(row+col)%2 ? '#1a1a18' : '#ffffff'}" opacity=".9"/>`;
+  }
+  g+=`<text x="${TRK.x1}" y="14" font-size="${fsFlag}" text-anchor="middle">🏁</text>`;
+  // lane headers (Ben's doubles as the engine-off sign, which is where the lesson lives)
+  g+=`<text id="hdrA" x="14" y="33" font-size="${fsHdr}" fill="var(--t3-text)">🐦 Amy — in at 8</text>`;
+  g+=`<text id="hdrB" x="14" y="113" font-size="${fsHdr}" fill="var(--t3-text)">🦉 Ben — 😴 asleep in the drawer</text>`;
+  g+=`<text id="zzz" x="${TRK.x0+26}" y="146" font-size="${upx(12)}">💤</text>`;
+  g+=birdCar('carA','#1a8754','🐦',fsMoney,pillW)+birdCar('carB','#2563eb','🦉',fsMoney,pillW);
+  host.innerHTML=`<svg viewBox="0 0 ${TRK.W} ${TRK.H}" role="img" aria-label="Amy and Ben racing to age 60">${g}</svg>`;
+}
+function birdTrackMove(a){
+  const gA=document.getElementById('carA'), gB=document.getElementById('carB');
+  if(!gA||!gB) return;
+  window._birdAge=a;                     // so a resize rebuild can restore the cars where they were
+  gA.setAttribute('transform', `translate(${birdX(birdDbl(BIRD_START,a)).toFixed(2)},${TRK.laneA})`);
+  gB.setAttribute('transform', `translate(${birdX(birdDbl(BEN_STARTS,a)).toFixed(2)},${TRK.laneB})`);
+  document.getElementById('moneyA').textContent=fmt(birdValAt(BIRD_START,a));
+  document.getElementById('moneyB').textContent=fmt(birdValAt(BEN_STARTS,a));
+  // Ben is not slow — he is SWITCHED OFF. No transition, dimmed, engine-off sign, 💤 parked
+  // beside him. That stalled start is the whole lesson, so it has to be unmistakable.
+  const parked=a<BEN_STARTS;
+  gB.classList.toggle('parked', parked);
+  gB.setAttribute('opacity', parked?'.55':'1');
+  document.getElementById('zzz').setAttribute('opacity', parked?'1':'0');
+  document.getElementById('hdrB').textContent = parked
+    ? '🦉 Ben — 😴 asleep in the drawer' : '🦉 Ben — started at 25, same $1,000';
+}
+/* Pacing, per the Step 0 wyrDelay precedent: constant speed blurs compounding. Brisk through the
+   years Ben is parked, a long HOLD at 25 when his engine finally turns over, then decelerate hard
+   into the finish so the last (largest) doublings land one at a time. ~9.7s in total. */
 function birdDelay(a){
-  if(a===BEN_STARTS) return 950;   // hold the beat where Ben finally wakes up
-  if(a>=55) return 170;            // slow into the finish, where the gap really opens
-  return 75;
+  if(a===BEN_STARTS) return 1150;        // the beat: Ben wakes up, and the gap is already huge
+  if(a<BEN_STARTS)   return 80;          // Amy pulls away while Ben sits still
+  if(a<46)           return 110;         // both cruising, gap frozen — the least new information
+  if(a<52)           return 150;
+  return 240 + (a-52)*55;                // savour the finish: age 60 lands at ~680ms
 }
 function birdDraw(upto, done){
   const amy=birdPath(BIRD_START).filter(p=>p.a<=upto);
@@ -1706,30 +1866,61 @@ function birdDraw(upto, done){
     {name:'Amy', color:'#1a8754', pts:amy, fill:true, w:3.5, tag: done?fmt(amy[amy.length-1].v):''}
   ], {xPrefix:'age ', noFade:true});
 }
+/* Predict-then-reveal only works if the prediction is visibly HELD and then explicitly settled.
+   The old version ignored `pick` entirely at tap time — it lit Amy up and printed both totals
+   before the race had run, so tapping "Ben" showed a child their answer being overwritten with
+   no acknowledgement, and spoiled the result into the bargain. Now: the choice is recorded and
+   echoed, the totals stay "?" until the finish, and all THREE answers land a different screen.
+   Wrong must be fun. "About the same" is not simply wrong — that child is right about the money
+   IN and wrong about the money OUT, which is the most useful place to be. */
+let birdPick=null;
+const BIRD_SAID={amy:'🐦 Amy', ben:'🦉 Ben', same:'🤝 About the same'};
+function birdVerdictFor(pick, amyT, benT){
+  const gap=fmt(amyT-benT), times=(amyT/benT).toFixed(2);
+  if(pick==='amy') return {cls:'right', html:
+    `<b class="vh">🎉 You said Amy — and you were RIGHT!</b>`
+    + `Amy wins, and it is not close: <b>${times}×</b> more money. Waiting 17 years cost Ben <b>${gap}</b>, `
+    + `and he did not put in a single cent less. He just started later.`};
+  if(pick==='ben') return {cls:'oops', html:
+    `<b class="vh">🙃 You said Ben — good guess, but Amy got there first!</b>`
+    + `It is a fair guess: Ben is older, and grown-ups usually have more money. But this race was `
+    + `never about who is older — it was about who <b>started earlier</b>. Ben spent 17 years parked `
+    + `at the start line, and it cost him <b>${gap}</b>.`};
+  return {cls:'half', html:
+    `<b class="vh">🤔 You said "about the same" — you were half right!</b>`
+    + `You were right about the money going <b>in</b>: they each put in exactly <b>$1,000</b>, not a `
+    + `cent apart. But the money coming <b>out</b> is nowhere near the same — Amy ends with <b>${times}×</b> `
+    + `Ben's, a gap of <b>${gap}</b>. Same money in, wildly different money out. That is what starting early does.`};
+}
 function birdGuess(pick){
+  birdPick=pick;
+  // hold the prediction on screen: chip + the button stays visibly chosen
+  ['pickAmy','pickBen','pickSame'].forEach(id=>document.getElementById(id).classList.remove('picked'));
+  document.getElementById({amy:'pickAmy',ben:'pickBen',same:'pickSame'}[pick]).classList.add('picked');
+  document.getElementById('birdYouSaid').innerHTML=`You said <b>${BIRD_SAID[pick]}</b> — now watch!`;
+  sfx.pick();
   const amyT=birdEnd(BIRD_START), benT=birdEnd(BEN_STARTS);
-  document.getElementById('amyTot').textContent=fmt(amyT);
-  document.getElementById('benTot').textContent=fmt(benT);
-  document.getElementById('birdA').classList.add('win');
-  document.getElementById('birdB').classList.add('lose');
+  // the totals are the ANSWER: they stay hidden until the race has actually been run
+  document.getElementById('amyTot').textContent='?';
+  document.getElementById('benTot').textContent='?';
+  document.getElementById('birdA').classList.remove('win','lose');
+  document.getElementById('birdB').classList.remove('win','lose');
   const res=document.getElementById('birdResult'); res.style.display='block';
   res.classList.remove('reveal'); void res.offsetWidth; res.classList.add('reveal');
-  bringIntoView(res);                     // the chart is the point; do not make them hunt for it
+  bringIntoView(res);                     // the race is the point; do not make them hunt for it
   document.getElementById('birdMsg').innerHTML='';
+  const verdict=document.getElementById('birdVerdict'); verdict.className='verdict'; verdict.innerHTML='';
+  const truth=document.getElementById('birdTruth'); truth.classList.remove('show');
+  document.getElementById('tbA').style.width='0'; document.getElementById('tbB').style.width='0';
   const live=document.getElementById('birdLive'); live.style.display='block';
-  live.innerHTML='🐦 Amy puts her $1,000 in at <b>8</b>. 🦉 Ben keeps his in a drawer — watch his snowball do <b>nothing</b>…';
+  live.innerHTML='🚦 <b>Off they go!</b> 🐦 Amy invests her $1,000 at <b>8</b>. 🦉 Ben leaves his in a drawer — watch his car do <b>nothing</b>…';
   const chart=document.getElementById('birdChart'); chart.style.display='none';   // chart is the epilogue
-  const sleep=document.getElementById('benSleep'); sleep.style.display='block';
+  birdTrackBuild();
   let a=BIRD_START, lastDA=0, lastDB=0;
   const render=()=>{
-    const va=birdValAt(BIRD_START,a), vb=birdValAt(BEN_STARTS,a);
     document.getElementById('birdAge').textContent=a;
-    document.getElementById('valA').textContent=fmt(va);
-    document.getElementById('valB').textContent=fmt(vb);
-    birdBall('ballA', va); birdBall('ballB', vb);
-    const da=birdDoubles(va), db=birdDoubles(vb);
-    document.getElementById('dblA').textContent='✨'.repeat(da);
-    document.getElementById('dblB').textContent='✨'.repeat(db);
+    birdTrackMove(a);
+    const da=birdDoubles(birdValAt(BIRD_START,a)), db=birdDoubles(birdValAt(BEN_STARTS,a));
     if(da>lastDA){ sfx.grow(da+4); lastDA=da; }   // a beat every time her money doubles
     if(db>lastDB){ sfx.grow(db+4); lastDB=db; }
   };
@@ -1738,21 +1929,38 @@ function birdGuess(pick){
   const step=()=>{
     a++;
     if(a===BEN_STARTS){
-      sleep.style.display='none';
-      live.innerHTML='🦉 <b>Ben finally starts at 25</b> — same $1,000. But look how much bigger Amy\'s snowball already is.';
+      live.innerHTML='🦉 <b>Ben\'s engine finally starts at 25</b> — same $1,000, same speed from here. But look how far ahead Amy already is.';
       sfx.whoosh();
     }
     render();
     if(a>=BIRD_END){
       clearTimeout(window._bird);
-      const times=(amyT/benT).toFixed(1);
-      live.innerHTML=`🤯 <b>Same $1,000. Same 10%.</b> Amy's money doubled <b>${birdDoubles(amyT)}</b> times; Ben's only <b>${birdDoubles(benT)}</b> — so she ends with <b>${times}×</b> more, purely for starting earlier.`;
-      document.getElementById('birdMsg').innerHTML = (pick==='amy')
-        ? `🎉 <b>Correct — Amy wins, and it is not close.</b> Waiting 17 years cost Ben <b>${fmt(amyT-benT)}</b>. He did not put in a single cent less. He just started later.`
-        : `😮 <b>Amy wins — by a mile.</b> Both put in exactly <b>$1,000</b>, so this is not about saving harder. Waiting 17 years cost Ben <b>${fmt(amyT-benT)}</b>.`;
+      live.innerHTML=`🤯 <b>Same $1,000. Same 10%. Same speed.</b> Amy's money doubled <b>${birdDoubles(amyT)}</b> times; Ben's only <b>${birdDoubles(benT)}</b> — she crossed the line <b>${(amyT/benT).toFixed(2)}×</b> ahead, purely for setting off earlier.`;
+      document.getElementById('amyTot').textContent=fmt(amyT);
+      document.getElementById('benTot').textContent=fmt(benT);
+      document.getElementById('birdA').classList.add('win');
+      document.getElementById('birdB').classList.add('lose');
+      const v=birdVerdictFor(pick, amyT, benT);
+      verdict.className='verdict show '+v.cls; verdict.innerHTML=v.html;
+      // repay the track's compression in plain linear dollars, out loud
+      truth.classList.add('show');
+      document.getElementById('tbAv').textContent=fmt(amyT);
+      document.getElementById('tbBv').textContent=fmt(benT);
+      document.getElementById('tbNote').innerHTML=`On the race track Ben looked about two-thirds of the way home, because the flags count <b>doublings</b>. In plain dollars he has <b>${(benT/amyT*100).toFixed(0)}%</b> of Amy's — she has <b>${(amyT/benT).toFixed(2)}×</b> his.`;
+      // Flush the display:none -> block change with a forced reflow (the .reveal idiom used above)
+      // rather than waiting on requestAnimationFrame: rAF does not fire in a backgrounded tab, so
+      // a page left in the background at this instant would show two empty bars until refocused.
+      const tbA=document.getElementById('tbA'), tbB=document.getElementById('tbB');
+      void tbA.offsetWidth;
+      tbA.style.width='100%'; tbB.style.width=(benT/amyT*100).toFixed(1)+'%';
+      document.getElementById('birdMsg').innerHTML=`Both put in exactly <b>$1,000</b>, so this was never about saving harder. Amy's money simply had <b>52 years</b> to double; Ben's had <b>35</b>.`;
       chart.style.display='';                    // now the whole journey, as the epilogue
       birdDraw(BIRD_END, true);
-      confettiBurst(); sfx.fanfare(); showTake(4);
+      confettiBurst(); showTake(4);
+      // right and wrong must SOUND different — but wrong gets a playful boing, never the sad tone,
+      // and everyone still gets the fanfare, because the reveal is the reward, not the score.
+      if(pick==='amy') sfx.fanfare();
+      else { sfx.boing(); setTimeout(()=>sfx.fanfare(), 480); }
       return;
     }
     window._bird=setTimeout(step, birdDelay(a+1));
