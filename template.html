@@ -193,10 +193,17 @@ body.older .younger-only.inline{display:none}
 .gu-val{font-family:var(--mono); color:var(--joy); font-weight:700}
 .gu-first{font-family:var(--mono); font-weight:700; font-size:18px; color:var(--t2); padding:6px 0 2px}
 /* Scrub read-out: every rate's value at the hovered age. min-height stops the layout jumping. */
-.gu-scrub{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:4px 12px;
-  min-height:24px; margin:6px 0 2px; font-size:13px; font-family:var(--mono)}
+/* Reads as the chart's output panel, not a caption. Persistent border + min-height so swapping
+   between the hint and the values never shifts the layout under the pointer. */
+.gu-scrub{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:5px 13px;
+  min-height:44px; margin:8px 0 2px; padding:8px 10px; font-size:14px; font-family:var(--mono);
+  background:var(--bg3); border:1px solid var(--bd); border-radius:12px}
+/* On a phone the six values wrap onto more lines than the hint, so reserve the taller height —
+   otherwise everything below jumps ~37px while a finger is dragging across the chart. */
+@media(max-width:520px){ .gu-scrub{min-height:92px; font-size:13px; gap:4px 10px} }
 .gu-scrub b{font-weight:700}
-.gu-scrub .muted{color:var(--t3-text); font-family:var(--sans)}
+.gu-scrub .age{font-size:15px; color:var(--t1); padding-right:2px}
+.gu-scrub .muted{color:var(--t3-text); font-family:var(--sans); font-size:13px}
 .chart{cursor:crosshair}
 .snow-readout{display:flex; justify-content:center; align-items:baseline; gap:10px; margin-top:6px}
 .yeartag{font-family:var(--mono); font-size:14px; color:var(--t3-text)}
@@ -1445,6 +1452,11 @@ function paintChart(hostId, series, o){
     const last=s.pts[s.pts.length-1];
     if(s.tag) g+=`<text class="lb" font-size="${lbFS}" x="${(X(last.a)-4).toFixed(1)}" y="${(Y(last.v)-7).toFixed(1)}" text-anchor="end" fill="${s.color}">${s.tag}</text>`;
   });
+  // Scrub markers: a dot on every line at the hovered age, so the read-out is visibly tied to the
+  // lines. Chosen over a floating tooltip because six series make a ~120px box that would cover
+  // the chart it is explaining — unusable on a phone, where a finger already hides the point.
+  if(o.markAt!=null) series.forEach(s=>{ const p=s.pts.find(x=>x.a===o.markAt);
+    if(p) g+=`<circle cx="${X(p.a).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="${upx(4)}" fill="${s.color}" stroke="#fff" stroke-width="${upx(1.5)}"/>`; });
   // axes: age ticks + top value label
   [a0, Math.round((a0+a1)/2), a1].forEach(a=>{
     g+=`<text class="ax" font-size="${axFS}" x="${X(a).toFixed(1)}" y="${H-6}" text-anchor="middle">${o.xPrefix||''}${a}</text>`;
@@ -1714,19 +1726,20 @@ function guDrawChart(scrubAge){
   // 65 so the final tick IS the age-65 column. Milestones only read on log (even spacing).
   drawChart('guChart', guSeriesCache, {log:guLog, h:250, xPrefix:'age ', noFade:true,
     hlines: guLog ? [{v:1e5,label:'$100k'},{v:1e6,label:'$1m'},{v:1e7,label:'$10m'},{v:1e8,label:'$100m'}] : null,
-    vlines: scrubAge!=null ? [{a:scrubAge, label:'age '+scrubAge}] : null});
+    vlines: scrubAge!=null ? [{a:scrubAge, label:'age '+scrubAge}] : null,
+    markAt: scrubAge});
 }
 function guShowAt(a){
   const el=document.getElementById('guScrub');
   if(a==null){
-    el.innerHTML='<span class="muted">Hover or drag across the chart to read every rate at any age.</span>';
+    el.innerHTML='<span class="muted">👆 Drag across the chart to read every rate at any age.</span>';
     guDrawChart(null); return;
   }
   const chips=guSeriesCache.map(s=>{
     const p=s.pts.find(x=>x.a===a);
     return p?`<span style="color:${s.color}"><b>${s.name}</b> ${fmtShort(p.v)}</span>`:'';
   }).filter(Boolean).join('');
-  el.innerHTML=`<b class="mono">Age ${a}</b>${chips}`;
+  el.innerHTML=`<b class="age">Age ${a}</b>${chips}`;
   guDrawChart(a);
 }
 function guWireScrub(){
